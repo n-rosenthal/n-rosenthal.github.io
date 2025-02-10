@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: "export",  // <=== enables static exports
+  output: "export",
   reactStrictMode: true,
+  basePath: " https://n-rosenthal.github.io/"
 };
 
 module.exports = nextConfig;
