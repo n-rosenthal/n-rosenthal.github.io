@@ -1,1 +1,0 @@
-# n-rosenthal.github.io
