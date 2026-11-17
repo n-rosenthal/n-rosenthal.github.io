@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<!-- 2026-11-17 Tue 20:07 -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Métricas</title>
+<meta name="author" content="Nicolas" />
+<meta name="description" content="Definição (amplo senso) para /métricas/" />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/estudo.css">
+<link rel="alternate" type="application/atom+xml" title="Notas de estudo" href="/feed.xml">
+<script defer src="/js/grafo-local.js"></script>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Métricas">
+<meta property="og:description" content="Definição (amplo senso) para /métricas/">
+<meta property="og:url" content="https://n-rosenthal.github.io/estudo/conceitos/metricas.html">
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav class="nav"><a href="/">Início</a><a href="/grafo.html">Grafo</a><a href="/feed.xml">Feed</a></nav><div class="meta-nota"><span class="selo selo-crescendo">crescendo</span><span>2 min de leitura</span><span>criada em 2026-11-17</span><span>atualizada em 2026-11-17</span></div>
+</div>
+<div id="content" class="content">
+<header>
+<h1 class="title">Métricas</h1>
+</header><nav id="table-of-contents" role="doc-toc">
+<h2>&Iacute;ndice</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orgf522eff">Definição</a></li>
+<li><a href="#org3de83db">Veja também</a></li>
+</ul>
+</div>
+</nav>
+<div id="outline-container-orgf522eff" class="outline-2">
+<h2 id="orgf522eff">Definição</h2>
+<div class="outline-text-2" id="text-orgf522eff">
+<p>
+Uma métrica \( m \) é uma função quantitativa que busca <i>medir</i> determinado <i>atributo</i> de uma <b>entidade</b>, <b>processo</b>, <b>artefato</b> ou <b>sistema</b>:
+</p>
+
+<p>
+\[
+m : E \to V
+\]
+</p>
+
+<p>
+onde \( E \) é o <b>domínio das entidades</b> e \( V \) é o <b>domínio dos valores</b>. Normalmente, \( V \) assume valores inteiros ou reais, <i>i.e.</i>, \( V = \mathbf{R} \) ou \( V = \mathbf{N} \).
+</p>
+
+<div class="exemplo" id="org49ed1ca">
+<p>
+Em <b>Ciência da Computação</b>, algumas métricas comuns são <i>complexidade ciclomática</i>, <i>tempo de execução</i>, <i>taxa de erro</i> e <i>cobertura de código</i> (dentre muitas outras).
+</p>
+
+</div>
+
+<p>
+Nos exemplos acima, e na definição apresentada, estamos aumentando a semântica de <i>métrica</i> para além das definições em <b>espaços métricos</b>:
+</p>
+
+<div class="teorema" id="orge82950b">
+<p>
+O <i>conceito de métrica</i> quando utilizado fora do domínio dos <b>espaços métricos</b> não necessita, obrigatoriamente, satisfazer todos os axiomas destes espaços.
+</p>
+
+</div>
+</div>
+</div>
+<div id="outline-container-org3de83db" class="outline-2">
+<h2 id="org3de83db">Veja também</h2>
+<div class="outline-text-2" id="text-org3de83db">
+<ul class="org-ul">
+<li><code>[Métrica em um Conjunto]</code> (ou <i>métrica espacial</i>, para a definição mais rigorosa em Matemática)</li>
+<li><code>[Métricas de Distância]</code>  (métricas para as quais os axiomas dos espaços métricos são necessários; utilizadas em Ciência da Computação: funções de distância que satisfazem os axiomas métricos, como aquelas utilizadas em <i>nearest-neighbor search</i>, <i>clustering</i>, relações de similariedade, <i>metric embeddings</i> e outros.</li>
+</ul>
+
+<span class="pf-meta" data-pagefind-filter="tipo[data-v]" data-v="conceito"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="concept"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="mathematics/general"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="computer-science/general"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="conceito"></span>
+<span class="pf-meta" data-pagefind-filter="status[data-v]" data-v="crescendo"></span>
+</div>
+</div>
+</div>
+</body>
+</html>
