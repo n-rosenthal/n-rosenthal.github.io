@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<!-- 2026-11-17 Tue 23:05 -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Resolução de exercício em Especificação Formal (Maude)</title>
+<meta name="author" content="Nicolas" />
+<meta name="description" content="Estudo sobre determinação de tipos em Maude" />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/estudo.css">
+<link rel="alternate" type="application/atom+xml" title="Notas de estudo" href="/feed.xml">
+<script defer src="/js/grafo-local.js"></script>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Resolução de exercício em Especificação Formal (Maude)">
+<meta property="og:description" content="Estudo sobre determinação de tipos em Maude">
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav class="nav"><a href="/">Início</a><a href="/grafo.html">Grafo</a><a href="/feed.xml">Feed</a></nav><div class="meta-nota"><span>6 min de leitura</span><span>criada em 2026-11-17</span><span>atualizada em 2026-11-17</span></div>
+</div>
+<div id="content" class="content">
+<header>
+<h1 class="title">Resolução de exercício em Especificação Formal (Maude)</h1>
+<p class="subtitle" role="doc-subtitle">Tipos, sortes e espécies (kinds)</p>
+</header><nav id="table-of-contents" role="doc-toc">
+<h2>&Iacute;ndice</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org7877921">Exercício</a>
+<ul>
+<li><a href="#org21a06f0">Convenções e Regras</a></li>
+<li><a href="#orgc9d2ff3">Fragmentos de Especificações</a></li>
+<li><a href="#orgf70669a">Termos a analisar</a></li>
+<li><a href="#orgdc264e7">Determinação dos Tipos</a>
+<ul>
+<li><a href="#orgc36b0ae">Em `ESPECIE1`</a></li>
+<li><a href="#org11fc66d">Em `ESPECIE2`</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org11d5ffa">Exercício Seguinte</a>
+<ul>
+<li><a href="#org96f09a7">Fragmento de Especificação</a></li>
+<li><a href="#orgbf063a8">Tabela de Determinação dos Tipos</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav>
+<div id="outline-container-org7877921" class="outline-2">
+<h2 id="org7877921">Exercício</h2>
+<div class="outline-text-2" id="text-org7877921">
+<p>
+Dadas dois fragmentos de especificação em Maude, devemos determinar os tipos de certos termos. Em Maude, um <b>tipo</b> é definido como um supersorte sobre <b>espécies</b> (ou <i>kinds</i>) e <b>sortes</b>.
+</p>
+</div>
+<div id="outline-container-org21a06f0" class="outline-3">
+<h3 id="org21a06f0">Convenções e Regras</h3>
+<div class="outline-text-3" id="text-org21a06f0">
+<div class="margem" id="orge0b5efb">
+<p>
+Em Maude, a espécie de um termo mal tipado é denotada por colchetes, como em \([Nat]\) ou \([Int]\).
+</p>
+
+</div>
+
+<p>
+Neste documento, escrevemos \(s' \ll s\) para indicar que o sorte \(s'\) é subsorte de \(s\), isto é, que \(\mathbf{T}_{s'} \subseteq \mathbf{T}_{s}\). Escrevemos \(s' \not\ll s\) para indicar que \(s'\) não é subsorte de \(s\).
+</p>
+
+<p>
+Em Maude, o tipo de um termo pode ser:
+</p>
+<ul class="org-ul">
+<li>um <b><b>sorte</b></b> \(s\), quando o termo é bem tipado e sua menor sorte é \(s\);</li>
+<li>uma <b><b>espécie</b></b> \([s]\), quando o termo é mal tipado ou quando não há sorte suficiente para classificá-lo; nesse caso, toma-se o sorte máximo \(s\) do componente conectado relevante.</li>
+</ul>
+
+<p>
+As duas regras usadas nas resoluções são:
+</p>
+
+<p>
+<b><b>Regra (5) — sucesso de tipagem.</b></b>
+\[
+\frac{
+\mathrm{op}\ s_1 \cdots s_n \to s
+}{
+\mathrm{op}(s_1',\ldots,s_n') \to s
+}
+\qquad
+\text{se } s \in S \text{ e } s_i' \ll s_i \text{ para todo } i.
+\]
+</p>
+
+<p>
+<b><b>Regra (6) — termo mal tipado.</b></b>
+\[
+\frac{
+\mathrm{op}\ s_1 \cdots s_i \cdots s_n \to s
+}{
+\mathrm{op}(s_1',\ldots,s_i',\ldots,s_n') \to [s]
+}
+\qquad
+\text{se } s \in S \text{ e, para algum } i,\ s_i' \not\ll s_i.
+\]
+</p>
+</div>
+</div>
+<div id="outline-container-orgc9d2ff3" class="outline-3">
+<h3 id="orgc9d2ff3">Fragmentos de Especificações</h3>
+<div class="outline-text-3" id="text-orgc9d2ff3">
+<div class="org-src-container">
+<pre class="src src-maude">fmod ESPECIE1 is
+  protecting NAT .
+  op op_ : NzNat -&gt; Nat .
+endfm
+</pre>
+</div>
+
+<p>
+Na especificação `ESPECIE1`, estamos importando os números naturais através de `protecting NAT.` e definindo uma operação que recebe um argumento do sorte `NzNat` (naturais com exceção do zero) e produz um termo do sorte `Nat` (natural qualquer, inclusive o zero).
+</p>
+
+<div class="org-src-container">
+<pre class="src src-maude">fmod ESPECIE2 is
+  protecting INT .
+  op op_ : NzNat -&gt; Int .
+endfm
+</pre>
+</div>
+
+<p>
+Na especificação `ESPECIE2`, importamos os números inteiros através de `protecting INT.`. A operação recebe um termo de `NzNat` e retorna um número inteiro (um termo do sorte `Int`).
+</p>
+</div>
+</div>
+<div id="outline-container-orgf70669a" class="outline-3">
+<h3 id="orgf70669a">Termos a analisar</h3>
+<div class="outline-text-3" id="text-orgf70669a">
+<p>
+Devemos determinar os tipos dos termos `op -3`, `op 0` e `op 3`.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdc264e7" class="outline-3">
+<h3 id="orgdc264e7">Determinação dos Tipos</h3>
+<div class="outline-text-3" id="text-orgdc264e7">
+</div>
+<div id="outline-container-orgc36b0ae" class="outline-4">
+<h4 id="orgc36b0ae">Em `ESPECIE1`</h4>
+<div class="outline-text-4" id="text-orgc36b0ae">
+<ol class="org-ol">
+<li><p>
+<b><b>`op -3`</b></b>: O termo é uma <i>erro sintático</i>. O Maude retorna `didn't expect token -3`. 
+Isso ocorre porque os números negativos não são definidos em `NAT`, que importamos para `ESPECIE1`. Portanto, `-3` não é um termo bem-formado e não possui tipo.
+</p>
+
+<p>
+\[
+   \boxed{\texttt{op -3}: \text{erro sintático; não há tipo.}}
+   \]
+</p></li>
+
+<li><p>
+<b><b>`op 0`</b></b>: Tipo <b>espécie</b> `[Nat]`. 
+A operação `op_` é definida para o parâmetro `NzNat`, portanto não é possível aplicá-la sobre zero. Seu tipo é a espécie `[Nat]`. Para descobrirmos qual sorte deverá ser tomado para formar a espécie de um termo "errado", devemos encontrar o sorte <b>máximo</b> do componente conectado da especificação `NAT`, que é `Nat`.
+</p>
+
+<p>
+Pelas regras, temos:
+</p>
+<ol class="org-ol">
+<li>\( \text{Zero} \not\ll \text{NzNat} \) (zero não está contido em non-zero naturals); e</li>
+<li>Regra (6).</li>
+</ol>
+
+<p>
+\[
+   \boxed{\texttt{op 0} : [\textit{Nat}].}
+   \]
+</p></li>
+
+<li><p>
+<b><b>`op 3`</b></b>: Tipo <b>sorte</b> `Nat`. 
+Este é o caso de sucesso da operação. `op_` recebe um natural distinto de zero (`3: NzNat`) e retornará um natural (`op 3: Nat`).
+</p>
+
+<p>
+Pelas regras, temos:
+</p>
+<ol class="org-ol">
+<li>\( 3 : \text{NzNat} \);</li>
+<li>\( \text{NzNat} \ll \text{NzNat} \), por reflexividade; e</li>
+<li>Regra (5).</li>
+</ol>
+
+<p>
+\[
+   \boxed{\texttt{op 3} : \textit{Nat}.}
+   \]
+</p></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org11fc66d" class="outline-4">
+<h4 id="org11fc66d">Em `ESPECIE2`</h4>
+<div class="outline-text-4" id="text-org11fc66d">
+<ol class="org-ol">
+<li><p>
+<b><b>`op -3`</b></b>: Tipo <b>espécie</b> `[Int]`. 
+Diferente de `ESPECIE1`, em `ESPECIE2` os números negativos estão definidos (importamos `INT`), logo não há erro de sintaxe. A operação `op_` recebe um non-zero natural e retorna um inteiro. Estamos tentando passar um inteiro para uma operação que espera um natural distinto do zero. Por ser um termo mal tipado, seu tipo será a espécie inteiro.
+</p>
+
+<p>
+Pelas regras, temos:
+</p>
+<ol class="org-ol">
+<li>\( -3 : \text{Int} \);</li>
+<li>\( \text{Int} \not\ll \text{NzNat} \).</li>
+</ol>
+
+<p>
+\[
+   \boxed{\texttt{op -3} : [\textit{Int}].}
+   \]
+</p></li>
+
+<li><p>
+<b><b>`op 0`</b></b>: Tipo <b>espécie</b> `[Int]`. 
+A operação `op_` é definida para parâmetro `NzNat`, portanto não é possível aplicá-la sobre zero. Esta é a mesma situação que encontramos em `ESPECIE1`.
+</p>
+
+<p>
+Pelas regras, temos:
+</p>
+<ol class="org-ol">
+<li>\( 0 : \text{Zero} \); e</li>
+<li>\( \text{Zero} \not\ll \text{NzNat} \).</li>
+</ol>
+
+<p>
+\[
+   \boxed{\texttt{op 0} : [\textit{Int}].}
+   \]
+</p></li>
+
+<li><p>
+<b><b>`op 3`</b></b>: Tipo <b>sorte</b> `Int`. 
+Este é o caso de sucesso. `op_` recebe um natural distinto de zero (`3: NzNat`) e retornará um inteiro (`op 3: Int`).
+</p>
+
+<p>
+Pelas regras, temos:
+</p>
+<ol class="org-ol">
+<li>\( 3 : \text{NzNat} \);</li>
+<li>\( \text{NzNat} \ll \text{NzNat} \), por reflexividade; e</li>
+<li>Regra (5).</li>
+</ol>
+
+<p>
+\[
+   \boxed{\texttt{op 3} : \textit{Int}.}
+   \]
+</p></li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org11d5ffa" class="outline-2">
+<h2 id="org11d5ffa">Exercício Seguinte</h2>
+<div class="outline-text-2" id="text-org11d5ffa">
+<p>
+O exercício seguinte é interessante pois, diferente do anterior, temos aqui as <b>equações</b> que definem a operação.
+</p>
+</div>
+<div id="outline-container-org96f09a7" class="outline-3">
+<h3 id="org96f09a7">Fragmento de Especificação</h3>
+<div class="outline-text-3" id="text-org96f09a7">
+<div class="org-src-container">
+<pre class="src src-maude">protecting INT .
+op _op_ : Nat NzNat -&gt; Int .
+var n : Nat .
+var i : Int .
+eq 2 op 3 = 2 .
+eq 3 op 5 = 0 .
+</pre>
+</div>
+
+<p>
+Este fragmento importa os números inteiros e define uma operação `_ op _` de parâmetros `Nat` e `NzNat` (o primeiro parâmetro deve ser um natural qualquer, enquanto o segundo deve ser um non-zero natural). A operação retorna um inteiro. 
+</p>
+
+<p>
+A operação é definida por duas equações:
+\[
+\mathbf{eq}\ 2\ \text{op}\ 3 = 2 \qquad \mathbf{eq}\ 3\ \text{op}\ 5 = 0
+\]
+</p>
+
+<p>
+Para quaisquer outros pares de parâmetros distintos de \((2, 3)\) e \((3, 5)\), a redução de `_ op _` não é definida pelas equações.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbf063a8" class="outline-3">
+<h3 id="orgbf063a8">Tabela de Determinação dos Tipos</h3>
+<div class="outline-text-3" id="text-orgbf063a8">
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+
+<col  class="org-left">
+
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Termo</th>
+<th scope="col" class="org-left">Tipo</th>
+<th scope="col" class="org-left">Resultado</th>
+<th scope="col" class="org-left">Tipo</th>
+<th scope="col" class="org-left">Comentário e Resolução</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left"><code>-4 op 3</code></td>
+<td class="org-left"><code>[Int]</code></td>
+<td class="org-left"><code>-4 op 3</code></td>
+<td class="org-left"><code>[Int]</code></td>
+<td class="org-left">\(Int \not\ll Nat\). O primeiro argumento deveria ser `Nat`, mas é `Int`. Operação não definida.</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>2 op 0</code></td>
+<td class="org-left"><code>[Int]</code></td>
+<td class="org-left"><code>2 op 0</code></td>
+<td class="org-left"><code>[Int]</code></td>
+<td class="org-left">\(Zero \not\ll NzNat\). O segundo argumento deveria ser `NzNat`. Operação não definida.</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0 op 5</code></td>
+<td class="org-left"><code>Int</code></td>
+<td class="org-left"><code>0 op 5</code></td>
+<td class="org-left"><code>Int</code></td>
+<td class="org-left">É um termo correto e bem tipado. Não reduz porque \((0, 5)\) não tem equação.</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>5 op 8</code></td>
+<td class="org-left"><code>Int</code></td>
+<td class="org-left"><code>5 op 8</code></td>
+<td class="org-left"><code>Int</code></td>
+<td class="org-left">É um termo correto e bem tipado. Não reduz porque \((5, 8)\) não tem equação.</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>2 op 3</code></td>
+<td class="org-left"><code>Int</code></td>
+<td class="org-left"><code>2</code></td>
+<td class="org-left"><code>NzNat</code></td>
+<td class="org-left">Reduz pela equação 1. Sorte mínimo de `2` é `NzNat`.</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>3 op 5</code></td>
+<td class="org-left"><code>Int</code></td>
+<td class="org-left"><code>0</code></td>
+<td class="org-left"><code>Zero</code></td>
+<td class="org-left">Reduz pela equação 2. Sorte mínimo de `0` é `Zero`.</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>n op 3</code></td>
+<td class="org-left"><code>Int</code></td>
+<td class="org-left"><code>n op 3</code></td>
+<td class="org-left"><code>Int</code></td>
+<td class="org-left">`n` é uma variável `Nat`, `3` é `NzNat`. Termo bem tipado, mas sem equação aplicável.</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>i op 2</code></td>
+<td class="org-left"><code>[Int]</code></td>
+<td class="org-left"><code>i op 2</code></td>
+<td class="org-left"><code>[Int]</code></td>
+<td class="org-left">\(Int \not\ll Nat\). `i` é variável `Int` e não serve como primeiro argumento.</td>
+</tr>
+</tbody>
+</table>
+
+<span class="pf-meta" data-pagefind-filter="tipo[data-v]" data-v="estudo"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="computer-science/formal-specification/exercise"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="estudo"></span>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
