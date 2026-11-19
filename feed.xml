@@ -4,7 +4,19 @@
   <link href="https://n-rosenthal.github.io/feed.xml" rel="self"/>
   <link href="https://n-rosenthal.github.io/"/>
   <id>https://n-rosenthal.github.io/</id>
-  <updated>2026-11-17T00:00:00Z</updated>
+  <updated>2026-11-19T00:00:00Z</updated>
+  <entry>
+    <title>Definições para Extração de Informações</title>
+    <link href="https://n-rosenthal.github.io/estudo/conceitos/definicoes-para-extracao-de-informacoes.html"/>
+    <id>https://n-rosenthal.github.io/estudo/conceitos/definicoes-para-extracao-de-informacoes.html</id>
+    <updated>2026-11-19T00:00:00Z</updated>
+  </entry>
+  <entry>
+    <title>Tarefas em Extração de Informações</title>
+    <link href="https://n-rosenthal.github.io/estudo/conceitos/tarefas-em-extracao-de-informacoes.html"/>
+    <id>https://n-rosenthal.github.io/estudo/conceitos/tarefas-em-extracao-de-informacoes.html</id>
+    <updated>2026-11-19T00:00:00Z</updated>
+  </entry>
   <entry>
     <title>Métricas</title>
     <link href="https://n-rosenthal.github.io/estudo/conceitos/metricas.html"/>
