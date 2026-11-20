@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<!-- 2026-11-20 Fri 01:15 -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Definições para Sistemas de Tipos</title>
+<meta name="author" content="n-rosenthal" />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/estudo.css">
+<link rel="alternate" type="application/atom+xml" title="Notas de estudo" href="/feed.xml">
+<script defer src="/js/grafo-local.js"></script>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Definições para Sistemas de Tipos">
+<meta property="og:description" content="">
+<meta property="og:url" content="https://n-rosenthal.github.io/estudo/conceitos/definicoes-para-sistemas-de-tipos.html">
+</head>
+<body>
+<div id="preamble" class="status">
+<nav class="nav"><a href="/">Início</a><a href="/grafo.html">Grafo</a><a href="/feed.xml">Feed</a></nav><div class="meta-nota"><span class="selo selo-semente">semente</span><span>5 min de leitura</span><span>criada em 2026-11-19</span><span>atualizada em 2026-11-19</span></div>
+</div>
+<div id="content" class="content">
+<header>
+<h1 class="title">Definições para Sistemas de Tipos</h1>
+</header><nav id="table-of-contents" role="doc-toc">
+<h2>&Iacute;ndice</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orgaa6aa4e">Definições</a>
+<ul>
+<li><a href="#orgc1cb291">Uma Definição Geral (Peirce, 2002)</a>
+<ul>
+<li><a href="#orgc7925ba">Breve Histórico da <i>Teoria dos Tipos</i></a></li>
+<li><a href="#org79805bb">Classificação quanto à Praticidade</a></li>
+<li><a href="#org42b1e54">Para que serve um sistema de tipos</a></li>
+</ul>
+</li>
+<li><a href="#org1e0f9dd">Sistemas de Tipos Estáticos e Dinâmicos</a></li>
+</ul>
+</li>
+<li><a href="#org5f2e68c">Citada em</a></li>
+</ul>
+</div>
+</nav>
+<div id="outline-container-orgaa6aa4e" class="outline-2">
+<h2 id="orgaa6aa4e">Definições</h2>
+<div class="outline-text-2" id="text-orgaa6aa4e">
+<p>
+Sistemas de Tipos são <a href="/estudo/conceitos/frameworks-de-metodos-formais.html">um tipo de <i>framework</i> em Métodos Formais</a>
+</p>
+</div>
+<div id="outline-container-orgc1cb291" class="outline-3">
+<h3 id="orgc1cb291">Uma Definição Geral (Peirce, 2002)</h3>
+<div class="outline-text-3" id="text-orgc1cb291">
+<blockquote>
+<p>
+A type system is a tractable syntactic method for proving the absence of certain program behaviors by classifying phrases according to the kinds of values they compute.
+</p>
+</blockquote>
+</div>
+<div id="outline-container-orgc7925ba" class="outline-4">
+<h4 id="orgc7925ba">Breve Histórico da <i>Teoria dos Tipos</i></h4>
+<div class="outline-text-4" id="text-orgc7925ba">
+<p>
+São, portantom <i>ferramentas</i> para o estudo de <code>[programas]</code> e para a análise de Linguagens de Programação. São frutos da <code>[Teoria dos Tipos]</code>, um vasto campo interseccional da Lógica, da Matemática e da Filosofia, formalizado no início do século XX por <code>[Bertrand Russel]</code> <code>(1902... )</code> para o tratamento de paradoxos na formalização das fundações da Matemática. Ao longo do século XX, <i>tipos</i> foram utilizados como ferramentas na <code>[Teoria das Provas]</code> e permearam tanto a Filosofia quanto a Ciência, no geral.
+</p>
+
+<blockquote>
+<p>
+Major landmarks in this area include Russell’s original <code>ramified theory of types</code> (Whitehead and Russell, 1910), Ramsey’s <code>simple theory of types</code> (1925) — the basis of Church’s <code>simply typed lambda-calculus</code> (1940) — Martin-Löf’s <code>constructive type theory</code> (1973, 1984), and Berardi, Terlouw, and Barendregt’s <code>pure type systems</code> (Berardi, 1988; Terlouw, 1989; Barendregt, 1992).
+</p>
+</blockquote>
+</div>
+</div>
+<div id="outline-container-org79805bb" class="outline-4">
+<h4 id="org79805bb">Classificação quanto à Praticidade</h4>
+<div class="outline-text-4" id="text-org79805bb">
+<p>
+Em Ciência da Computação, podemos dividir os sistemas de tipos em duas categorias, <b>para fins pragmáticos</b>,
+</p>
+
+<ul class="org-ul">
+<li>aplicados à Linguagens de Programação e sua implementação; e</li>
+<li>relacionados à <code>[Correspondência de Curry-Howard]</code>, ao <code>[Cálculo Lambda Puramente Tipado]</code> e às variedades de lógicas</li>
+</ul>
+
+<p>
+mas ambas comunidades utilizam conceitos, notações e técnicas em comum, apesar da diferença de orientação.
+</p>
+
+<p>
+#+begin<sub>nota</sub>
+É dada muita importância, no estudo dos cálculos lambda tipados, para provar propriedades de <b>terminação</b> para qualquer computação bem-tipada. Entretanto, na implementação de linguagens de programação, muitas vezses isto é deixado de lado para possibilitar a implementação de <code>[definições de funções recursivas]</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org42b1e54" class="outline-4">
+<h4 id="org42b1e54">Para que serve um sistema de tipos</h4>
+<div class="outline-text-4" id="text-org42b1e54">
+<p>
+Sistemas de Tipos servem, dentre outras finalidades, à <b>classificação</b> de termos de uma linguagem, de acordo com <b>os valores que os termos produzem</b> (uma vez reduzidos à sua <code>[forma normal]</code>, isto é, quando <i>executados</i>). Um sistema de tipos pode ser visto como uma maneira de <b>computar, <i>aproximada</i> e <i>estaticamente</i>, o comportamento de um termo em um programa.</b>
+</p>
+
+<div class="nota" id="org107b4a6">
+<p>
+Dizemos que sistemas de tipos computam tipos à termos de forma <b>composicional</b>, isto é, (em sistemas <i>estáticos</i>) o <b>tipo de uma expressão</b> depende única e exclusivamente dos <b>tipos de suas sub-expressões</b>.
+</p>
+
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org1e0f9dd" class="outline-3">
+<h3 id="org1e0f9dd">Sistemas de Tipos Estáticos e Dinâmicos</h3>
+<div class="outline-text-3" id="text-org1e0f9dd">
+<p>
+Um sistema de tipos é &#x2026;&#x2026;&#x2026;. <b>latente</b> quando <i>type tags</i>, ou <b>rótulos de tipos</b>, são utilizados para diferenciar estruturas no <code>[heap]</code>.
+</p>
+
+<blockquote>
+<p>
+Terms like “dynamically typed” are arguably misnomers and should probably be replaced by “dynamically checked,” but the usage is standard.
+</p>
+</blockquote>
+
+<p>
+Sistemas de tipagem estáticos também são ditos <b>conservativos</b> (ou conservadores?) pois são capazes de provar a <b>ausência</b> de alguns tipos de comportamentos indesejados em programas, mas não necessariamente conseguem provar sua presença; portanto, podem rejeitar programas que se comportam de maneira adequada em tempo de execução, mas que <i>parecem</i> mal-tipados.
+</p>
+
+<blockquote>
+<p>
+The tension between conservativity and expressiveness is a fundamental fact of life in the design of type systems. The desire to allow more programs to be typed — by assigning more accurate types to their parts — isthe main force driving research in the field.
+</p>
+</blockquote>
+
+<p>
+A maioria dos sistemas de tipos são capazes de garantir que <b>alguns</b> tipos de comportamentos indesejados ocasionarão um programa a ser rejeitado por ser mal-formado, mas <b>não garantem que todos os erros serão encontrados</b>:
+</p>
+
+<blockquote>
+<p>
+A related point is that the relatively straightforward analyses embodied in most type systems are not capable of proscribing arbitrary undesired program behaviors; they can only guarantee that well-typed programs are free from certain kinds of misbehavior. For example, most type systems can check statically that the arguments to primitive arithmetic operations are always numbers, that the receiver object in a method invocation always provides the requested method, etc., but not that the second argument to the division operation is non-zero, or that array accesses are always within bounds.
+</p>
+</blockquote>
+
+<p>
+Os comportamentos indesejados que <b>podem ser eliminados pelo sistema de tipo</b> em uma dada linguagem são ditos <code>[*erros de tipo em tempo de execução*]</code> (<i>run-time type errors</i>):
+</p>
+
+<blockquote>
+<p>
+The bad behaviors that can be eliminated by the type system in a given language are often called run-time type errors. It is important to keep in mind that this set of behaviors is a per-language choice: although there is substantial overlap between the behaviors considered to be run-time type errors in different languages, in principle each type system comes with a definition of the behaviors it aims to prevent. The <b>safety</b> (or <b>soundness</b>) of each type system must be judged with respect to its own set of run-time errors.
+</p>
+</blockquote>
+
+<p>
+&gt;&gt; <code>[Segurança em Sistemas de Tipos]</code>.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org5f2e68c" class="outline-2">
+<h2 id="org5f2e68c">Citada em</h2>
+<div class="outline-text-2" id="text-org5f2e68c">
+<ul class="backlinks">
+<li><a href="/sinteses/introducao-aos-metodos-formais.html">Introdução aos Métodos Formais</a></li>
+</ul>
+
+<span class="pf-meta" data-pagefind-filter="tipo[data-v]" data-v="conceito"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="computer-science/formal-methods"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="conceito"></span>
+<span class="pf-meta" data-pagefind-filter="status[data-v]" data-v="semente"></span>
+</div>
+</div>
+</div>
+</body>
+</html>
