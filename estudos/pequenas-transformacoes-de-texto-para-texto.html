@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<!-- 2026-11-25 Wed 00:55 -->
+<!-- 2026-11-25 Wed 19:48 -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>pequenas transformações de texto para texto</title>
+<title>pequenas transformações sobre textos</title>
 <meta name="author" content="n-rosenthal" />
 <meta name="generator" content="Org Mode" />
 <link rel="stylesheet" href="/css/site.css">
@@ -12,34 +12,34 @@
 <link rel="alternate" type="application/atom+xml" title="Notas de estudo" href="/feed.xml">
 <script defer src="/js/grafo-local.js"></script>
 <meta property="og:type" content="article">
-<meta property="og:title" content="pequenas transformações de texto para texto">
+<meta property="og:title" content="pequenas transformações sobre textos">
 <meta property="og:description" content="">
 <meta property="og:url" content="https://n-rosenthal.github.io/estudos/pequenas-transformacoes-de-texto-para-texto.html">
 </head>
 <body>
 <div id="preamble" class="status">
-<nav class="nav"><a href="/">Início</a><a href="/grafo.html">Grafo</a><a href="/feed.xml">Feed</a></nav><div class="meta-nota"><span class="selo selo-semente">semente</span><span>1 min de leitura</span><span>criada em 2026-11-24</span><span>atualizada em 2026-11-24</span></div>
+<nav class="nav"><a href="/">Início</a><a href="/grafo.html">Grafo</a><a href="/feed.xml">Feed</a></nav><div class="meta-nota"><span class="selo selo-semente">semente</span><span>1 min de leitura</span><span>criada em 2026-11-24</span><span>atualizada em 2026-11-25</span></div>
 </div>
 <div id="content" class="content">
 <header>
-<h1 class="title">pequenas transformações de texto para texto</h1>
+<h1 class="title">pequenas transformações sobre textos</h1>
 </header><nav id="table-of-contents" role="doc-toc">
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org730fbd7">Definição</a>
+<li><a href="#orgac60dd4">Definição</a>
 <ul>
-<li><a href="#org9da5926">example of <code>async-tokenize</code></a></li>
-<li><a href="#orga7638c5"><i>struct wrapper</i></a></li>
+<li><a href="#org69bb0ae">example of <code>async-tokenize</code></a></li>
+<li><a href="#orgf88c9c8"><i>struct wrapper</i></a></li>
 </ul>
 </li>
-<li><a href="#org858174c">Tokenizador</a></li>
+<li><a href="#org21a01eb">Tokenizador</a></li>
 </ul>
 </div>
 </nav>
-<div id="outline-container-org730fbd7" class="outline-2">
-<h2 id="org730fbd7">Definição</h2>
-<div class="outline-text-2" id="text-org730fbd7">
+<div id="outline-container-orgac60dd4" class="outline-2">
+<h2 id="orgac60dd4">Definição</h2>
+<div class="outline-text-2" id="text-orgac60dd4">
 <div class="org-src-container">
 <pre class="src src-emacs-lisp"><span class="org-comment-delimiter">;;; </span><span class="org-comment">text-transform.el --- Org text transformations -*- lexical-binding: t; -*-
 </span>
@@ -125,9 +125,9 @@ propagates an error if the subprocess fails or emits invalid JSON."</span>
 </pre>
 </div>
 </div>
-<div id="outline-container-org9da5926" class="outline-3">
-<h3 id="org9da5926">example of <code>async-tokenize</code></h3>
-<div class="outline-text-3" id="text-org9da5926">
+<div id="outline-container-org69bb0ae" class="outline-3">
+<h3 id="org69bb0ae">example of <code>async-tokenize</code></h3>
+<div class="outline-text-3" id="text-org69bb0ae">
 <div class="org-src-container">
 <pre class="src src-emacs-lisp">(aio-defun demo ()
   <span class="org-string">"Tokenize a test string and return the tokens."</span>
@@ -167,9 +167,9 @@ propagates an error if the subprocess fails or emits invalid JSON."</span>
 </div>
 </div>
 </div>
-<div id="outline-container-orga7638c5" class="outline-3">
-<h3 id="orga7638c5"><i>struct wrapper</i></h3>
-<div class="outline-text-3" id="text-orga7638c5">
+<div id="outline-container-orgf88c9c8" class="outline-3">
+<h3 id="orgf88c9c8"><i>struct wrapper</i></h3>
+<div class="outline-text-3" id="text-orgf88c9c8">
 <div class="org-src-container">
 <pre class="src src-emacs-lisp">(aio-defun transform-current-buffer ()
   <span class="org-string">"Tokenize all sections of the current buffer and report the counts."</span>
@@ -187,9 +187,9 @@ propagates an error if the subprocess fails or emits invalid JSON."</span>
 </div>
 </div>
 </div>
-<div id="outline-container-org858174c" class="outline-2">
-<h2 id="org858174c">Tokenizador</h2>
-<div class="outline-text-2" id="text-org858174c">
+<div id="outline-container-org21a01eb" class="outline-2">
+<h2 id="org21a01eb">Tokenizador</h2>
+<div class="outline-text-2" id="text-org21a01eb">
 <div class="org-src-container">
 <pre class="src src-python"><span class="org-doc">"""tokenizer.py &#8212; reads text from stdin, emits a JSON array of tokens on stdout.
 
