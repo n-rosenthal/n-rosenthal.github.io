@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<!-- 2026-11-25 Wed 00:55 -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>pequenas transformações de texto para texto</title>
+<meta name="author" content="n-rosenthal" />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/estudo.css">
+<link rel="alternate" type="application/atom+xml" title="Notas de estudo" href="/feed.xml">
+<script defer src="/js/grafo-local.js"></script>
+<meta property="og:type" content="article">
+<meta property="og:title" content="pequenas transformações de texto para texto">
+<meta property="og:description" content="">
+<meta property="og:url" content="https://n-rosenthal.github.io/estudos/pequenas-transformacoes-de-texto-para-texto.html">
+</head>
+<body>
+<div id="preamble" class="status">
+<nav class="nav"><a href="/">Início</a><a href="/grafo.html">Grafo</a><a href="/feed.xml">Feed</a></nav><div class="meta-nota"><span class="selo selo-semente">semente</span><span>1 min de leitura</span><span>criada em 2026-11-24</span><span>atualizada em 2026-11-24</span></div>
+</div>
+<div id="content" class="content">
+<header>
+<h1 class="title">pequenas transformações de texto para texto</h1>
+</header><nav id="table-of-contents" role="doc-toc">
+<h2>&Iacute;ndice</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org730fbd7">Definição</a>
+<ul>
+<li><a href="#org9da5926">example of <code>async-tokenize</code></a></li>
+<li><a href="#orga7638c5"><i>struct wrapper</i></a></li>
+</ul>
+</li>
+<li><a href="#org858174c">Tokenizador</a></li>
+</ul>
+</div>
+</nav>
+<div id="outline-container-org730fbd7" class="outline-2">
+<h2 id="org730fbd7">Definição</h2>
+<div class="outline-text-2" id="text-org730fbd7">
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-comment-delimiter">;;; </span><span class="org-comment">text-transform.el --- Org text transformations -*- lexical-binding: t; -*-
+</span>
+(<span class="org-keyword">require</span> '<span class="org-constant">org-element</span>)
+(<span class="org-keyword">require</span> '<span class="org-constant">aio</span>)
+(<span class="org-keyword">require</span> '<span class="org-constant">json</span>)
+(<span class="org-keyword">require</span> '<span class="org-constant">subr-x</span>)
+
+(<span class="org-keyword">defconst</span> <span class="org-variable-name">text-transform--tokenizer-script</span>
+  (expand-file-name <span class="org-string">"code/tokenizer.py"</span>
+                    (file-name-directory (<span class="org-keyword">or</span> load-file-name buffer-file-name)))
+  <span class="org-doc">"Path to the Python tokenizer, expected next to this file."</span>)
+
+<span class="org-comment-delimiter">;; </span><span class="org-comment">fn to_ast(document: org-document) -&gt; ast
+</span><span class="org-comment-delimiter">;;  </span><span class="org-comment">extracts the syntax tree from a given ~.org~ DOCUMENT.
+</span>(<span class="org-keyword">defun</span> <span class="org-function-name">to-ast</span> (<span class="org-type">&amp;optional</span> buffer)
+  <span class="org-doc">"Parse BUFFER (or current buffer) into an Org syntax tree."</span>
+  (<span class="org-keyword">with-current-buffer</span> (<span class="org-keyword">or</span> buffer (current-buffer))
+    (org-element-parse-buffer)))
+
+<span class="org-comment-delimiter">;; </span><span class="org-comment">fn sections(tree: ast) -&gt; list[ast?]
+</span><span class="org-comment-delimiter">;;  </span><span class="org-comment">extracts all SECTIONS from a given TREE.
+</span>(<span class="org-keyword">defun</span> <span class="org-function-name">sections</span> (tree)
+  <span class="org-doc">"Return a list of all `</span><span class="org-doc"><span class="org-constant">section</span></span><span class="org-doc">' elements in TREE."</span>
+  (org-element-map tree 'section #'identity))
+
+<span class="org-comment-delimiter">;; </span><span class="org-comment">fn to_text(tree: ast) -&gt; string
+</span>(<span class="org-keyword">defun</span> <span class="org-function-name">to-text</span> (tree)
+  <span class="org-doc">"Interpret TREE as canonical Org syntax and return it as a string."</span>
+  (org-element-interpret-data tree))
+
+<span class="org-comment-delimiter">;; </span><span class="org-comment">fn async tokenize(string) -&gt; Promise[list[token]]
+</span><span class="org-comment-delimiter">;;  </span><span class="org-comment">runs tokenizer.py in a subprocess on a given STRING.
+</span>(<span class="org-keyword">defun</span> <span class="org-function-name">async-tokenize</span> (string)
+  <span class="org-doc">"Asynchronously tokenize STRING using the Python tokenizer subprocess.
+
+Return an `</span><span class="org-doc"><span class="org-constant">aio</span></span><span class="org-doc">' promise that resolves to a list of tokens, or that
+propagates an error if the subprocess fails or emits invalid JSON."</span>
+  (<span class="org-keyword">let</span> ((promise    (aio-promise))
+        (output     <span class="org-string">""</span>)
+        (stderr-buf (generate-new-buffer <span class="org-string">" *tokenizer-stderr*"</span>)))
+    (<span class="org-keyword">let</span> ((proc (make-process
+                 <span class="org-builtin">:name</span> <span class="org-string">"tokenizer"</span>
+                 <span class="org-builtin">:buffer</span> nil
+                 <span class="org-builtin">:stderr</span> stderr-buf
+                 <span class="org-builtin">:command</span> (list <span class="org-string">"python3"</span> text-transform--tokenizer-script)
+                 <span class="org-builtin">:connection-type</span> 'pipe
+                 <span class="org-builtin">:coding</span> 'utf-8
+                 <span class="org-builtin">:noquery</span> t
+                 <span class="org-builtin">:filter</span> (<span class="org-keyword">lambda</span> (_proc chunk)
+                           (<span class="org-keyword">setq</span> output (concat output chunk)))
+                 <span class="org-builtin">:sentinel</span>
+                 (<span class="org-keyword">lambda</span> (proc _event)
+                   (<span class="org-keyword">when</span> (memq (process-status proc) '(exit signal))
+                     (<span class="org-keyword">let*</span> ((status (process-exit-status proc))
+                            (err    (<span class="org-keyword">with-current-buffer</span> stderr-buf
+                                      (string-trim (buffer-string))))
+                            (raw    (string-trim output))
+                            (msg    nil)
+                            (tokens nil))
+                       (kill-buffer stderr-buf)
+                       (<span class="org-keyword">cond</span>
+                        ((not (zerop status))
+                         (<span class="org-keyword">setq</span> msg (format <span class="org-string">"tokenizer exited %d: %s"</span> status err)))
+                        ((string-empty-p raw)
+                         (<span class="org-keyword">setq</span> msg (format <span class="org-string">"tokenizer produced no output (stderr: %s)"</span> err)))
+                        (t
+                         (<span class="org-keyword">condition-case</span> e
+                             (<span class="org-keyword">setq</span> tokens (json-parse-string raw <span class="org-builtin">:array-type</span> 'list))
+                           (<span class="org-warning">error</span> (<span class="org-keyword">setq</span> msg (format <span class="org-string">"invalid tokenizer JSON: %s"</span>
+                                                    (error-message-string e)))))))
+                       <span class="org-comment-delimiter">;; </span><span class="org-comment">`</span><span class="org-comment"><span class="org-constant">aio-resolve</span></span><span class="org-comment">' takes a *function*; signalling inside it
+</span>                       <span class="org-comment-delimiter">;; </span><span class="org-comment">rejects the promise.  Signalling directly in a sentinel
+</span>                       <span class="org-comment-delimiter">;; </span><span class="org-comment">would be swallowed and the promise would hang forever.
+</span>                       (aio-resolve promise
+                                    (<span class="org-keyword">lambda</span> ()
+                                      (<span class="org-keyword">if</span> msg
+                                          (<span class="org-warning">signal</span> 'error (list msg))
+                                        tokens)))))))))
+      (process-send-string proc string)
+      (process-send-eof proc))
+    promise))
+</pre>
+</div>
+</div>
+<div id="outline-container-org9da5926" class="outline-3">
+<h3 id="org9da5926">example of <code>async-tokenize</code></h3>
+<div class="outline-text-3" id="text-org9da5926">
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(aio-defun demo ()
+  <span class="org-string">"Tokenize a test string and return the tokens."</span>
+  (<span class="org-keyword">let</span> ((tokens (aio-await (async-tokenize <span class="org-string">"Hello, world!"</span>))))
+    (message <span class="org-string">"Tokens: %S"</span> tokens)
+    tokens))
+
+<span class="org-comment-delimiter">;; </span><span class="org-comment">run it (blocks until the promise resolves):
+</span>(aio-wait-for (demo))
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span class="org-keyword">require</span> '<span class="org-constant">json</span>)
+(<span class="org-keyword">let*</span> ((text    <span class="org-string">"Ol&#225;, mundo! Hello, World!"</span>)
+       (outbuf  (generate-new-buffer <span class="org-string">" *tok*"</span>))
+       (proc    (make-process
+                 <span class="org-builtin">:name</span> <span class="org-string">"tok"</span>
+                 <span class="org-builtin">:buffer</span> outbuf
+                 <span class="org-builtin">:command</span> '(<span class="org-string">"python3"</span> <span class="org-string">"-c"</span>
+                            <span class="org-string">"import sys, json; print(json.dumps(sys.stdin.read().split()))"</span>)
+                 <span class="org-builtin">:connection-type</span> 'pipe
+                 <span class="org-builtin">:coding</span> 'utf-8
+                 <span class="org-builtin">:sentinel</span> #'ignore <span class="org-comment-delimiter">; </span><span class="org-comment">default sentinel appends "Process tok finished" to the buffer
+</span>                 <span class="org-builtin">:noquery</span> t)))
+  (<span class="org-keyword">unwind-protect</span>
+      (<span class="org-keyword">progn</span>
+        (process-send-string proc text)
+        (process-send-eof proc)
+        (<span class="org-keyword">while</span> (memq (process-status proc) '(run open))
+          (accept-process-output proc 0.1))
+        (<span class="org-keyword">with-current-buffer</span> outbuf
+          (json-parse-string (buffer-string) <span class="org-builtin">:array-type</span> 'list)))
+    (<span class="org-keyword">when</span> (process-live-p proc) (delete-process proc))
+    (kill-buffer outbuf)))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orga7638c5" class="outline-3">
+<h3 id="orga7638c5"><i>struct wrapper</i></h3>
+<div class="outline-text-3" id="text-orga7638c5">
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(aio-defun transform-current-buffer ()
+  <span class="org-string">"Tokenize all sections of the current buffer and report the counts."</span>
+  (<span class="org-keyword">let*</span> ((tree     (to-ast))
+         (secs     (sections tree))
+         (text     (mapconcat #'to-text secs <span class="org-string">"\n"</span>))
+         (tokens   (aio-await (async-tokenize text))))
+    (message <span class="org-string">"Parsed %d sections &#8594; %d tokens"</span> (length secs) (length tokens))
+    tokens))
+
+(<span class="org-keyword">provide</span> '<span class="org-constant">text-transform</span>)
+<span class="org-comment-delimiter">;;; </span><span class="org-comment">text-transform.el ends here</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org858174c" class="outline-2">
+<h2 id="org858174c">Tokenizador</h2>
+<div class="outline-text-2" id="text-org858174c">
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-doc">"""tokenizer.py &#8212; reads text from stdin, emits a JSON array of tokens on stdout.
+
+Contract with Emacs:
+  stdin  : raw text (UTF-8)
+  stdout : JSON array of strings, e.g. ["Hello", ",", "world", "!"]
+  exit 0 on success; non-zero with the error message on stderr on failure.
+"""</span>
+<span class="org-keyword">from</span> __future__ <span class="org-keyword">import</span> annotations
+
+<span class="org-keyword">import</span> json
+<span class="org-keyword">import</span> re
+<span class="org-keyword">import</span> sys
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Unicode-aware word tokenizer: a "word" run, or a single non-space,
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">non-word character (punctuation). Handles accented letters correctly.
+</span><span class="org-variable-name">_TOKEN_RE</span> <span class="org-operator">=</span> re.<span class="org-builtin">compile</span>(r<span class="org-string">"\w+|[^\w\s]"</span>, re.UNICODE)
+
+
+<span class="org-keyword">def</span> <span class="org-function-name">tokenize</span>(text: <span class="org-builtin">str</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">list</span>[<span class="org-builtin">str</span>]:
+    <span class="org-keyword">return</span> _TOKEN_RE.findall(text)
+
+
+<span class="org-keyword">def</span> <span class="org-function-name">main</span>() <span class="org-operator">-&gt;</span> <span class="org-builtin">int</span>:
+    <span class="org-comment-delimiter"># </span><span class="org-comment">Force UTF-8 regardless of the locale Emacs spawned us under.
+</span>    sys.stdin.reconfigure(encoding<span class="org-operator">=</span><span class="org-string">"utf-8"</span>)
+    sys.stdout.reconfigure(encoding<span class="org-operator">=</span><span class="org-string">"utf-8"</span>)
+    <span class="org-keyword">try</span>:
+        <span class="org-variable-name">text</span> <span class="org-operator">=</span> sys.stdin.read()
+        <span class="org-variable-name">tokens</span> <span class="org-operator">=</span> tokenize(text)
+        json.dump(tokens, sys.stdout, ensure_ascii<span class="org-operator">=</span><span class="org-constant">False</span>)
+        sys.stdout.write(<span class="org-string">"</span><span class="org-constant">\n</span><span class="org-string">"</span>)
+        sys.stdout.flush()
+        <span class="org-keyword">return</span> 0
+    <span class="org-keyword">except</span> <span class="org-type">Exception</span> <span class="org-keyword">as</span> exc:  <span class="org-comment-delimiter"># </span><span class="org-comment">noqa: BLE001
+</span>        <span class="org-builtin">print</span>(f<span class="org-string">"tokenizer error: </span>{exc}<span class="org-string">"</span>, <span class="org-builtin">file</span><span class="org-operator">=</span>sys.stderr)
+        <span class="org-keyword">return</span> 1
+
+
+<span class="org-keyword">if</span> <span class="org-builtin">__name__</span> <span class="org-operator">==</span> <span class="org-string">"__main__"</span>:
+    sys.<span class="org-constant">exit</span>(main())
+</pre>
+</div>
+
+<span class="pf-meta" data-pagefind-filter="tipo[data-v]" data-v="estudo"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="computer-science/natural-language-processing"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="implementation"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="estudo"></span>
+<span class="pf-meta" data-pagefind-filter="status[data-v]" data-v="semente"></span>
+</div>
+</div>
+</div>
+</body>
+</html>
