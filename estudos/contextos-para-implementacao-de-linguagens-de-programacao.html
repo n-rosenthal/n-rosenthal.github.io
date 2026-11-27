@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<!-- 2026-11-27 Fri 00:19 -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Contextos para Implementação de Linguagens de Programação</title>
+<meta name="author" content="n-rosenthal" />
+<meta name="description" content="Estudo sobre contextos, bindings e ambientes semânticos." />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/estudo.css">
+<link rel="alternate" type="application/atom+xml" title="Notas de estudo" href="/feed.xml">
+<script defer src="/js/grafo-local.js"></script>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Contextos para Implementação de Linguagens de Programação">
+<meta property="og:description" content="Estudo sobre contextos, bindings e ambientes semânticos.">
+<meta property="og:url" content="https://n-rosenthal.github.io/estudos/contextos-para-implementacao-de-linguagens-de-programacao.html">
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav class="nav"><a href="/">Início</a><a href="/grafo.html">Grafo</a><a href="/feed.xml">Feed</a></nav><div class="meta-nota"><span class="selo selo-semente">semente</span><span>6 min de leitura</span><span>criada em 2026-11-25</span><span>atualizada em 2026-11-26</span></div>
+</div>
+<div id="content" class="content">
+<header>
+<h1 class="title">Contextos para Implementação de Linguagens de Programação</h1>
+</header><nav id="table-of-contents" role="doc-toc">
+<h2>&Iacute;ndice</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orgd9cf85f">Definições</a>
+<ul>
+<li><a href="#org4e7f839">Binding</a></li>
+<li><a href="#orgc9fbeaf">Contexto</a></li>
+<li><a href="#org0a6b879">Contextos persistentes</a></li>
+<li><a href="#orgbf6a10e">Sombreamento</a></li>
+</ul>
+</li>
+<li><a href="#org4ded2f4">Implementação</a>
+<ul>
+<li><a href="#org4a882c0">Reutilização de LinkedList</a></li>
+<li><a href="#org323d0c9">Representação de Context</a></li>
+<li><a href="#org1cb1d98">Responsabilidades</a></li>
+</ul>
+</li>
+<li><a href="#orga9f027a">Operações</a>
+<ul>
+<li><a href="#org0fe48d9">Construção</a></li>
+<li><a href="#org5802941">Extensão</a></li>
+<li><a href="#org3f2d300">Consulta por identificador</a></li>
+<li><a href="#org80cdea9">Consulta por índice</a></li>
+<li><a href="#org2a9fe57">Iteração</a></li>
+</ul>
+</li>
+<li><a href="#orgde6a2bd">Contextos genéricos</a>
+<ul>
+<li><a href="#org36f2199">Contexto de tipos</a></li>
+<li><a href="#org0353c76">Contexto de valores</a></li>
+<li><a href="#org6de0e03">Contexto de termos</a></li>
+<li><a href="#org535e483">Contexto de substituições</a></li>
+<li><a href="#org1edd649">Ambiente de execução</a></li>
+</ul>
+</li>
+<li><a href="#org7ce3b54">Relação com a semântica formal</a>
+<ul>
+<li><a href="#org84d71a0">Julgamentos de tipagem</a></li>
+<li><a href="#orgebf9bd3">Avaliação</a></li>
+<li><a href="#orgb18522c">Escopos lexicais</a></li>
+</ul>
+</li>
+<li><a href="#org5918b00">Índices de De Bruijn</a></li>
+<li><a href="#org2edb972">Estratégias de armazenamento</a>
+<ul>
+<li><a href="#org2b33672">LinkedList</a></li>
+<li><a href="#orgd846a21">HashMap</a></li>
+</ul>
+</li>
+<li><a href="#orgbc3a968">Testes e propriedades</a>
+<ul>
+<li><a href="#org4e284df">Persistência</a></li>
+<li><a href="#org6311f45">Sombreamento</a></li>
+<li><a href="#orgcac0040">Indexação</a></li>
+<li><a href="#org14ba2cf">Ordem de iteração</a></li>
+<li><a href="#org6c3a424">Igualdade</a></li>
+</ul>
+</li>
+<li><a href="#orgcb5ccb8">Decisões de implementação</a></li>
+<li><a href="#org8c8e901">Referências internas</a></li>
+<li><a href="#orga2972cb">Próximos passos</a>
+<ul>
+<li><a href="#org652673b"><span class="todo TODO">TODO</span> Revisar a interface abstrata e suas restrições de tipos.</a></li>
+<li><a href="#org45132f1"><span class="todo TODO">TODO</span> Integrar os contextos ao sistema de tipagem.</a></li>
+<li><a href="#orgb6b9b92"><span class="todo TODO">TODO</span> Integrar os contextos à semântica operacional.</a></li>
+<li><a href="#orgd1c8eca"><span class="todo TODO">TODO</span> Verificar a compatibilidade com termos nameless.</a></li>
+<li><a href="#orgffb0c9b"><span class="todo TODO">TODO</span> Implementar suporte a representação LaTeX.</a></li>
+<li><a href="#org2a8de92"><span class="todo TODO">TODO</span> Consolidar testes de persistência, sombreamento e indexação.</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav>
+<div id="outline-container-orgd9cf85f" class="outline-2">
+<h2 id="orgd9cf85f">Definições</h2>
+<div class="outline-text-2" id="text-orgd9cf85f">
+</div>
+<div id="outline-container-org4e7f839" class="outline-3">
+<h3 id="org4e7f839">Binding</h3>
+<div class="outline-text-3" id="text-org4e7f839">
+<p>
+Um <i>binding</i> é uma associação entre um identificador e uma informação.
+</p>
+
+<p>
+\[
+  x \mapsto b
+\]
+</p>
+
+<p>
+O identificador pode representar uma variável, função, constante ou
+qualquer outro elemento nomeado da linguagem.
+</p>
+
+<p>
+O valor associado pode representar:
+</p>
+
+<ul class="org-ul">
+<li>um tipo;</li>
+<li>um termo;</li>
+<li>um valor;</li>
+<li>uma definição;</li>
+<li>uma substituição;</li>
+<li>uma informação específica da linguagem.</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgc9fbeaf" class="outline-3">
+<h3 id="orgc9fbeaf">Contexto</h3>
+<div class="outline-text-3" id="text-orgc9fbeaf">
+<p>
+Um contexto é uma coleção de bindings que registra informações necessárias
+à interpretação de uma expressão.
+</p>
+
+<p>
+Na notação da semântica formal, é frequentemente representado por Γ.
+</p>
+
+<p>
+\[
+  \Gamma = [x_1 \mapsto b_1,\ldots,x_n \mapsto b_n]
+\]
+</p>
+
+<p>
+A operação de extensão adiciona uma associação:
+</p>
+
+<p>
+\[
+  \Gamma' = \Gamma, x \mapsto b
+\]
+</p>
+
+<p>
+A associação recém-adicionada passa a ser a mais recente.
+</p>
+</div>
+</div>
+<div id="outline-container-org0a6b879" class="outline-3">
+<h3 id="org0a6b879">Contextos persistentes</h3>
+<div class="outline-text-3" id="text-org0a6b879">
+<p>
+Um contexto persistente é uma estrutura na qual operações de extensão
+produzem novos contextos sem modificar os anteriores.
+</p>
+
+<p>
+\[
+  \Gamma' = \operatorname{extend}(\Gamma,x,b)
+\]
+</p>
+
+<p>
+A estrutura original continua disponível.
+</p>
+
+<p>
+Essa propriedade é particularmente útil para representar escopos lexicais:
+cada extensão pode representar a entrada em um novo escopo.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbf6a10e" class="outline-3">
+<h3 id="orgbf6a10e">Sombreamento</h3>
+<div class="outline-text-3" id="text-orgbf6a10e">
+<p>
+Sombreamento ocorre quando uma associação mais recente utiliza um
+identificador já presente no contexto.
+</p>
+
+<p>
+Considere:
+</p>
+
+<p>
+\[
+  \Gamma_0 = [x \mapsto 1]
+\]
+</p>
+
+<p>
+\[
+  \Gamma_1 = \Gamma_0, x \mapsto 2
+\]
+</p>
+
+<p>
+A consulta no contexto mais recente deve retornar:
+</p>
+
+<p>
+\[
+  \operatorname{lookup}(\Gamma_1,x)=2
+\]
+</p>
+
+<p>
+O binding anterior continua existindo na estrutura persistente, mas deixa
+de ser o resultado da consulta nominal.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org4ded2f4" class="outline-2">
+<h2 id="org4ded2f4">Implementação</h2>
+<div class="outline-text-2" id="text-org4ded2f4">
+</div>
+<div id="outline-container-org4a882c0" class="outline-3">
+<h3 id="org4a882c0">Reutilização de LinkedList</h3>
+<div class="outline-text-3" id="text-org4a882c0">
+<p>
+A estrutura <code>LinkedList&lt;T&gt;</code> já implementa uma lista encadeada persistente
+com armazenamento de nomes e valores.
+</p>
+
+<p>
+Sua representação conceitual é:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust">pub struct LinkedList&lt;T&gt; {
+    head: Option&lt;Rc&lt;Node&lt;T&gt;&gt;&gt;,
+    len: usize,
+}
+</pre>
+</div>
+
+<p>
+Cada nó contém:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust">pub struct Node&lt;T&gt; {
+    name: String,
+    value: T,
+    parent: Option&lt;Rc&lt;Node&lt;T&gt;&gt;&gt;,
+}
+</pre>
+</div>
+
+<p>
+A estrutura já é responsável por:
+</p>
+
+<ul class="org-ul">
+<li>armazenamento dos elementos;</li>
+<li>compartilhamento estrutural;</li>
+<li>extensão persistente;</li>
+<li>iteração;</li>
+<li>consulta por nome;</li>
+<li>consulta por índice;</li>
+<li>destruição da estrutura.</li>
+</ul>
+
+<p>
+Portanto, a implementação de <code>Context</code> não deve reproduzir essas
+responsabilidades.
+</p>
+</div>
+</div>
+<div id="outline-container-org323d0c9" class="outline-3">
+<h3 id="org323d0c9">Representação de Context</h3>
+<div class="outline-text-3" id="text-org323d0c9">
+<p>
+A representação do contexto é deliberadamente simples:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust">pub struct Context&lt;B&gt; {
+    bindings: LinkedList&lt;B&gt;,
+}
+</pre>
+</div>
+
+<p>
+O nome está armazenado no nó da lista, enquanto o valor armazenado é o
+binding.
+</p>
+
+<p>
+Assim, não precisamos de uma segunda estrutura:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust">// Desnecessário quando LinkedList já armazena nomes.
+pub struct Binding&lt;B&gt; {
+    pub name: String,
+    pub value: B,
+}
+</pre>
+</div>
+
+<p>
+A associação entre nome e valor já é fornecida pela própria lista.
+</p>
+</div>
+</div>
+<div id="outline-container-org1cb1d98" class="outline-3">
+<h3 id="org1cb1d98">Responsabilidades</h3>
+<div class="outline-text-3" id="text-org1cb1d98">
+<p>
+A separação de responsabilidades é:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Componente</th>
+<th scope="col" class="org-left">Responsabilidade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left"><code>LinkedList</code></td>
+<td class="org-left">Estrutura persistente e armazenamento</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>Context</code></td>
+<td class="org-left">Operações semânticas sobre bindings</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>Node</code></td>
+<td class="org-left">Representação interna de um elemento</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>Rc</code></td>
+<td class="org-left">Compartilhamento estrutural</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+O contexto não precisa conhecer a implementação dos nós.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orga9f027a" class="outline-2">
+<h2 id="orga9f027a">Operações</h2>
+<div class="outline-text-2" id="text-orga9f027a">
+</div>
+<div id="outline-container-org0fe48d9" class="outline-3">
+<h3 id="org0fe48d9">Construção</h3>
+<div class="outline-text-3" id="text-org0fe48d9">
+<p>
+Um contexto vazio é construído a partir de uma lista vazia:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust">pub fn empty() -&gt; Self {
+    Self {
+        bindings: LinkedList::empty(),
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org5802941" class="outline-3">
+<h3 id="org5802941">Extensão</h3>
+<div class="outline-text-3" id="text-org5802941">
+<p>
+A extensão delega a operação à lista:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust">pub fn extend(
+    &amp;self,
+    name: impl Into&lt;String&gt;,
+    binding: B,
+) -&gt; Self {
+    Self {
+        bindings: self.bindings.extend(binding, name),
+    }
+}
+</pre>
+</div>
+
+<p>
+O contexto original não é modificado.
+</p>
+</div>
+</div>
+<div id="outline-container-org3f2d300" class="outline-3">
+<h3 id="org3f2d300">Consulta por identificador</h3>
+<div class="outline-text-3" id="text-org3f2d300">
+<p>
+A consulta nominal também é delegada:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust">pub fn lookup(&amp;self, name: &amp;str) -&gt; Option&lt;&amp;B&gt; {
+    self.bindings.lookup(name)
+}
+</pre>
+</div>
+
+<p>
+Como a lista percorre os elementos do mais recente ao mais antigo, o
+primeiro binding encontrado corresponde ao binding visível.
+</p>
+</div>
+</div>
+<div id="outline-container-org80cdea9" class="outline-3">
+<h3 id="org80cdea9">Consulta por índice</h3>
+<div class="outline-text-3" id="text-org80cdea9">
+<p>
+A consulta por índice utiliza a ordem mais recente primeiro:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust">pub fn lookup_index(&amp;self, index: usize) -&gt; Option&lt;&amp;B&gt; {
+    self.bindings
+        .iter()
+        .nth(index)
+        .map(|(_, binding)| binding)
+}
+</pre>
+</div>
+
+<p>
+Essa operação é adequada à implementação de índices de De Bruijn.
+</p>
+</div>
+</div>
+<div id="outline-container-org2a9fe57" class="outline-3">
+<h3 id="org2a9fe57">Iteração</h3>
+<div class="outline-text-3" id="text-org2a9fe57">
+<p>
+A iteração preserva as duas ordens úteis:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust">/// Mais recente para mais antigo.
+pub fn iter(&amp;self) -&gt; impl Iterator&lt;Item = (&amp;str, &amp;B)&gt; {
+    self.bindings.iter()
+}
+
+/// Mais antigo para mais recente.
+pub fn bindings(&amp;self) -&gt; Vec&lt;(&amp;str, &amp;B)&gt; {
+    self.bindings.values()
+}
+</pre>
+</div>
+
+<p>
+A escolha da ordem depende da operação semântica.
+</p>
+
+<p>
+Para resolução de variáveis e índices de De Bruijn, a ordem mais recente
+primeiro é conveniente.
+</p>
+
+<p>
+Para exibição e reconstrução da sequência de extensões, a ordem mais antiga
+primeiro pode ser mais apropriada.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgde6a2bd" class="outline-2">
+<h2 id="orgde6a2bd">Contextos genéricos</h2>
+<div class="outline-text-2" id="text-orgde6a2bd">
+<p>
+A abstração pode ser utilizada para diferentes categorias de informação.
+</p>
+</div>
+<div id="outline-container-org36f2199" class="outline-3">
+<h3 id="org36f2199">Contexto de tipos</h3>
+<div class="outline-text-3" id="text-org36f2199">
+<p>
+\[
+  \Gamma = [x_1:T_1,\ldots,x_n:T_n]
+\]
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust">pub type TypeContext&lt;T&gt; = Context&lt;T&gt;;
+</pre>
+</div>
+
+<p>
+Utilização:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust">let context: TypeContext&lt;Type&gt; = Context::empty()
+    .extend("x", Type::Integer)
+    .extend("y", Type::Boolean);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org0353c76" class="outline-3">
+<h3 id="org0353c76">Contexto de valores</h3>
+<div class="outline-text-3" id="text-org0353c76">
+<p>
+\[
+  \rho = [x_1 \mapsto v_1,\ldots,x_n \mapsto v_n]
+\]
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust">pub type ValueContext&lt;V&gt; = Context&lt;V&gt;;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org6de0e03" class="outline-3">
+<h3 id="org6de0e03">Contexto de termos</h3>
+<div class="outline-text-3" id="text-org6de0e03">
+<div class="org-src-container">
+<pre class="src src-rust">pub type TermContext&lt;T&gt; = Context&lt;T&gt;;
+</pre>
+</div>
+
+<p>
+Pode armazenar definições nomeadas, expressões ou termos associados a
+identificadores.
+</p>
+</div>
+</div>
+<div id="outline-container-org535e483" class="outline-3">
+<h3 id="org535e483">Contexto de substituições</h3>
+<div class="outline-text-3" id="text-org535e483">
+<div class="org-src-container">
+<pre class="src src-rust">pub type SubstitutionContext&lt;S&gt; = Context&lt;S&gt;;
+</pre>
+</div>
+
+<p>
+Pode representar associações utilizadas durante operações de substituição.
+</p>
+</div>
+</div>
+<div id="outline-container-org1edd649" class="outline-3">
+<h3 id="org1edd649">Ambiente de execução</h3>
+<div class="outline-text-3" id="text-org1edd649">
+<div class="org-src-container">
+<pre class="src src-rust">pub type Environment&lt;V&gt; = Context&lt;V&gt;;
+</pre>
+</div>
+
+<p>
+Um ambiente de execução associa variáveis a valores.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org7ce3b54" class="outline-2">
+<h2 id="org7ce3b54">Relação com a semântica formal</h2>
+<div class="outline-text-2" id="text-org7ce3b54">
+</div>
+<div id="outline-container-org84d71a0" class="outline-3">
+<h3 id="org84d71a0">Julgamentos de tipagem</h3>
+<div class="outline-text-3" id="text-org84d71a0">
+<p>
+Um julgamento de tipagem tem a forma:
+</p>
+
+<p>
+\[
+  \Gamma \vdash t : T
+\]
+</p>
+
+<p>
+O contexto Γ fornece os tipos das variáveis livres de t.
+</p>
+
+<p>
+Por exemplo, uma regra de variável pode ser representada por:
+</p>
+
+<p>
+\[
+\frac{x:T \in \Gamma}
+     {\Gamma \vdash x:T}
+\]
+</p>
+
+<p>
+A operação <code>lookup</code> fornece a associação necessária para verificar a
+premissa.
+</p>
+</div>
+</div>
+<div id="outline-container-orgebf9bd3" class="outline-3">
+<h3 id="orgebf9bd3">Avaliação</h3>
+<div class="outline-text-3" id="text-orgebf9bd3">
+<p>
+Na semântica operacional, um ambiente pode ser representado por:
+</p>
+
+<p>
+\[
+  \rho = [x_1 \mapsto v_1,\ldots,x_n \mapsto v_n]
+\]
+</p>
+
+<p>
+A avaliação de uma variável utiliza o ambiente:
+</p>
+
+<p>
+\[
+  \langle x,\rho\rangle \Downarrow \rho(x)
+\]
+</p>
+</div>
+</div>
+<div id="outline-container-orgb18522c" class="outline-3">
+<h3 id="orgb18522c">Escopos lexicais</h3>
+<div class="outline-text-3" id="text-orgb18522c">
+<p>
+A persistência permite representar diferentes escopos sem modificar
+ambientes anteriores.
+</p>
+
+<p>
+Por exemplo:
+</p>
+
+<p>
+\[
+  \rho_0 = []
+\]
+</p>
+
+<p>
+\[
+  \rho_1 = \rho_0, x \mapsto 10
+\]
+</p>
+
+<p>
+\[
+  \rho_2 = \rho_1, y \mapsto 20
+\]
+</p>
+
+<p>
+Cada ambiente preserva a estrutura anterior.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org5918b00" class="outline-2">
+<h2 id="org5918b00">Índices de De Bruijn</h2>
+<div class="outline-text-2" id="text-org5918b00">
+<p>
+Índices de De Bruijn substituem nomes de variáveis por índices que
+representam a distância até a abstração correspondente.
+</p>
+
+<p>
+Considere:
+</p>
+
+<p>
+\[
+  \Gamma = [x \mapsto b_x,\; y \mapsto b_y,\; z \mapsto b_z]
+\]
+</p>
+
+<p>
+Com o binding mais recente no índice zero:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-right">
+
+<col  class="org-left">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">Índice</th>
+<th scope="col" class="org-left">Variável</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">0</td>
+<td class="org-left">z</td>
+</tr>
+
+<tr>
+<td class="org-right">1</td>
+<td class="org-left">y</td>
+</tr>
+
+<tr>
+<td class="org-right">2</td>
+<td class="org-left">x</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+A consulta por índice é:
+</p>
+
+<p>
+\[
+  \operatorname{lookupIndex}(\Gamma,i)
+\]
+</p>
+
+<p>
+Essa convenção deve ser mantida consistentemente nas operações de
+deslocamento, substituição e interpretação de termos nameless.
+</p>
+</div>
+</div>
+<div id="outline-container-org2edb972" class="outline-2">
+<h2 id="org2edb972">Estratégias de armazenamento</h2>
+<div class="outline-text-2" id="text-org2edb972">
+</div>
+<div id="outline-container-org2b33672" class="outline-3">
+<h3 id="org2b33672">LinkedList</h3>
+<div class="outline-text-3" id="text-org2b33672">
+<p>
+A implementação baseada em lista persistente é apropriada quando:
+</p>
+
+<ul class="org-ul">
+<li>é necessário preservar versões anteriores do contexto;</li>
+<li>há muitos escopos aninhados;</li>
+<li>sombreamento precisa ser preservado;</li>
+<li>consultas por índice são frequentes;</li>
+<li>a ordem de inserção possui significado semântico.</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgd846a21" class="outline-3">
+<h3 id="orgd846a21">HashMap</h3>
+<div class="outline-text-3" id="text-orgd846a21">
+<p>
+A implementação baseada em mapa é apropriada quando:
+</p>
+
+<ul class="org-ul">
+<li>a consulta por identificador é predominante;</li>
+<li>não é necessário preservar associações anteriores;</li>
+<li>a substituição de bindings é aceitável;</li>
+<li>a ordem dos elementos não é semanticamente relevante.</li>
+</ul>
+
+<p>
+As duas implementações não devem ser consideradas semanticamente
+intercambiáveis sem que suas diferenças sejam explicitadas.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgbc3a968" class="outline-2">
+<h2 id="orgbc3a968">Testes e propriedades</h2>
+<div class="outline-text-2" id="text-orgbc3a968">
+<p>
+A implementação deve verificar as seguintes propriedades.
+</p>
+</div>
+<div id="outline-container-org4e284df" class="outline-3">
+<h3 id="org4e284df">Persistência</h3>
+<div class="outline-text-3" id="text-org4e284df">
+<p>
+A extensão não modifica o contexto original:
+</p>
+
+<p>
+\[
+  \Gamma' = \operatorname{extend}(\Gamma,x,b)
+\]
+</p>
+
+<p>
+\[
+  \Gamma \neq \Gamma'
+\]
+</p>
+
+<p>
+quando a extensão adiciona uma associação nova.
+</p>
+</div>
+</div>
+<div id="outline-container-org6311f45" class="outline-3">
+<h3 id="org6311f45">Sombreamento</h3>
+<div class="outline-text-3" id="text-org6311f45">
+<p>
+Uma associação mais recente deve prevalecer na consulta nominal:
+</p>
+
+<p>
+\[
+  \operatorname{lookup}(
+    \Gamma,x
+  ) = b_{\text{recente}}
+\]
+</p>
+</div>
+</div>
+<div id="outline-container-orgcac0040" class="outline-3">
+<h3 id="orgcac0040">Indexação</h3>
+<div class="outline-text-3" id="text-orgcac0040">
+<p>
+O índice zero deve representar o binding mais recente:
+</p>
+
+<p>
+\[
+  \operatorname{lookupIndex}(\Gamma,0)
+  =
+  \operatorname{last}(\Gamma)
+\]
+</p>
+
+<p>
+considerando a sequência de extensões.
+</p>
+</div>
+</div>
+<div id="outline-container-org14ba2cf" class="outline-3">
+<h3 id="org14ba2cf">Ordem de iteração</h3>
+<div class="outline-text-3" id="text-org14ba2cf">
+<p>
+As operações de iteração devem respeitar as convenções documentadas.
+</p>
+</div>
+</div>
+<div id="outline-container-org6c3a424" class="outline-3">
+<h3 id="org6c3a424">Igualdade</h3>
+<div class="outline-text-3" id="text-org6c3a424">
+<p>
+A igualdade estrutural deve considerar os nomes, os valores e a ordem
+dos bindings.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgcb5ccb8" class="outline-2">
+<h2 id="orgcb5ccb8">Decisões de implementação</h2>
+<div class="outline-text-2" id="text-orgcb5ccb8">
+<ol class="org-ol">
+<li><code>Context&lt;B&gt;</code> utiliza <code>LinkedList&lt;B&gt;</code>.</li>
+<li>A lista é a única responsável por armazenar os nomes e os valores.</li>
+<li>Não há uma segunda implementação de <code>Node</code>.</li>
+<li>Não há gerenciamento próprio de <code>Rc</code> em <code>Context</code>.</li>
+<li>Não há implementação própria de <code>Drop</code> em <code>Context</code>.</li>
+<li>A extensão é persistente.</li>
+<li>O binding mais recente tem precedência em consultas nominais.</li>
+<li>O índice zero corresponde ao binding mais recente.</li>
+<li>A implementação baseada em mapa possui semântica documentada
+separadamente.</li>
+<li>Os contextos de tipos, valores, termos e substituições são
+especializações da abstração genérica.</li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org8c8e901" class="outline-2">
+<h2 id="org8c8e901">Referências internas</h2>
+</div>
+
+<div id="outline-container-orga2972cb" class="outline-2">
+<h2 id="orga2972cb">Próximos passos</h2>
+<div class="outline-text-2" id="text-orga2972cb">
+</div>
+<div id="outline-container-org652673b" class="outline-3">
+<h3 id="org652673b"><span class="todo TODO">TODO</span> Revisar a interface abstrata e suas restrições de tipos.</h3>
+</div>
+<div id="outline-container-org45132f1" class="outline-3">
+<h3 id="org45132f1"><span class="todo TODO">TODO</span> Integrar os contextos ao sistema de tipagem.</h3>
+</div>
+<div id="outline-container-orgb6b9b92" class="outline-3">
+<h3 id="orgb6b9b92"><span class="todo TODO">TODO</span> Integrar os contextos à semântica operacional.</h3>
+</div>
+<div id="outline-container-orgd1c8eca" class="outline-3">
+<h3 id="orgd1c8eca"><span class="todo TODO">TODO</span> Verificar a compatibilidade com termos nameless.</h3>
+</div>
+<div id="outline-container-orgffb0c9b" class="outline-3">
+<h3 id="orgffb0c9b"><span class="todo TODO">TODO</span> Implementar suporte a representação LaTeX.</h3>
+</div>
+<div id="outline-container-org2a8de92" class="outline-3">
+<h3 id="org2a8de92"><span class="todo TODO">TODO</span> Consolidar testes de persistência, sombreamento e indexação.</h3>
+<div class="outline-text-3" id="text-org2a8de92">
+<span class="pf-meta" data-pagefind-filter="tipo[data-v]" data-v="estudo"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="programming-languages"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="semantics"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="rust"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="context"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="estudo"></span>
+<span class="pf-meta" data-pagefind-filter="status[data-v]" data-v="semente"></span>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
