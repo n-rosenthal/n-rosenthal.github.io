@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<!-- 2026-11-27 Fri 22:45 -->
+<!-- 2026-11-27 Fri 23:57 -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Aplicações de Pré-ordens, Morfismos e Diagramas de Hasse em Rust</title>
@@ -60,29 +60,29 @@
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orge794b7c">Aplicações Integradas</a>
+<li><a href="#org27f29fc">Aplicações Integradas</a>
 <ul>
-<li><a href="#orge97178f">Importações</a></li>
-<li><a href="#orgc7578f3">Aplicação 1: Resolução de Dependências e Detecção de Ciclos Mútuos</a></li>
-<li><a href="#org280280a">Aplicação 2: Reticulado de Divisibilidade nos Inteiros</a></li>
-<li><a href="#org452347b">Aplicação 3: Interpretação Abstrata e Análise de Sinais via Conexão de Galois</a></li>
-<li><a href="#org17b2b5d">Aplicação 4: Triagem Multicritério (Produto, Ordem Lexicográfica e Dualidade)</a></li>
-<li><a href="#org34ee1ea">Suíte de Verificação (<code>cargo test</code>)</a></li>
+<li><a href="#org11f5baa">Importações</a></li>
+<li><a href="#org567a14c">Aplicação 1: Resolução de Dependências e Detecção de Ciclos Mútuos</a></li>
+<li><a href="#orge6cbeb1">Aplicação 2: Reticulado de Divisibilidade nos Inteiros</a></li>
+<li><a href="#org7f73e6e">Aplicação 3: Interpretação Abstrata e Análise de Sinais via Conexão de Galois</a></li>
+<li><a href="#org4592057">Aplicação 4: Triagem Multicritério (Produto, Ordem Lexicográfica e Dualidade)</a></li>
+<li><a href="#orga081f38">Suíte de Verificação (<code>cargo test</code>)</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </nav>
-<div id="outline-container-orge794b7c" class="outline-2">
-<h2 id="orge794b7c">Aplicações Integradas</h2>
-<div class="outline-text-2" id="text-orge794b7c">
+<div id="outline-container-org27f29fc" class="outline-2">
+<h2 id="org27f29fc">Aplicações Integradas</h2>
+<div class="outline-text-2" id="text-org27f29fc">
 <p>
 Este estudo reúne quatro domínios práticos que exercitam todo o ecossistema construído nos módulos anteriores (<code>lib.rs</code>, <code>operations.rs</code>, <code>morphisms.rs</code> e <code>hasse.rs</code>), conectando teoria da ordem, análise estática e algoritmos em grafos.
 </p>
 </div>
-<div id="outline-container-orge97178f" class="outline-3">
-<h3 id="orge97178f">Importações</h3>
-<div class="outline-text-3" id="text-orge97178f">
+<div id="outline-container-org11f5baa" class="outline-3">
+<h3 id="org11f5baa">Importações</h3>
+<div class="outline-text-3" id="text-org11f5baa">
 <div class="org-src-container">
 <pre class="src src-rust">use std::collections::{BTreeSet, HashMap, HashSet};
 
@@ -94,9 +94,9 @@ use crate::{OrderError, PartialOrderSet, Preorder, PreorderSet, Relation};
 </div>
 </div>
 </div>
-<div id="outline-container-orgc7578f3" class="outline-3">
-<h3 id="orgc7578f3">Aplicação 1: Resolução de Dependências e Detecção de Ciclos Mútuos</h3>
-<div class="outline-text-3" id="text-orgc7578f3">
+<div id="outline-container-org567a14c" class="outline-3">
+<h3 id="org567a14c">Aplicação 1: Resolução de Dependências e Detecção de Ciclos Mútuos</h3>
+<div class="outline-text-3" id="text-org567a14c">
 <p>
 Considere um sistema de compilação ou gerenciador de pacotes em que uma aresta direcionada \( u \to v \) significa <b>"\( u \) deve ser compilado antes de \( v \)"</b> (isto é, \( v \) depende de \( u \)).
 </p>
@@ -167,9 +167,9 @@ pub fn analyze_build_dependencies() -&gt; BuildPlanReport {
 </div>
 </div>
 </div>
-<div id="outline-container-org280280a" class="outline-3">
-<h3 id="org280280a">Aplicação 2: Reticulado de Divisibilidade nos Inteiros</h3>
-<div class="outline-text-3" id="text-org280280a">
+<div id="outline-container-orge6cbeb1" class="outline-3">
+<h3 id="orge6cbeb1">Aplicação 2: Reticulado de Divisibilidade nos Inteiros</h3>
+<div class="outline-text-3" id="text-orge6cbeb1">
 <p>
 Sobre o conjunto de inteiros \( \mathbb{Z} \), a relação de divisibilidade \( a \preceq b \iff a \mid b \) é uma <b>pré-ordem genuína</b>, pois \( a \mid -a \) e \( -a \mid a \) implicam \( a \sim -a \) sem que \( a = -a \).
 </p>
@@ -230,9 +230,9 @@ pub fn analyze_divisibility_lattice() -&gt; DivisibilityReport {
 </div>
 </div>
 </div>
-<div id="outline-container-org452347b" class="outline-3">
-<h3 id="org452347b">Aplicação 3: Interpretação Abstrata e Análise de Sinais via Conexão de Galois</h3>
-<div class="outline-text-3" id="text-org452347b">
+<div id="outline-container-org7f73e6e" class="outline-3">
+<h3 id="org7f73e6e">Aplicação 3: Interpretação Abstrata e Análise de Sinais via Conexão de Galois</h3>
+<div class="outline-text-3" id="text-org7f73e6e">
 <p>
 Na verificação estática de programas, aproxima-se um domínio concreto de conjuntos de valores por um domínio abstrato finito usando uma <b>conexão de Galois</b> \( \alpha \dashv \gamma \):
 </p>
@@ -357,9 +357,9 @@ pub fn build_sign_galois_connection() -&gt; SignAnalysisReport {
 </div>
 </div>
 </div>
-<div id="outline-container-org17b2b5d" class="outline-3">
-<h3 id="org17b2b5d">Aplicação 4: Triagem Multicritério (Produto, Ordem Lexicográfica e Dualidade)</h3>
-<div class="outline-text-3" id="text-org17b2b5d">
+<div id="outline-container-org4592057" class="outline-3">
+<h3 id="org4592057">Aplicação 4: Triagem Multicritério (Produto, Ordem Lexicográfica e Dualidade)</h3>
+<div class="outline-text-3" id="text-org4592057">
 <p>
 Na priorização de tarefas de engenharia, cada tarefa \( t \) possui dois atributos: <b>severidade</b> \( s(t) \in \{1, 2, 3\} \) (quanto maior, mais urgente) e <b>esforço</b> \( e(t) \in \{1, 2, 5\} \) (quanto menor, mais desejável — modelado via <code>Dual</code>).
 </p>
@@ -477,9 +477,9 @@ pub fn triage_tasks() -&gt; TriageReport {
 </div>
 </div>
 </div>
-<div id="outline-container-org34ee1ea" class="outline-3">
-<h3 id="org34ee1ea">Suíte de Verificação (<code>cargo test</code>)</h3>
-<div class="outline-text-3" id="text-org34ee1ea">
+<div id="outline-container-orga081f38" class="outline-3">
+<h3 id="orga081f38">Suíte de Verificação (<code>cargo test</code>)</h3>
+<div class="outline-text-3" id="text-orga081f38">
 <p>
 Os testes abaixo validam cada propriedade matemática demonstrada nas quatro aplicações.
 </p>

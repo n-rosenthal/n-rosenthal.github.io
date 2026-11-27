@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<!-- 2026-11-27 Fri 23:57 -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Relação de Ordem e Reticulados</title>
+<meta name="author" content="n-rosenthal" />
+<meta name="description" content="Definição formal de pré-ordem, ordem parcial (poset), ordem total, elementos extremos e reticulados." />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/estudo.css">
+<link rel="alternate" type="application/atom+xml" title="Notas de estudo" href="/feed.xml">
+<script defer src="/js/grafo-local.js"></script>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Relação de Ordem e Reticulados">
+<meta property="og:description" content="Definição formal de pré-ordem, ordem parcial (poset), ordem total, elementos extremos e reticulados.">
+<meta property="og:url" content="https://n-rosenthal.github.io/estudo/conceitos/relacao-de-ordem-e-reticulados.html">
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav class="nav"><a href="/">Início</a><a href="/grafo.html">Grafo</a><a href="/feed.xml">Feed</a></nav><div class="meta-nota"><span class="selo selo-semente">semente</span><span>4 min de leitura</span><span>criada em 2026-11-27</span><span>atualizada em 2026-11-27</span></div>
+</div>
+<div id="content" class="content">
+<header>
+<h1 class="title">Relação de Ordem e Reticulados</h1>
+</header><nav id="table-of-contents" role="doc-toc">
+<h2>&Iacute;ndice</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org37dd556">Definição Formal</a></li>
+<li><a href="#org2cd822f">Elementos Distintos e Limites em um Poset \((P, \le)\)</a></li>
+<li><a href="#orgffa93a2">Reticulados (Lattices)</a></li>
+<li><a href="#orgdfcd944">Teorema Elementar (Unicidade do Supremo e Caracterização Algébrica)</a></li>
+<li><a href="#org2ad55eb">Papel na Álgebra de Lang</a></li>
+<li><a href="#org00888cb">Realizações Computacionais e Formais</a></li>
+<li><a href="#orgd21b36f">Citada em</a></li>
+</ul>
+</div>
+</nav>
+<div id="outline-container-org37dd556" class="outline-2">
+<h2 id="org37dd556">Definição Formal</h2>
+<div class="outline-text-2" id="text-org37dd556">
+<p>
+Uma <a href="/estudo/conceitos/relacao.html">Relação</a> homogênea \({\le} \subseteq P \times P\) sobre um conjunto \(P\) admite uma hierarquia de estruturas conforme os axiomas que satisfaz para quaisquer \(a, b, c \in P\):
+</p>
+
+<ol class="org-ol">
+<li><b>Pré-ordem (Quasi-ordem):</b> É reflexiva (\(a \le a\)) e transitiva (\(a \le b \land b \le c \implies a \le c\)).</li>
+<li><b>Ordem Parcial (Poset — Partially Ordered Set):</b> É uma pré-ordem <b><b>antissimétrica</b></b>:
+\[(a \le b \;\land\; b \le a) \implies a = b.\]</li>
+<li><b>Ordem Total (Cadeia / Ordem Linear):</b> É uma ordem parcial em que quaisquer dois elementos são comparáveis:
+\[\forall a, b \in P,\quad a \le b \;\lor\; b \le a.\]</li>
+<li><b>Boa-Ordem:</b> É uma ordem total na qual todo subconjunto não-vazio \(S \subseteq P\) possui um elemento mínimo.</li>
+</ol>
+
+<p>
+<b>(Nota: Todo conjunto pré-ordenado \((P, \lesssim)\) induz naturalmente uma <a href="/estudo/conceitos/relacao-de-equivalencia-e-conjunto-quociente.html">Relação de Equivalência e Conjunto Quociente</a> dada por \(a \sim b \iff (a \lesssim b \land b \lesssim a)\), tornando o quociente \(P/{\sim}\) um Poset).</b>
+</p>
+</div>
+</div>
+<div id="outline-container-org2cd822f" class="outline-2">
+<h2 id="org2cd822f">Elementos Distintos e Limites em um Poset \((P, \le)\)</h2>
+<div class="outline-text-2" id="text-org2cd822f">
+<p>
+Seja \(S \subseteq P\) um subconjunto e \(m \in P\):
+</p>
+<ul class="org-ul">
+<li><b>Elemento Minimal / Maximal:</b> \(m \in S\) é minimal em \(S\) se \(\forall x \in S,\; x \le m \implies x = m\) (e maximal se \(m \le x \implies x = m\)).</li>
+<li><b>Mínimo / Máximo:</b> \(m \in S\) é mínimo de \(S\) se \(\forall x \in S,\; m \le x\) (único pela antissimetria).</li>
+<li><b>Ínfimo (\(\bigwedge S\), meet) e Supremo (\(\bigvee S\), join):</b> Respectivamente, a maior cota inferior e a menor cota superior de \(S\) em \(P\).</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgffa93a2" class="outline-2">
+<h2 id="orgffa93a2">Reticulados (Lattices)</h2>
+<div class="outline-text-2" id="text-orgffa93a2">
+<p>
+Um poset \((L, \le)\) é um <b><b>reticulado</b></b> se todo par de elementos \(\{a, b\} \subseteq L\) admite um supremo \(a \vee b = \sup\{a, b\}\) (<b>join</b>) e um ínfimo \(a \wedge b = \inf\{a, b\}\) (<b>meet</b>).
+</p>
+</div>
+</div>
+<div id="outline-container-orgdfcd944" class="outline-2">
+<h2 id="orgdfcd944">Teorema Elementar (Unicidade do Supremo e Caracterização Algébrica)</h2>
+<div class="outline-text-2" id="text-orgdfcd944">
+<p>
+<b>Proposição.</b> Em um poset \((P, \le)\):
+</p>
+<ol class="org-ol">
+<li>Se o supremo de \(S \subseteq P\) existe, ele é único.</li>
+<li>Em um reticulado, \(a \le b \iff a \wedge b = a \iff a \vee b = b\).</li>
+</ol>
+
+<p>
+<i>Demonstração.</i>
+</p>
+<ol class="org-ol">
+<li>Se \(s_1\) e \(s_2\) são ambos menores cotas superiores de \(S\), então \(s_1 \le s_2\) (pois \(s_2\) é cota superior e \(s_1\) é a menor) e \(s_2 \le s_1\); pela antissimetria, \(s_1 = s_2\).</li>
+<li>Se \(a \le b\), como \(a \le a\), \(a\) é cota inferior de \(\{a, b\}\); qualquer outra cota inferior \(c\) satisfaz \(c \le a\), logo \(\inf\{a, b\} = a\). Reciprocamente, se \(a \wedge b = a\), como \(a \wedge b \le b\), segue \(a \le b\). O caso de \(a \vee b = b\) é dual. \(\blacksquare\)</li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org2ad55eb" class="outline-2">
+<h2 id="org2ad55eb">Papel na Álgebra de Lang</h2>
+<div class="outline-text-2" id="text-org2ad55eb">
+<ul class="org-ul">
+<li><b><b>Reticulado de Subestruturas:</b></b> Os subgrupos de um grupo \(G\), os ideais de um anel \(R\) e os subcorpos intermediários de uma extensão \(E/F\) (Teorema Fundamental de Galois) formam reticulados completos sob inclusão \(\subseteq\).</li>
+<li><b><b>Lema de Zorn (Cap. I / Apêndice):</b></b> Se toda cadeia em um poset não-vazio \(P\) tem cota superior, então \(P\) possui ao menos um elemento maximal — princípio utilizado por Lang para provar que todo anel comutativo com unidade possui um ideal maximal e que todo espaço vetorial possui base.</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org00888cb" class="outline-2">
+<h2 id="org00888cb">Realizações Computacionais e Formais</h2>
+<div class="outline-text-2" id="text-org00888cb">
+<ul class="org-ul">
+<li>Especificação equacional em Maude: <a href="/estudo/conceitos/relacoes-de-ordem-em-maude.html">Relações de Ordem em Maude</a></li>
+<li>Formalização dependente e provas em Lean 4: <a href="/estudo/conceitos/relacoes-de-ordem-em-lean-4.html">Relações de Ordem em Lean 4</a></li>
+<li>Estrutura de Poset finito, diagrama de Hasse e reticulado em Rust: <a href="/estudo/conceitos/relacoes-de-ordem-em-rust.html">Relações de Ordem em Rust</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgd21b36f" class="outline-2">
+<h2 id="orgd21b36f">Citada em</h2>
+<div class="outline-text-2" id="text-orgd21b36f">
+<ul class="backlinks">
+<li><a href="/estudo/conceitos/relacoes-de-ordem-em-lean-4.html">Relações de Ordem em Lean 4</a></li>
+<li><a href="/estudo/conceitos/relacoes-de-ordem-em-maude.html">Relações de Ordem em Maude</a></li>
+<li><a href="/estudo/conceitos/relacoes-de-ordem-em-rust.html">Relações de Ordem em Rust</a></li>
+</ul>
+
+<span class="pf-meta" data-pagefind-filter="tipo[data-v]" data-v="conceito"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="algebra"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="order-theory"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="conceito"></span>
+<span class="pf-meta" data-pagefind-filter="status[data-v]" data-v="semente"></span>
+</div>
+</div>
+</div>
+</body>
+</html>

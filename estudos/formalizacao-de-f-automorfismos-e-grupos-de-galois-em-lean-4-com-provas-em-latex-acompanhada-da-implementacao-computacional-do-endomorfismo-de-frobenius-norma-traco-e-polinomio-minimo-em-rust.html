@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<!-- 2026-11-27 Fri 22:45 -->
+<!-- 2026-11-27 Fri 23:57 -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Teoria de Galois Finita, Automorfismo de Frobenius, Norma e Traço (Lean 4 + Rust)</title>
@@ -60,32 +60,32 @@
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org37ee67d">Visão Geral: Simetrias de Corpos e o Grupo de Galois (Lang, Cap. VI, §1–§6)</a></li>
-<li><a href="#orga3a358c">Camada Formal em Lean 4 (<code>GaloisTheory.lean</code>)</a>
+<li><a href="#orgc831a4a">Visão Geral: Simetrias de Corpos e o Grupo de Galois (Lang, Cap. VI, §1–§6)</a></li>
+<li><a href="#orga4b759c">Camada Formal em Lean 4 (<code>GaloisTheory.lean</code>)</a>
 <ul>
-<li><a href="#org9671578">Automorfismos de Corpos e $F$-Estabilidade (Grupo de Galois)</a></li>
-<li><a href="#org39b47ef">Teorema 1: Estrutura de Grupo de \(\text{Gal}(E/F)\)</a>
+<li><a href="#org649894d">Automorfismos de Corpos e $F$-Estabilidade (Grupo de Galois)</a></li>
+<li><a href="#orga599d94">Teorema 1: Estrutura de Grupo de \(\text{Gal}(E/F)\)</a>
 <ul>
-<li><a href="#orgd74ba13">Prova Matemática (LaTeX)</a></li>
-<li><a href="#org9b5eb7b">Implementação e Provas em Lean 4</a></li>
+<li><a href="#orged8a34e">Prova Matemática (LaTeX)</a></li>
+<li><a href="#org7949b47">Implementação e Provas em Lean 4</a></li>
 </ul>
 </li>
-<li><a href="#org6ef85f4">Teorema 2: Ação de \(\text{Gal}(E/F)\) sobre Raízes de Polinômios em \(F[x]\)</a>
+<li><a href="#org51f63ae">Teorema 2: Ação de \(\text{Gal}(E/F)\) sobre Raízes de Polinômios em \(F[x]\)</a>
 <ul>
-<li><a href="#orgac21a0f">Prova Matemática (LaTeX)</a></li>
-<li><a href="#org30df0a8">Implementação em Lean 4</a></li>
+<li><a href="#org525fd51">Prova Matemática (LaTeX)</a></li>
+<li><a href="#org5e8289e">Implementação em Lean 4</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org96180c4">Motor Computacional em Rust: Frobenius, Norma, Traço e Polinômio Mínimo</a></li>
-<li><a href="#org38452b8">Próximo Passo: Álgebra Linear sobre PIDs e Forma Normal de Smith (Lang, Cap. III e XV)</a></li>
+<li><a href="#org69f9bb3">Motor Computacional em Rust: Frobenius, Norma, Traço e Polinômio Mínimo</a></li>
+<li><a href="#org5225796">Próximo Passo: Álgebra Linear sobre PIDs e Forma Normal de Smith (Lang, Cap. III e XV)</a></li>
 </ul>
 </div>
 </nav>
-<div id="outline-container-org37ee67d" class="outline-2">
-<h2 id="org37ee67d">Visão Geral: Simetrias de Corpos e o Grupo de Galois (Lang, Cap. VI, §1–§6)</h2>
-<div class="outline-text-2" id="text-org37ee67d">
+<div id="outline-container-orgc831a4a" class="outline-2">
+<h2 id="orgc831a4a">Visão Geral: Simetrias de Corpos e o Grupo de Galois (Lang, Cap. VI, §1–§6)</h2>
+<div class="outline-text-2" id="text-orgc831a4a">
 <p>
 No estudo anterior, construímos extensões algébricas simples \(E = K[x]/(f(x))\) e corpos finitos \(\mathbb{F}_{p^n}\). Agora entramos no núcleo do <b><b>Capítulo VI do Lang (Teoria de Galois)</b></b>: o estudo do grupo de automorfismos de uma extensão de corpos \(E / F\).
 </p>
@@ -109,13 +109,13 @@ Neste estudo:
 </ol>
 </div>
 </div>
-<div id="outline-container-orga3a358c" class="outline-2">
-<h2 id="orga3a358c">Camada Formal em Lean 4 (<code>GaloisTheory.lean</code>)</h2>
-<div class="outline-text-2" id="text-orga3a358c">
+<div id="outline-container-orga4b759c" class="outline-2">
+<h2 id="orga4b759c">Camada Formal em Lean 4 (<code>GaloisTheory.lean</code>)</h2>
+<div class="outline-text-2" id="text-orga4b759c">
 </div>
-<div id="outline-container-org9671578" class="outline-3">
-<h3 id="org9671578">Automorfismos de Corpos e $F$-Estabilidade (Grupo de Galois)</h3>
-<div class="outline-text-3" id="text-org9671578">
+<div id="outline-container-org649894d" class="outline-3">
+<h3 id="org649894d">Automorfismos de Corpos e $F$-Estabilidade (Grupo de Galois)</h3>
+<div class="outline-text-3" id="text-org649894d">
 <p>
 Modelamos uma extensão de corpos \(E / F\) através de um homomorfismo injetivo canônico \(\iota : F \to E\) (a inclusão do corpo base no corpo extensão) e definimos \(\text{Gal}(E/F)\) como o tipo dos automorfismos bijetivos \(\sigma : E \to E\) compatíveis com \(\iota\).
 </p>
@@ -148,13 +148,13 @@ structure GaloisAut {F E : Type u} [Field F] [Field E] (ι : RingHom F E) extend
 </div>
 </div>
 </div>
-<div id="outline-container-org39b47ef" class="outline-3">
-<h3 id="org39b47ef">Teorema 1: Estrutura de Grupo de \(\text{Gal}(E/F)\)</h3>
-<div class="outline-text-3" id="text-org39b47ef">
+<div id="outline-container-orga599d94" class="outline-3">
+<h3 id="orga599d94">Teorema 1: Estrutura de Grupo de \(\text{Gal}(E/F)\)</h3>
+<div class="outline-text-3" id="text-orga599d94">
 </div>
-<div id="outline-container-orgd74ba13" class="outline-4">
-<h4 id="orgd74ba13">Prova Matemática (LaTeX)</h4>
-<div class="outline-text-4" id="text-orgd74ba13">
+<div id="outline-container-orged8a34e" class="outline-4">
+<h4 id="orged8a34e">Prova Matemática (LaTeX)</h4>
+<div class="outline-text-4" id="text-orged8a34e">
 <p>
 <b>Teorema 1.1 (Grupo de Galois).</b> Seja \(\iota : F \hookrightarrow E\) uma extensão de corpos. O conjunto \(\text{Gal}(E/F)\) munido da composição de funções \((\sigma \circ \tau)(x) = \sigma(\tau(x))\), da identidade \(\text{id}_E\) e da inversa funcional \(\sigma^{-1}\) forma um grupo.
 </p>
@@ -172,9 +172,9 @@ Além disso, \(\sigma^{-1}\) preserva soma e produto: por exemplo, \(\sigma(\sig
 </ol>
 </div>
 </div>
-<div id="outline-container-org9b5eb7b" class="outline-4">
-<h4 id="org9b5eb7b">Implementação e Provas em Lean 4</h4>
-<div class="outline-text-4" id="text-org9b5eb7b">
+<div id="outline-container-org7949b47" class="outline-4">
+<h4 id="org7949b47">Implementação e Provas em Lean 4</h4>
+<div class="outline-text-4" id="text-org7949b47">
 <div class="org-src-container">
 <pre class="src src-lean4">section GaloisGroupStructure
 variable {F E : Type u} [Field F] [Field E] (ι : RingHom F E)
@@ -240,13 +240,13 @@ end GaloisGroupStructure
 </div>
 </div>
 </div>
-<div id="outline-container-org6ef85f4" class="outline-3">
-<h3 id="org6ef85f4">Teorema 2: Ação de \(\text{Gal}(E/F)\) sobre Raízes de Polinômios em \(F[x]\)</h3>
-<div class="outline-text-3" id="text-org6ef85f4">
+<div id="outline-container-org51f63ae" class="outline-3">
+<h3 id="org51f63ae">Teorema 2: Ação de \(\text{Gal}(E/F)\) sobre Raízes de Polinômios em \(F[x]\)</h3>
+<div class="outline-text-3" id="text-org51f63ae">
 </div>
-<div id="outline-container-orgac21a0f" class="outline-4">
-<h4 id="orgac21a0f">Prova Matemática (LaTeX)</h4>
-<div class="outline-text-4" id="text-orgac21a0f">
+<div id="outline-container-org525fd51" class="outline-4">
+<h4 id="org525fd51">Prova Matemática (LaTeX)</h4>
+<div class="outline-text-4" id="text-org525fd51">
 <p>
 <b>Teorema 2.1 (Permutação de Raízes).</b> Seja \(g(x) = \sum_{i=0}^{d} c_i x^i \in F[x]\) um polinômio com coeficientes no corpo base \(F\), e seja \(\alpha \in E\) uma raiz de \(g\) (isto é, \(g(\alpha) = 0\)). Então, para todo \(\sigma \in \text{Gal}(E/F)\), o conjugado \(\sigma(\alpha)\) também é raiz de \(g\):
 \[g(\sigma(\alpha)) = 0.\]
@@ -258,9 +258,9 @@ end GaloisGroupStructure
 </p>
 </div>
 </div>
-<div id="outline-container-org30df0a8" class="outline-4">
-<h4 id="org30df0a8">Implementação em Lean 4</h4>
-<div class="outline-text-4" id="text-org30df0a8">
+<div id="outline-container-org5e8289e" class="outline-4">
+<h4 id="org5e8289e">Implementação em Lean 4</h4>
+<div class="outline-text-4" id="text-org5e8289e">
 <p>
 Definimos a avaliação de um polinômio \(g \in F[x]\) em um ponto \(\alpha \in E\) (via esquema de Horner) e provamos formalmente que \(\sigma(g(\alpha)) = g(\sigma(\alpha))\):
 </p>
@@ -299,9 +299,9 @@ end StrangeAlgebras.Galois
 </div>
 </div>
 </div>
-<div id="outline-container-org96180c4" class="outline-2">
-<h2 id="org96180c4">Motor Computacional em Rust: Frobenius, Norma, Traço e Polinômio Mínimo</h2>
-<div class="outline-text-2" id="text-org96180c4">
+<div id="outline-container-org69f9bb3" class="outline-2">
+<h2 id="org69f9bb3">Motor Computacional em Rust: Frobenius, Norma, Traço e Polinômio Mínimo</h2>
+<div class="outline-text-2" id="text-org69f9bb3">
 <p>
 Para corpos finitos \(E = \mathbb{F}_{p^n} = \mathbb{F}_p[x]/(f(x))\) (onde \(n = \deg(f)\)), o grupo de Galois \(\text{Gal}(\mathbb{F}_{p^n} / \mathbb{F}_p)\) é gerado pelo <b><b>Automorfismo de Frobenius</b></b> \(\Phi_p(\alpha) = \alpha^p\).
 </p>
@@ -487,9 +487,9 @@ mod tests {
 </div>
 </div>
 </div>
-<div id="outline-container-org38452b8" class="outline-2">
-<h2 id="org38452b8">Próximo Passo: Álgebra Linear sobre PIDs e Forma Normal de Smith (Lang, Cap. III e XV)</h2>
-<div class="outline-text-2" id="text-org38452b8">
+<div id="outline-container-org5225796" class="outline-2">
+<h2 id="org5225796">Próximo Passo: Álgebra Linear sobre PIDs e Forma Normal de Smith (Lang, Cap. III e XV)</h2>
+<div class="outline-text-2" id="text-org5225796">
 <p>
 Com os Capítulos I, II, IV, V e VI do Lang estruturados entre Lean 4 e Rust, o próximo marco natural no projeto `StrangeAlgebras` é o <b><b>Capítulo III / Capítulo XV (Módulos sobre Domínios de Ideais Principais e Álgebra Linear)</b></b>:
 </p>

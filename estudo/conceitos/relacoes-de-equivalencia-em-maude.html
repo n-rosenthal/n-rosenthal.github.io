@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<!-- 2026-11-27 Fri 23:57 -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Relações de Equivalência em Maude</title>
+<meta name="author" content="n-rosenthal" />
+<meta name="description" content="Especificação de relações de equivalência, fecho reflexivo-simétrico-transitivo e representantes canônicos de classes em Maude." />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/estudo.css">
+<link rel="alternate" type="application/atom+xml" title="Notas de estudo" href="/feed.xml">
+<script defer src="/js/grafo-local.js"></script>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Relações de Equivalência em Maude">
+<meta property="og:description" content="Especificação de relações de equivalência, fecho reflexivo-simétrico-transitivo e representantes canônicos de classes em Maude.">
+<meta property="og:url" content="https://n-rosenthal.github.io/estudo/conceitos/relacoes-de-equivalencia-em-maude.html">
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav class="nav"><a href="/">Início</a><a href="/grafo.html">Grafo</a><a href="/feed.xml">Feed</a></nav><div class="meta-nota"><span class="selo selo-semente">semente</span><span>1 min de leitura</span><span>criada em 2026-11-27</span><span>atualizada em 2026-11-27</span></div>
+</div>
+<div id="content" class="content">
+<header>
+<h1 class="title">Relações de Equivalência em Maude</h1>
+</header><nav id="table-of-contents" role="doc-toc">
+<h2>&Iacute;ndice</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orga1a30d4">Visão Geral</a></li>
+<li><a href="#org3586914">Módulo Funcional <code>EQUIVALENCE-RELATION</code></a></li>
+<li><a href="#orge0f0f0f">Redução Executável</a></li>
+<li><a href="#org0a34b2f">Conexões</a></li>
+<li><a href="#orgd08643a">Citada em</a></li>
+</ul>
+</div>
+</nav>
+<div id="outline-container-orga1a30d4" class="outline-2">
+<h2 id="orga1a30d4">Visão Geral</h2>
+<div class="outline-text-2" id="text-orga1a30d4">
+<p>
+Na lógica equacional do Maude, toda igualdade <code>eq t1 = t2</code> já define implicitamente uma <b><b>congruência</b></b> (uma <a href="/estudo/conceitos/relacao-de-equivalencia-e-conjunto-quociente.html">Relação de Equivalência e Conjunto Quociente</a> compatível com os construtores). Quando queremos computar explicitamente o quociente de uma <a href="/estudo/conceitos/relacoes-em-maude.html">Relações em Maude</a> finita \(R\), construímos o <b><b>fecho reflexivo-simétrico-transitivo</b></b> de \(R\) e extraímos a classe de equivalência \([x]_{\sim}\).
+</p>
+</div>
+</div>
+<div id="outline-container-org3586914" class="outline-2">
+<h2 id="org3586914">Módulo Funcional <code>EQUIVALENCE-RELATION</code></h2>
+<div class="outline-text-2" id="text-org3586914">
+<div class="org-src-container">
+<pre class="src src-maude">fmod EQUIVALENCE-RELATION is
+  protecting BOOL .
+  sorts Elt EltSet Pair Rel .
+  subsort Elt &lt; EltSet .
+  subsort Pair &lt; Rel .
+
+  --- Elementos de exemplo
+  ops a b c d : -&gt; Elt [ctor] .
+
+  --- Conjunto de elementos (para representar classes de equivalência [a])
+  op emptySet : -&gt; EltSet [ctor] .
+  op _|_      : EltSet EltSet -&gt; EltSet [ctor assoc comm id: emptySet] .
+  eq X:Elt | X:Elt = X:Elt .
+
+  --- Pares e Relações (herdado conceitualmente de BINARY-RELATION)
+  op (_,_) : Elt Elt -&gt; Pair [ctor] .
+  op empty : -&gt; Rel [ctor] .
+  op _;_   : Rel Rel -&gt; Rel [ctor assoc comm id: empty] .
+  eq (X:Elt, Y:Elt) ; (X:Elt, Y:Elt) = (X:Elt, Y:Elt) .
+
+  vars X Y Z : Elt .
+  vars R S   : Rel .
+  vars D     : EltSet .
+
+  --- Fecho Reflexivo sobre um domínio D
+  op reflClosure : EltSet Rel -&gt; Rel .
+  eq reflClosure(emptySet, R)   = R .
+  eq reflClosure((X | D), R)    = reflClosure(D, (X, X) ; R) .
+
+  --- Fecho Simétrico: R ∪ R⁻¹
+  op symClosure : Rel -&gt; Rel .
+  eq symClosure(empty)          = empty .
+  eq symClosure((X, Y) ; R)     = (X, Y) ; (Y, X) ; symClosure(R) .
+
+  --- Passo de composição transitiva
+  op stepTrans : Pair Rel -&gt; Rel .
+  eq stepTrans((X, Y), empty)        = empty .
+  eq stepTrans((X, Y), (Y, Z) ; S)   = (X, Z) ; stepTrans((X, Y), S) .
+  eq stepTrans((X, Y), S)            = empty [owise] .
+
+  op transStepAll : Rel Rel -&gt; Rel .
+  eq transStepAll(empty, S)          = empty .
+  eq transStepAll((X, Y) ; R, S)     = stepTrans((X, Y), S) ; transStepAll(R, S) .
+
+  --- Fecho Transitivo (ponto fixo da adição de caminhos de comprimento 2)
+  op transClosure : Rel -&gt; Rel .
+  ceq transClosure(R) = transClosure(R ; transStepAll(R, R))
+   if (R ; transStepAll(R, R)) =/= R .
+  eq transClosure(R) = R [owise] .
+
+  --- Fecho de Equivalência Eq(R) sobre o domínio D
+  op equivClosure : EltSet Rel -&gt; Rel .
+  eq equivClosure(D, R) = transClosure(symClosure(reflClosure(D, R))) .
+
+  --- Extração da Classe de Equivalência [X]_~ = { Y | (X, Y) ∈ Eq(R) }
+  op classOf : Elt Rel -&gt; EltSet .
+  eq classOf(X, empty)        = emptySet .
+  eq classOf(X, (X, Y) ; R)   = Y | classOf(X, R) .
+  eq classOf(X, R)            = emptySet [owise] .
+endfm
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orge0f0f0f" class="outline-2">
+<h2 id="orge0f0f0f">Redução Executável</h2>
+<div class="outline-text-2" id="text-orge0f0f0f">
+<div class="org-src-container">
+<pre class="src src-maude">--- Partindo apenas de a ~ b e b ~ c sobre {a, b, c, d}:
+reduce classOf(a, equivClosure(a | b | c | d, (a, b) ; (b, c))) .
+--- Resultado: a | b | c
+
+reduce classOf(d, equivClosure(a | b | c | d, (a, b) ; (b, c))) .
+--- Resultado: d
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org0a34b2f" class="outline-2">
+<h2 id="org0a34b2f">Conexões</h2>
+<div class="outline-text-2" id="text-org0a34b2f">
+<ul class="org-ul">
+<li>Definição matemática abstrata: <a href="/estudo/conceitos/relacao-de-equivalencia-e-conjunto-quociente.html">Relação de Equivalência e Conjunto Quociente</a></li>
+<li>Base relacional em Maude: <a href="/estudo/conceitos/relacoes-em-maude.html">Relações em Maude</a></li>
+<li>Formalização em Lean 4: <a href="/estudo/conceitos/relacoes-de-equivalencia-em-lean-4.html">Relações de Equivalência em Lean 4</a></li>
+<li>Implementação em Rust: <a href="/estudo/conceitos/relacoes-de-equivalencia-em-rust.html">Relações de Equivalência em Rust</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgd08643a" class="outline-2">
+<h2 id="orgd08643a">Citada em</h2>
+<div class="outline-text-2" id="text-orgd08643a">
+<ul class="backlinks">
+<li><a href="/estudo/conceitos/relacao-de-equivalencia-e-conjunto-quociente.html">Relação de Equivalência e Conjunto Quociente</a></li>
+<li><a href="/estudo/conceitos/relacoes-de-equivalencia-em-lean-4.html">Relações de Equivalência em Lean 4</a></li>
+<li><a href="/estudo/conceitos/relacoes-de-equivalencia-em-rust.html">Relações de Equivalência em Rust</a></li>
+</ul>
+
+<span class="pf-meta" data-pagefind-filter="tipo[data-v]" data-v="conceito"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="algebra"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="maude"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="formal-specification"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="conceito"></span>
+<span class="pf-meta" data-pagefind-filter="status[data-v]" data-v="semente"></span>
+</div>
+</div>
+</div>
+</body>
+</html>

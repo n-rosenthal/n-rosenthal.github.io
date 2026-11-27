@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<!-- 2026-11-27 Fri 22:45 -->
+<!-- 2026-11-27 Fri 23:57 -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Álgebra Homológica: Complexos de Cadeias, Homologia Simplicial e Torção (Lean 4 + Rust)</title>
@@ -60,25 +60,25 @@
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org0e6b5dd">Visão Geral: Do Núcleo e Imagem à Homologia (Lang, Cap. XX, §1–§4)</a></li>
-<li><a href="#org731a868">Camada Formal em Lean 4 (<code>HomologicalAlgebra.lean</code>)</a>
+<li><a href="#org29e7a96">Visão Geral: Do Núcleo e Imagem à Homologia (Lang, Cap. XX, §1–§4)</a></li>
+<li><a href="#org65e5245">Camada Formal em Lean 4 (<code>HomologicalAlgebra.lean</code>)</a>
 <ul>
-<li><a href="#orgba929ba">Imagem, Complexos de Cadeias e a Inclusão \(B_n \subseteq Z_n\)</a>
+<li><a href="#org1f7c3d6">Imagem, Complexos de Cadeias e a Inclusão \(B_n \subseteq Z_n\)</a>
 <ul>
-<li><a href="#orgc8126a8">Prova Matemática (LaTeX)</a></li>
-<li><a href="#org7d267c6">Implementação e Provas em Lean 4</a></li>
+<li><a href="#org8b8df53">Prova Matemática (LaTeX)</a></li>
+<li><a href="#orgec8be25">Implementação e Provas em Lean 4</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgf37bc53">Motor Computacional em Rust: Homologia Simplicial e Torção via SNF</a></li>
-<li><a href="#orgb0a34d7">Mapa Completo da Arquitetura `StrangeAlgebras`</a></li>
+<li><a href="#org1e32f0e">Motor Computacional em Rust: Homologia Simplicial e Torção via SNF</a></li>
+<li><a href="#org87a3416">Mapa Completo da Arquitetura `StrangeAlgebras`</a></li>
 </ul>
 </div>
 </nav>
-<div id="outline-container-org0e6b5dd" class="outline-2">
-<h2 id="org0e6b5dd">Visão Geral: Do Núcleo e Imagem à Homologia (Lang, Cap. XX, §1–§4)</h2>
-<div class="outline-text-2" id="text-org0e6b5dd">
+<div id="outline-container-org29e7a96" class="outline-2">
+<h2 id="org29e7a96">Visão Geral: Do Núcleo e Imagem à Homologia (Lang, Cap. XX, §1–§4)</h2>
+<div class="outline-text-2" id="text-org29e7a96">
 <p>
 Nos estudos anteriores, construímos a hierarquia algébrica completa do Lang até chegar aos <b><b>$R$-Módulos sobre PIDs</b></b> (Cap. III), <b><b>Forma Normal de Smith</b></b> e <b><b>Álgebra Exterior</b></b> (Cap. XIX). Agora unimos todas essas ferramentas no <b><b>Capítulo XX do Lang (Álgebra Homológica)</b></b>.
 </p>
@@ -105,17 +105,17 @@ Neste documento:
 </ol>
 </div>
 </div>
-<div id="outline-container-org731a868" class="outline-2">
-<h2 id="org731a868">Camada Formal em Lean 4 (<code>HomologicalAlgebra.lean</code>)</h2>
-<div class="outline-text-2" id="text-org731a868">
+<div id="outline-container-org65e5245" class="outline-2">
+<h2 id="org65e5245">Camada Formal em Lean 4 (<code>HomologicalAlgebra.lean</code>)</h2>
+<div class="outline-text-2" id="text-org65e5245">
 </div>
-<div id="outline-container-orgba929ba" class="outline-3">
-<h3 id="orgba929ba">Imagem, Complexos de Cadeias e a Inclusão \(B_n \subseteq Z_n\)</h3>
-<div class="outline-text-3" id="text-orgba929ba">
+<div id="outline-container-org1f7c3d6" class="outline-3">
+<h3 id="org1f7c3d6">Imagem, Complexos de Cadeias e a Inclusão \(B_n \subseteq Z_n\)</h3>
+<div class="outline-text-3" id="text-org1f7c3d6">
 </div>
-<div id="outline-container-orgc8126a8" class="outline-4">
-<h4 id="orgc8126a8">Prova Matemática (LaTeX)</h4>
-<div class="outline-text-4" id="text-orgc8126a8">
+<div id="outline-container-org8b8df53" class="outline-4">
+<h4 id="org8b8df53">Prova Matemática (LaTeX)</h4>
+<div class="outline-text-4" id="text-org8b8df53">
 <p>
 <b>Teorema 1.1 (Inclusão dos Bordos nos Ciclos — Lang, Cap. XX, §1).</b> Seja \((C_\bullet, \partial_\bullet)\) um complexo de cadeias de $R$-módulos, isto é, \(\partial_n(\partial_{n+1}(x)) = 0\) para todo \(x \in C_{n+1}\). Então:
 </p>
@@ -135,9 +135,9 @@ donde \(y \in \ker(\partial_n)\). \(\blacksquare\)</li>
 </ol>
 </div>
 </div>
-<div id="outline-container-org7d267c6" class="outline-4">
-<h4 id="org7d267c6">Implementação e Provas em Lean 4</h4>
-<div class="outline-text-4" id="text-org7d267c6">
+<div id="outline-container-orgec8be25" class="outline-4">
+<h4 id="orgec8be25">Implementação e Provas em Lean 4</h4>
+<div class="outline-text-4" id="text-orgec8be25">
 <p>
 Reutilizamos `CommRing`, `AddCommGroup`, `Module`, `Submodule`, `LinearMap` e `ker` definidos em `Modules.lean`:
 </p>
@@ -216,9 +216,9 @@ end StrangeAlgebras.Homology
 </div>
 </div>
 </div>
-<div id="outline-container-orgf37bc53" class="outline-2">
-<h2 id="orgf37bc53">Motor Computacional em Rust: Homologia Simplicial e Torção via SNF</h2>
-<div class="outline-text-2" id="text-orgf37bc53">
+<div id="outline-container-org1e32f0e" class="outline-2">
+<h2 id="org1e32f0e">Motor Computacional em Rust: Homologia Simplicial e Torção via SNF</h2>
+<div class="outline-text-2" id="text-org1e32f0e">
 <p>
 Para computar efetivamente \(H_k(X; \mathbb{Z}) = \ker \partial_k / \text{im }\partial_{k+1}\) de um complexo simplicial finito \(X\):
 </p>
@@ -444,9 +444,9 @@ mod tests {
 </div>
 </div>
 </div>
-<div id="outline-container-orgb0a34d7" class="outline-2">
-<h2 id="orgb0a34d7">Mapa Completo da Arquitetura `StrangeAlgebras`</h2>
-<div class="outline-text-2" id="text-orgb0a34d7">
+<div id="outline-container-org87a3416" class="outline-2">
+<h2 id="org87a3416">Mapa Completo da Arquitetura `StrangeAlgebras`</h2>
+<div class="outline-text-2" id="text-org87a3416">
 <p>
 Com este décimo documento, fechamos um percurso vertical completo pela <b>Algebra</b> de Serge Lang, onde cada camada teórica no <b><b>Lean 4</b></b> alimenta diretamente uma estrutura de dados e algoritmo construtivo em <b><b>Rust</b></b>:
 </p>

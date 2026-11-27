@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<!-- 2026-11-27 Fri 23:57 -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Relação de Equivalência e Conjunto Quociente</title>
+<meta name="author" content="n-rosenthal" />
+<meta name="description" content="Definição formal de relação de equivalência, classes de equivalência, partições e propriedade universal do conjunto quociente A/~." />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/estudo.css">
+<link rel="alternate" type="application/atom+xml" title="Notas de estudo" href="/feed.xml">
+<script defer src="/js/grafo-local.js"></script>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Relação de Equivalência e Conjunto Quociente">
+<meta property="og:description" content="Definição formal de relação de equivalência, classes de equivalência, partições e propriedade universal do conjunto quociente A/~.">
+<meta property="og:url" content="https://n-rosenthal.github.io/estudo/conceitos/relacao-de-equivalencia-e-conjunto-quociente.html">
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav class="nav"><a href="/">Início</a><a href="/grafo.html">Grafo</a><a href="/feed.xml">Feed</a></nav><div class="meta-nota"><span class="selo selo-semente">semente</span><span>3 min de leitura</span><span>criada em 2026-11-27</span><span>atualizada em 2026-11-27</span></div>
+</div>
+<div id="content" class="content">
+<header>
+<h1 class="title">Relação de Equivalência e Conjunto Quociente</h1>
+</header><nav id="table-of-contents" role="doc-toc">
+<h2>&Iacute;ndice</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org3ce2200">Definição Formal</a></li>
+<li><a href="#org58634a6">Classes de Equivalência e Conjunto Quociente (\(A / {\sim}\))</a></li>
+<li><a href="#orge3d4d24">Teoremas Fundamentais</a>
+<ul>
+<li><a href="#org00f8259">Teorema 1 (Teorema Fundamental das Relações de Equivalência / Partição)</a></li>
+<li><a href="#orga1e45f1">Teorema 2 (Propriedade Universal do Conjunto Quociente)</a></li>
+</ul>
+</li>
+<li><a href="#org3a54e9c">Papel na Álgebra de Lang</a></li>
+<li><a href="#org65c3591">Realizações Computacionais e Formais</a></li>
+<li><a href="#org7d49b9b">Citada em</a></li>
+</ul>
+</div>
+</nav>
+<div id="outline-container-org3ce2200" class="outline-2">
+<h2 id="org3ce2200">Definição Formal</h2>
+<div class="outline-text-2" id="text-org3ce2200">
+<p>
+Uma <a href="/estudo/conceitos/relacao.html">Relação</a> homogênea \({\sim} \subseteq A \times A\) sobre um conjunto \(A\) é chamada de <b><b>relação de equivalência</b></b> se satisfaz simultaneamente três axiomas para quaisquer \(a, b, c \in A\):
+</p>
+<ol class="org-ol">
+<li><b>Reflexividade:</b> \(a \sim a\).</li>
+<li><b>Simetria:</b> \(a \sim b \implies b \sim a\).</li>
+<li><b>Transitividade:</b> \((a \sim b \;\land\; b \sim c) \implies a \sim c\).</li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org58634a6" class="outline-2">
+<h2 id="org58634a6">Classes de Equivalência e Conjunto Quociente (\(A / {\sim}\))</h2>
+<div class="outline-text-2" id="text-org58634a6">
+<p>
+Dado um elemento \(a \in A\), sua <b><b>classe de equivalência</b></b> \([a]_{\sim}\) é o subconjunto de todos os elementos equivalentes a \(a\):
+\[[a]_{\sim} = \{ x \in A \mid x \sim a \}.\]
+O <b><b>conjunto quociente</b></b> \(A / {\sim}\) é a coleção de todas as classes de equivalência de \(A\) módulo \({\sim}\):
+\[A / {\sim} = \{ [a]_{\sim} \mid a \in A \}.\]
+A aplicação sobrejetiva \(\pi : A \to A/{\sim}\) dada por \(\pi(a) = [a]_{\sim}\) é denominada <b><b>projeção canônica</b></b>.
+</p>
+</div>
+</div>
+<div id="outline-container-orge3d4d24" class="outline-2">
+<h2 id="orge3d4d24">Teoremas Fundamentais</h2>
+<div class="outline-text-2" id="text-orge3d4d24">
+</div>
+<div id="outline-container-org00f8259" class="outline-3">
+<h3 id="org00f8259">Teorema 1 (Teorema Fundamental das Relações de Equivalência / Partição)</h3>
+<div class="outline-text-3" id="text-org00f8259">
+<p>
+<b>Proposição.</b> Seja \({\sim}\) uma relação de equivalência sobre \(A\). Para quaisquer \(a, b \in A\):
+</p>
+<ol class="org-ol">
+<li>\(a \in [a]_{\sim}\) (toda classe é não-vazia).</li>
+<li>\(a \sim b \iff [a]_{\sim} = [b]_{\sim}\).</li>
+<li>\([a]_{\sim} \cap [b]_{\sim} \neq \emptyset \implies [a]_{\sim} = [b]_{\sim}\) (classes distintas são disjuntas).</li>
+</ol>
+
+<p>
+<i>Demonstração.</i>
+</p>
+<ol class="org-ol">
+<li>Pela reflexividade, \(a \sim a\), logo \(a \in [a]_{\sim}\).</li>
+<li>(\(\Rightarrow\)) Suponha \(a \sim b\). Se \(x \in [a]_{\sim}\), então \(x \sim a\); por transitividade, \(x \sim b\), donde \(x \in [b]_{\sim}\). Pela simetria (\(b \sim a\)), a inclusão reversa é análoga, logo \([a]_{\sim} = [b]_{\sim}\).
+(\(\Leftarrow\)) Se \([a]_{\sim} = [b]_{\sim}\), como \(a \in [a]_{\sim}\), segue \(a \in [b]_{\sim}\), ou seja, \(a \sim b\).</li>
+<li>Se existe \(c \in [a]_{\sim} \cap [b]_{\sim}\), então \(c \sim a\) e \(c \sim b\). Por simetria e transitividade, \(a \sim b\), o que pelo item (2) implica \([a]_{\sim} = [b]_{\sim}\). \(\blacksquare\)</li>
+</ol>
+</div>
+</div>
+<div id="outline-container-orga1e45f1" class="outline-3">
+<h3 id="orga1e45f1">Teorema 2 (Propriedade Universal do Conjunto Quociente)</h3>
+<div class="outline-text-3" id="text-orga1e45f1">
+<p>
+<b>Proposição.</b> Seja \(\pi : A \to A/{\sim}\) a projeção canônica. Para toda função \(f : A \to B\) que <b><b>respeita a equivalência</b></b> (isto é, \(a \sim b \implies f(a) = f(b)\)), existe uma <b><b>única</b></b> função bem-definida \(\bar{f} : A/{\sim} \to B\) tal que \(\bar{f} \circ \pi = f\), isto é, \(\bar{f}([a]_{\sim}) = f(a)\).
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org3a54e9c" class="outline-2">
+<h2 id="org3a54e9c">Papel na Álgebra de Lang</h2>
+<div class="outline-text-2" id="text-org3a54e9c">
+<p>
+Esta construção é a base de todas as estruturas quocientes do Lang:
+</p>
+<ul class="org-ul">
+<li>Grupos quocientes \(G/N\) (via \(a \sim b \iff a^{-1}b \in N\)).</li>
+<li>Anéis quocientes \(R/I\) (via \(a \sim b \iff a - b \in I\)).</li>
+<li>Módulos quocientes \(M/N\) e espaços vetoriais quocientes.</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org65c3591" class="outline-2">
+<h2 id="org65c3591">Realizações Computacionais e Formais</h2>
+<div class="outline-text-2" id="text-org65c3591">
+<ul class="org-ul">
+<li>Especificação equacional e normalização em Maude: <a href="/estudo/conceitos/relacoes-de-equivalencia-em-maude.html">Relações de Equivalência em Maude</a></li>
+<li>Formalização com <code>Setoid</code> e <code>Quotient</code> em Lean 4: <a href="/estudo/conceitos/relacoes-de-equivalencia-em-lean-4.html">Relações de Equivalência em Lean 4</a></li>
+<li>Estrutura de partição (Union-Find / Quociente Finito) em Rust: <a href="/estudo/conceitos/relacoes-de-equivalencia-em-rust.html">Relações de Equivalência em Rust</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org7d49b9b" class="outline-2">
+<h2 id="org7d49b9b">Citada em</h2>
+<div class="outline-text-2" id="text-org7d49b9b">
+<ul class="backlinks">
+<li><a href="/estudo/conceitos/relacao-de-ordem-e-reticulados.html">Relação de Ordem e Reticulados</a></li>
+<li><a href="/estudo/conceitos/relacoes-de-equivalencia-em-lean-4.html">Relações de Equivalência em Lean 4</a></li>
+<li><a href="/estudo/conceitos/relacoes-de-equivalencia-em-maude.html">Relações de Equivalência em Maude</a></li>
+<li><a href="/estudo/conceitos/relacoes-de-equivalencia-em-rust.html">Relações de Equivalência em Rust</a></li>
+</ul>
+
+<span class="pf-meta" data-pagefind-filter="tipo[data-v]" data-v="conceito"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="algebra"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="conceito"></span>
+<span class="pf-meta" data-pagefind-filter="status[data-v]" data-v="semente"></span>
+</div>
+</div>
+</div>
+</body>
+</html>

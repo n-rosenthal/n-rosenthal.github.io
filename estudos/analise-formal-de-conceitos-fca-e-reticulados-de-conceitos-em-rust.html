@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<!-- 2026-11-27 Fri 22:45 -->
+<!-- 2026-11-27 Fri 23:57 -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Análise Formal de Conceitos (FCA) e Reticulados de Conceitos em Rust</title>
@@ -60,33 +60,33 @@
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgfc7930d">Implementação</a>
+<li><a href="#orgb501581">Implementação</a>
 <ul>
-<li><a href="#org8be20f7">Importações</a></li>
-<li><a href="#org0c5750f">Contexto Formal e Operadores de Derivação</a></li>
-<li><a href="#org5e731a5">Conceitos Formais e Teorema Fundamental da FCA</a></li>
-<li><a href="#org4ee40d1">Implicações de Atributos e Axiomas de Armstrong</a></li>
-<li><a href="#orgc6c450d">Representações</a>
+<li><a href="#orgfbc4f2e">Importações</a></li>
+<li><a href="#orga6244d9">Contexto Formal e Operadores de Derivação</a></li>
+<li><a href="#org794e528">Conceitos Formais e Teorema Fundamental da FCA</a></li>
+<li><a href="#orgb0e02c2">Implicações de Atributos e Axiomas de Armstrong</a></li>
+<li><a href="#orgfbc4d0d">Representações</a>
 <ul>
-<li><a href="#org224b7ef"><code>Display</code></a></li>
+<li><a href="#org168b272"><code>Display</code></a></li>
 </ul>
 </li>
-<li><a href="#org8ca8c89">Suíte de Verificação (<code>cargo test</code>)</a></li>
+<li><a href="#org4601ca6">Suíte de Verificação (<code>cargo test</code>)</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </nav>
-<div id="outline-container-orgfc7930d" class="outline-2">
-<h2 id="orgfc7930d">Implementação</h2>
-<div class="outline-text-2" id="text-orgfc7930d">
+<div id="outline-container-orgb501581" class="outline-2">
+<h2 id="orgb501581">Implementação</h2>
+<div class="outline-text-2" id="text-orgb501581">
 <p>
 A <b>Análise Formal de Conceitos</b> (<i>Formal Concept Analysis</i> — FCA, desenvolvida por Rudolf Wille e Bernhard Ganter) unifica quase todas as estruturas desenvolvidas nos estudos anteriores: <b>conexões de Galois</b>, <b>operadores de fecho</b>, <b>reticulados completos</b> e <b>diagramas de Hasse</b>. Seu objetivo é extrair hierarquias conceituais exatas e regras de implicação lógica a partir de tabelas de incidência entre objetos e atributos.
 </p>
 </div>
-<div id="outline-container-org8be20f7" class="outline-3">
-<h3 id="org8be20f7">Importações</h3>
-<div class="outline-text-3" id="text-org8be20f7">
+<div id="outline-container-orgfbc4f2e" class="outline-3">
+<h3 id="orgfbc4f2e">Importações</h3>
+<div class="outline-text-3" id="text-orgfbc4f2e">
 <div class="org-src-container">
 <pre class="src src-rust">use std::collections::{BTreeSet, HashMap, HashSet};
 use std::fmt;
@@ -100,9 +100,9 @@ use crate::{PreorderSet, Relation};
 </div>
 </div>
 </div>
-<div id="outline-container-org0c5750f" class="outline-3">
-<h3 id="org0c5750f">Contexto Formal e Operadores de Derivação</h3>
-<div class="outline-text-3" id="text-org0c5750f">
+<div id="outline-container-orga6244d9" class="outline-3">
+<h3 id="orga6244d9">Contexto Formal e Operadores de Derivação</h3>
+<div class="outline-text-3" id="text-orga6244d9">
 <p>
 Um <b>contexto formal</b> é uma tripla \( \mathbb{K} = (G, M, I) \), em que:
 </p>
@@ -270,9 +270,9 @@ impl&lt;G: Ord + Hash + Clone, M: Ord + Hash + Clone&gt; FormalContext&lt;G, M&g
 </div>
 </div>
 </div>
-<div id="outline-container-org5e731a5" class="outline-3">
-<h3 id="org5e731a5">Conceitos Formais e Teorema Fundamental da FCA</h3>
-<div class="outline-text-3" id="text-org5e731a5">
+<div id="outline-container-org794e528" class="outline-3">
+<h3 id="org794e528">Conceitos Formais e Teorema Fundamental da FCA</h3>
+<div class="outline-text-3" id="text-org794e528">
 <p>
 Um <b>conceito formal</b> de \( \mathbb{K} = (G, M, I) \) é um par maximal \( (A, B) \in \mathcal{P}(G) \times \mathcal{P}(M) \) tal que:
 </p>
@@ -367,9 +367,9 @@ impl&lt;G: Ord + Hash + Clone, M: Ord + Hash + Clone&gt; FormalContext&lt;G, M&g
 </div>
 </div>
 </div>
-<div id="outline-container-org4ee40d1" class="outline-3">
-<h3 id="org4ee40d1">Implicações de Atributos e Axiomas de Armstrong</h3>
-<div class="outline-text-3" id="text-org4ee40d1">
+<div id="outline-container-orgb0e02c2" class="outline-3">
+<h3 id="orgb0e02c2">Implicações de Atributos e Axiomas de Armstrong</h3>
+<div class="outline-text-3" id="text-orgb0e02c2">
 <p>
 Uma <b>implicação de atributos</b> sobre \( M \) é uma expressão \( X \to Y \) com \( X, Y \subseteq M \). Dizemos que \( X \to Y \) é <b>válida no contexto</b> \( \mathbb{K} \) (\( \mathbb{K} \models X \to Y \)) se todo objeto que possui todos os atributos de \( X \) também possui todos os atributos de \( Y \):
 </p>
@@ -448,13 +448,13 @@ impl&lt;G: Ord + Hash + Clone, M: Ord + Hash + Clone&gt; FormalContext&lt;G, M&g
 </div>
 </div>
 </div>
-<div id="outline-container-orgc6c450d" class="outline-3">
-<h3 id="orgc6c450d">Representações</h3>
-<div class="outline-text-3" id="text-orgc6c450d">
+<div id="outline-container-orgfbc4d0d" class="outline-3">
+<h3 id="orgfbc4d0d">Representações</h3>
+<div class="outline-text-3" id="text-orgfbc4d0d">
 </div>
-<div id="outline-container-org224b7ef" class="outline-4">
-<h4 id="org224b7ef"><code>Display</code></h4>
-<div class="outline-text-4" id="text-org224b7ef">
+<div id="outline-container-org168b272" class="outline-4">
+<h4 id="org168b272"><code>Display</code></h4>
+<div class="outline-text-4" id="text-org168b272">
 <div class="org-src-container">
 <pre class="src src-rust">fn format_set&lt;T: fmt::Display&gt;(set: &amp;BTreeSet&lt;T&gt;) -&gt; String {
     let items: Vec&lt;String&gt; = set.iter().map(|x| x.to_string()).collect();
@@ -510,9 +510,9 @@ impl&lt;G: Ord + Hash + fmt::Display, M: Ord + Hash + fmt::Display&gt; fmt::Disp
 </div>
 </div>
 </div>
-<div id="outline-container-org8ca8c89" class="outline-3">
-<h3 id="org8ca8c89">Suíte de Verificação (<code>cargo test</code>)</h3>
-<div class="outline-text-3" id="text-org8ca8c89">
+<div id="outline-container-org4601ca6" class="outline-3">
+<h3 id="org4601ca6">Suíte de Verificação (<code>cargo test</code>)</h3>
+<div class="outline-text-3" id="text-org4601ca6">
 <p>
 Como estudo de caso clássico da literatura de FCA, modelamos um contexto de <b><b>figuras geométricas planas</b></b> \( G = \{\text{Triângulo}, \text{Retângulo}, \text{Losango}, \text{Quadrado}\} \) sobre os atributos \( M = \{\text{3 lados}, \text{4 lados}, \text{ângulos retos}, \text{lados iguais}\} \), verificando automaticamente a hierarquia conceitual (e.g., <b>Quadrado</b> como subconceito simultâneo de <b>Retângulo</b> e <b>Losango</b>) e implicações lógicas como \( \{\text{ângulos retos}, \text{lados iguais}\} \to \{\text{4 lados}\} \).
 </p>

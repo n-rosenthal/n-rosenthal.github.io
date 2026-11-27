@@ -6,6 +6,90 @@
   <id>https://n-rosenthal.github.io/</id>
   <updated>2026-11-27T00:00:00Z</updated>
   <entry>
+    <title>Relação de Equivalência e Conjunto Quociente</title>
+    <link href="https://n-rosenthal.github.io/estudo/conceitos/relacao-de-equivalencia-e-conjunto-quociente.html"/>
+    <id>https://n-rosenthal.github.io/estudo/conceitos/relacao-de-equivalencia-e-conjunto-quociente.html</id>
+    <updated>2026-11-27T00:00:00Z</updated>
+    <summary>Definição formal de relação de equivalência, classes de equivalência, partições e propriedade universal do conjunto quociente A/~.</summary>
+  </entry>
+  <entry>
+    <title>Relação de Ordem e Reticulados</title>
+    <link href="https://n-rosenthal.github.io/estudo/conceitos/relacao-de-ordem-e-reticulados.html"/>
+    <id>https://n-rosenthal.github.io/estudo/conceitos/relacao-de-ordem-e-reticulados.html</id>
+    <updated>2026-11-27T00:00:00Z</updated>
+    <summary>Definição formal de pré-ordem, ordem parcial (poset), ordem total, elementos extremos e reticulados.</summary>
+  </entry>
+  <entry>
+    <title>Relação</title>
+    <link href="https://n-rosenthal.github.io/estudo/conceitos/relacao.html"/>
+    <id>https://n-rosenthal.github.io/estudo/conceitos/relacao.html</id>
+    <updated>2026-11-27T00:00:00Z</updated>
+    <summary>Definição conjuntista de relação binária, operações algébricas (inversa e composição) e propriedades estruturais fundamentais.</summary>
+  </entry>
+  <entry>
+    <title>Relações de Equivalência em Lean 4</title>
+    <link href="https://n-rosenthal.github.io/estudo/conceitos/relacoes-de-equivalencia-em-lean-4.html"/>
+    <id>https://n-rosenthal.github.io/estudo/conceitos/relacoes-de-equivalencia-em-lean-4.html</id>
+    <updated>2026-11-27T00:00:00Z</updated>
+    <summary>Formalização de Equivalence, Setoid e do tipo quociente nativo (Quotient / Quot.lift) em Lean 4, com provas da igualdade de classes e propriedade universal.</summary>
+  </entry>
+  <entry>
+    <title>Relações de Equivalência em Maude</title>
+    <link href="https://n-rosenthal.github.io/estudo/conceitos/relacoes-de-equivalencia-em-maude.html"/>
+    <id>https://n-rosenthal.github.io/estudo/conceitos/relacoes-de-equivalencia-em-maude.html</id>
+    <updated>2026-11-27T00:00:00Z</updated>
+    <summary>Especificação de relações de equivalência, fecho reflexivo-simétrico-transitivo e representantes canônicos de classes em Maude.</summary>
+  </entry>
+  <entry>
+    <title>Relações de Equivalência em Rust</title>
+    <link href="https://n-rosenthal.github.io/estudo/conceitos/relacoes-de-equivalencia-em-rust.html"/>
+    <id>https://n-rosenthal.github.io/estudo/conceitos/relacoes-de-equivalencia-em-rust.html</id>
+    <updated>2026-11-27T00:00:00Z</updated>
+    <summary>Implementação de relações de equivalência e conjuntos quocientes finitos em Rust via Partição Disjunta (Union-Find) e levantamento universal de funções.</summary>
+  </entry>
+  <entry>
+    <title>Relações de Ordem em Lean 4</title>
+    <link href="https://n-rosenthal.github.io/estudo/conceitos/relacoes-de-ordem-em-lean-4.html"/>
+    <id>https://n-rosenthal.github.io/estudo/conceitos/relacoes-de-ordem-em-lean-4.html</id>
+    <updated>2026-11-27T00:00:00Z</updated>
+    <summary>Formalização de Preorder, PartialOrder, LinearOrder e Lattice em Lean 4, com provas da unicidade de supremos e equivalência ordem-reticulado.</summary>
+  </entry>
+  <entry>
+    <title>Relações de Ordem em Maude</title>
+    <link href="https://n-rosenthal.github.io/estudo/conceitos/relacoes-de-ordem-em-maude.html"/>
+    <id>https://n-rosenthal.github.io/estudo/conceitos/relacoes-de-ordem-em-maude.html</id>
+    <updated>2026-11-27T00:00:00Z</updated>
+    <summary>Especificação de conjuntos parcialmente ordenados (Posets), elementos minimais/maximais e reticulados distributivos finitos em Maude.</summary>
+  </entry>
+  <entry>
+    <title>Relações de Ordem em Rust</title>
+    <link href="https://n-rosenthal.github.io/estudo/conceitos/relacoes-de-ordem-em-rust.html"/>
+    <id>https://n-rosenthal.github.io/estudo/conceitos/relacoes-de-ordem-em-rust.html</id>
+    <updated>2026-11-27T00:00:00Z</updated>
+    <summary>Implementação computacional de Posets finitos, redução transitiva (Diagrama de Hasse), elementos extremos e verificação de Reticulados em Rust.</summary>
+  </entry>
+  <entry>
+    <title>Relações em Lean 4</title>
+    <link href="https://n-rosenthal.github.io/estudo/conceitos/relacoes-em-lean-4.html"/>
+    <id>https://n-rosenthal.github.io/estudo/conceitos/relacoes-em-lean-4.html</id>
+    <updated>2026-11-27T00:00:00Z</updated>
+    <summary>Formalização de relações binárias como predicados binários (A → B → Prop) em Lean 4 e provas de suas propriedades estruturais.</summary>
+  </entry>
+  <entry>
+    <title>Relações em Maude</title>
+    <link href="https://n-rosenthal.github.io/estudo/conceitos/relacoes-em-maude.html"/>
+    <id>https://n-rosenthal.github.io/estudo/conceitos/relacoes-em-maude.html</id>
+    <updated>2026-11-27T00:00:00Z</updated>
+    <summary>Especificação algébrica de relações binárias finitas como conjuntos de pares ordenados em Maude.</summary>
+  </entry>
+  <entry>
+    <title>Relações em Rust</title>
+    <link href="https://n-rosenthal.github.io/estudo/conceitos/relacoes-em-rust.html"/>
+    <id>https://n-rosenthal.github.io/estudo/conceitos/relacoes-em-rust.html</id>
+    <updated>2026-11-27T00:00:00Z</updated>
+    <summary>Implementação computacional de relações binárias finitas em Rust sobre conjuntos ordenados (BTreeSet) com verificação de propriedades algébricas.</summary>
+  </entry>
+  <entry>
     <title>Álgebra Homológica: Complexos de Cadeias, Homologia Simplicial e Torção (Lean 4 + Rust)</title>
     <link href="https://n-rosenthal.github.io/estudos/algebra-homologica-complexos-de-cadeias-homologia-simplicial-e-torcao-lean-4-rust.html"/>
     <id>https://n-rosenthal.github.io/estudos/algebra-homologica-complexos-de-cadeias-homologia-simplicial-e-torcao-lean-4-rust.html</id>
@@ -130,81 +214,5 @@
     <id>https://n-rosenthal.github.io/estudos/reticulados-reticulados-completos-e-pontos-fixos-em-rust.html</id>
     <updated>2026-11-26T00:00:00Z</updated>
     <summary>Implementação de reticulados, reticulados distributivos, Teorema de Representação de Birkhoff e Teorema do Ponto Fixo de Knaster-Tarski</summary>
-  </entry>
-  <entry>
-    <title>Contextos para Implementação de Linguagens de Programação</title>
-    <link href="https://n-rosenthal.github.io/estudos/contextos-para-implementacao-de-linguagens-de-programacao.html"/>
-    <id>https://n-rosenthal.github.io/estudos/contextos-para-implementacao-de-linguagens-de-programacao.html</id>
-    <updated>2026-11-25T00:00:00Z</updated>
-    <summary>Estudo sobre contextos, bindings e ambientes semânticos.</summary>
-  </entry>
-  <entry>
-    <title>Implementando Listas Encadeadas em Rust</title>
-    <link href="https://n-rosenthal.github.io/estudos/implementando-listas-encadeadas-em-rust.html"/>
-    <id>https://n-rosenthal.github.io/estudos/implementando-listas-encadeadas-em-rust.html</id>
-    <updated>2026-11-25T00:00:00Z</updated>
-  </entry>
-  <entry>
-    <title>pequenas transformações sobre textos</title>
-    <link href="https://n-rosenthal.github.io/estudos/pequenas-transformacoes-de-texto-para-texto.html"/>
-    <id>https://n-rosenthal.github.io/estudos/pequenas-transformacoes-de-texto-para-texto.html</id>
-    <updated>2026-11-24T00:00:00Z</updated>
-  </entry>
-  <entry>
-    <title>Definições para Extração de Informações</title>
-    <link href="https://n-rosenthal.github.io/estudo/conceitos/definicoes-para-extracao-de-informacoes.html"/>
-    <id>https://n-rosenthal.github.io/estudo/conceitos/definicoes-para-extracao-de-informacoes.html</id>
-    <updated>2026-11-19T00:00:00Z</updated>
-  </entry>
-  <entry>
-    <title>Definições para Métodos Formais</title>
-    <link href="https://n-rosenthal.github.io/estudo/conceitos/definicoes-para-metodos-formais.html"/>
-    <id>https://n-rosenthal.github.io/estudo/conceitos/definicoes-para-metodos-formais.html</id>
-    <updated>2026-11-19T00:00:00Z</updated>
-  </entry>
-  <entry>
-    <title>Definições para Sistemas de Tipos</title>
-    <link href="https://n-rosenthal.github.io/estudo/conceitos/definicoes-para-sistemas-de-tipos.html"/>
-    <id>https://n-rosenthal.github.io/estudo/conceitos/definicoes-para-sistemas-de-tipos.html</id>
-    <updated>2026-11-19T00:00:00Z</updated>
-  </entry>
-  <entry>
-    <title>/Frameworks/ de Métodos Formais</title>
-    <link href="https://n-rosenthal.github.io/estudo/conceitos/frameworks-de-metodos-formais.html"/>
-    <id>https://n-rosenthal.github.io/estudo/conceitos/frameworks-de-metodos-formais.html</id>
-    <updated>2026-11-19T00:00:00Z</updated>
-  </entry>
-  <entry>
-    <title>Tarefas em Extração de Informações</title>
-    <link href="https://n-rosenthal.github.io/estudo/conceitos/tarefas-em-extracao-de-informacoes.html"/>
-    <id>https://n-rosenthal.github.io/estudo/conceitos/tarefas-em-extracao-de-informacoes.html</id>
-    <updated>2026-11-19T00:00:00Z</updated>
-  </entry>
-  <entry>
-    <title>Estudos e Conceitos pela frente</title>
-    <link href="https://n-rosenthal.github.io/sinteses/estudos-e-conceitos-pela-frente.html"/>
-    <id>https://n-rosenthal.github.io/sinteses/estudos-e-conceitos-pela-frente.html</id>
-    <updated>2026-11-19T00:00:00Z</updated>
-    <summary>Estudos e conceitos que deverão formar notas no futuro; anotações gerais</summary>
-  </entry>
-  <entry>
-    <title>Introdução aos Métodos Formais</title>
-    <link href="https://n-rosenthal.github.io/sinteses/introducao-aos-metodos-formais.html"/>
-    <id>https://n-rosenthal.github.io/sinteses/introducao-aos-metodos-formais.html</id>
-    <updated>2026-11-19T00:00:00Z</updated>
-  </entry>
-  <entry>
-    <title>Métricas</title>
-    <link href="https://n-rosenthal.github.io/estudo/conceitos/metricas.html"/>
-    <id>https://n-rosenthal.github.io/estudo/conceitos/metricas.html</id>
-    <updated>2026-11-17T00:00:00Z</updated>
-    <summary>Definição (amplo senso) para /métricas/</summary>
-  </entry>
-  <entry>
-    <title>Resolução de exercício em Especificação Formal (Maude)</title>
-    <link href="https://n-rosenthal.github.io/estudos/resolucao-de-um-breve-exercicio-em-especificacao-formal-maude-tipos-sortes-e-especies-kinds.html"/>
-    <id>https://n-rosenthal.github.io/estudos/resolucao-de-um-breve-exercicio-em-especificacao-formal-maude-tipos-sortes-e-especies-kinds.html</id>
-    <updated>2026-11-17T00:00:00Z</updated>
-    <summary>Estudo sobre determinação de tipos em Maude</summary>
   </entry>
 </feed>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<!-- 2026-11-27 Fri 22:45 -->
+<!-- 2026-11-27 Fri 23:57 -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Produtos Tensoriais, Propriedade Universal Bilinear e Álgebra Exterior (Lean 4 + Rust)</title>
@@ -60,26 +60,26 @@
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgea90a57">Visão Geral: De Aplicações Bilineares à Álgebra Exterior (Lang, Cap. XVI e XIX)</a></li>
-<li><a href="#orgd5c0166">Camada Formal em Lean 4 (<code>TensorAlgebra.lean</code>)</a>
+<li><a href="#org593a2bd">Visão Geral: De Aplicações Bilineares à Álgebra Exterior (Lang, Cap. XVI e XIX)</a></li>
+<li><a href="#orge3f1505">Camada Formal em Lean 4 (<code>TensorAlgebra.lean</code>)</a>
 <ul>
-<li><a href="#org88c4a2e">Aplicações $R$-Bilineares e Composição com Aplicações Lineares</a></li>
-<li><a href="#orgae8df7a">Propriedade Universal do Produto Tensorial e Teorema da Unicidade</a>
+<li><a href="#orgad861da">Aplicações $R$-Bilineares e Composição com Aplicações Lineares</a></li>
+<li><a href="#org7b757f4">Propriedade Universal do Produto Tensorial e Teorema da Unicidade</a>
 <ul>
-<li><a href="#org0c3e820">Prova Matemática (LaTeX)</a></li>
-<li><a href="#org1d3928f">Implementação e Prova Formal em Lean 4</a></li>
+<li><a href="#orgc6a1aa8">Prova Matemática (LaTeX)</a></li>
+<li><a href="#orgae35e54">Implementação e Prova Formal em Lean 4</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgbb4a5f1">Motor Computacional em Rust: Produto de Kronecker e Álgebra Exterior \(\bigwedge(V)\)</a></li>
-<li><a href="#orgf37c87e">Próximo Passo: Álgebra Homológica — Complexos de Cadeias e Homologia (Lang, Cap. XX)</a></li>
+<li><a href="#org535816a">Motor Computacional em Rust: Produto de Kronecker e Álgebra Exterior \(\bigwedge(V)\)</a></li>
+<li><a href="#org63268ab">Próximo Passo: Álgebra Homológica — Complexos de Cadeias e Homologia (Lang, Cap. XX)</a></li>
 </ul>
 </div>
 </nav>
-<div id="outline-container-orgea90a57" class="outline-2">
-<h2 id="orgea90a57">Visão Geral: De Aplicações Bilineares à Álgebra Exterior (Lang, Cap. XVI e XIX)</h2>
-<div class="outline-text-2" id="text-orgea90a57">
+<div id="outline-container-org593a2bd" class="outline-2">
+<h2 id="org593a2bd">Visão Geral: De Aplicações Bilineares à Álgebra Exterior (Lang, Cap. XVI e XIX)</h2>
+<div class="outline-text-2" id="text-org593a2bd">
 <p>
 Nos estudos anteriores, formalizamos $R$-módulos, aplicações $R$-lineares \(\text{Hom}_R(M, N)\) e a Forma Normal de Smith sobre PIDs. Agora avançamos para o <b><b>Capítulo XVI do Lang (Produtos Tensoriais)</b></b> e o <b><b>Capítulo XIX (Produtos Alternados e Álgebra Exterior)</b></b>.
 </p>
@@ -102,13 +102,13 @@ Neste documento:
 </ol>
 </div>
 </div>
-<div id="outline-container-orgd5c0166" class="outline-2">
-<h2 id="orgd5c0166">Camada Formal em Lean 4 (<code>TensorAlgebra.lean</code>)</h2>
-<div class="outline-text-2" id="text-orgd5c0166">
+<div id="outline-container-orge3f1505" class="outline-2">
+<h2 id="orge3f1505">Camada Formal em Lean 4 (<code>TensorAlgebra.lean</code>)</h2>
+<div class="outline-text-2" id="text-orge3f1505">
 </div>
-<div id="outline-container-org88c4a2e" class="outline-3">
-<h3 id="org88c4a2e">Aplicações $R$-Bilineares e Composição com Aplicações Lineares</h3>
-<div class="outline-text-3" id="text-org88c4a2e">
+<div id="outline-container-orgad861da" class="outline-3">
+<h3 id="orgad861da">Aplicações $R$-Bilineares e Composição com Aplicações Lineares</h3>
+<div class="outline-text-3" id="text-orgad861da">
 <p>
 Reutilizamos `CommRing`, `AddCommGroup`, `Module` e `LinearMap` de `Modules.lean` para definir aplicações bilineares entre $R$-módulos (Lang, Cap. XVI, §1).
 </p>
@@ -156,13 +156,13 @@ def compLinearBilinear {R M N T P : Type _}
 </div>
 </div>
 </div>
-<div id="outline-container-orgae8df7a" class="outline-3">
-<h3 id="orgae8df7a">Propriedade Universal do Produto Tensorial e Teorema da Unicidade</h3>
-<div class="outline-text-3" id="text-orgae8df7a">
+<div id="outline-container-org7b757f4" class="outline-3">
+<h3 id="org7b757f4">Propriedade Universal do Produto Tensorial e Teorema da Unicidade</h3>
+<div class="outline-text-3" id="text-org7b757f4">
 </div>
-<div id="outline-container-org0c3e820" class="outline-4">
-<h4 id="org0c3e820">Prova Matemática (LaTeX)</h4>
-<div class="outline-text-4" id="text-org0c3e820">
+<div id="outline-container-orgc6a1aa8" class="outline-4">
+<h4 id="orgc6a1aa8">Prova Matemática (LaTeX)</h4>
+<div class="outline-text-4" id="text-orgc6a1aa8">
 <p>
 <b>Teorema 1.1 (Unicidade Universal do Produto Tensorial — Lang, Cap. XVI, §1).</b> Sejam \((T_1, \tau_1)\) e \((T_2, \tau_2)\) dois $R$-módulos equipados com aplicações $R$-bilineares \(\tau_i : M \times N \to T_i\) que satisfazem a propriedade universal do produto tensorial. Então existe um <b><b>único</b></b> isomorfismo $R$-linear \(\Phi : T_1 \xrightarrow{\sim} T_2\) tal que \(\Phi(\tau_1(x, y)) = \tau_2(x, y)\) para todo \((x, y) \in M \times N\).
 </p>
@@ -178,9 +178,9 @@ def compLinearBilinear {R M N T P : Type _}
 </ol>
 </div>
 </div>
-<div id="outline-container-org1d3928f" class="outline-4">
-<h4 id="org1d3928f">Implementação e Prova Formal em Lean 4</h4>
-<div class="outline-text-4" id="text-org1d3928f">
+<div id="outline-container-orgae35e54" class="outline-4">
+<h4 id="orgae35e54">Implementação e Prova Formal em Lean 4</h4>
+<div class="outline-text-4" id="text-orgae35e54">
 <p>
 No Lean 4, encapsulamos a propriedade universal como uma estrutura dependente `TensorProductUP` (que exige existência e unicidade da fatoração `lift`) e provamos formalmente que quaisquer duas realizações \((T_1, \tau_1)\) e \((T_2, \tau_2)\) são mutuamente inversas:
 </p>
@@ -252,9 +252,9 @@ end StrangeAlgebras.Multilinear
 </div>
 </div>
 </div>
-<div id="outline-container-orgbb4a5f1" class="outline-2">
-<h2 id="orgbb4a5f1">Motor Computacional em Rust: Produto de Kronecker e Álgebra Exterior \(\bigwedge(V)\)</h2>
-<div class="outline-text-2" id="text-orgbb4a5f1">
+<div id="outline-container-org535816a" class="outline-2">
+<h2 id="org535816a">Motor Computacional em Rust: Produto de Kronecker e Álgebra Exterior \(\bigwedge(V)\)</h2>
+<div class="outline-text-2" id="text-org535816a">
 <p>
 No Rust, implementamos duas construções concretas fundamentais dos Capítulos XVI e XIX do Lang sobre qualquer anel comutativo `Ring`:
 </p>
@@ -525,9 +525,9 @@ mod tests {
 </div>
 </div>
 </div>
-<div id="outline-container-orgf37c87e" class="outline-2">
-<h2 id="orgf37c87e">Próximo Passo: Álgebra Homológica — Complexos de Cadeias e Homologia (Lang, Cap. XX)</h2>
-<div class="outline-text-2" id="text-orgf37c87e">
+<div id="outline-container-org63268ab" class="outline-2">
+<h2 id="org63268ab">Próximo Passo: Álgebra Homológica — Complexos de Cadeias e Homologia (Lang, Cap. XX)</h2>
+<div class="outline-text-2" id="text-org63268ab">
 <p>
 Com o produto tensorial e a álgebra exterior estabelecidos, o fecho natural desta arquitetura para o projeto `StrangeAlgebras` é o <b><b>Capítulo XX do Lang (Álgebra Homológica)</b></b>:
 </p>

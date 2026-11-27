@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<!-- 2026-11-27 Fri 22:45 -->
+<!-- 2026-11-27 Fri 23:57 -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Extensões Algébricas Simples K[x]/(f(x)) e Corpos Finitos F_{p^n} (Lean 4 + Rust)</title>
@@ -60,25 +60,25 @@
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgea96f26">Visão Geral: Construindo Corpos por Quocientes de Polinômios (Lang, Cap. V, §1–§5)</a></li>
-<li><a href="#org4b39fdc">Camada Formal em Lean 4 (<code>AlgebraicExtensions.lean</code>)</a>
+<li><a href="#org653c327">Visão Geral: Construindo Corpos por Quocientes de Polinômios (Lang, Cap. V, §1–§5)</a></li>
+<li><a href="#orgf162a2f">Camada Formal em Lean 4 (<code>AlgebraicExtensions.lean</code>)</a>
 <ul>
-<li><a href="#orgc848c5b">Aritmética Modular Polinomial e o Teorema de Bézout</a>
+<li><a href="#org1c13ba4">Aritmética Modular Polinomial e o Teorema de Bézout</a>
 <ul>
-<li><a href="#orgbc550ce">Prova Matemática (LaTeX)</a></li>
-<li><a href="#org7f0b285">Implementação em Lean 4</a></li>
+<li><a href="#org8f13448">Prova Matemática (LaTeX)</a></li>
+<li><a href="#orge8c1e27">Implementação em Lean 4</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org898be06">Motor Computacional em Rust: Extensões \(K[x]/(f(x))\) e Corpos Finitos \(\mathbb{F}_{p^n}\)</a></li>
-<li><a href="#org33a2f10">Conexão com os Próximos Capítulos do Lang (Teoria de Galois — Cap. VI)</a></li>
+<li><a href="#org186ccc7">Motor Computacional em Rust: Extensões \(K[x]/(f(x))\) e Corpos Finitos \(\mathbb{F}_{p^n}\)</a></li>
+<li><a href="#org1e14627">Conexão com os Próximos Capítulos do Lang (Teoria de Galois — Cap. VI)</a></li>
 </ul>
 </div>
 </nav>
-<div id="outline-container-orgea96f26" class="outline-2">
-<h2 id="orgea96f26">Visão Geral: Construindo Corpos por Quocientes de Polinômios (Lang, Cap. V, §1–§5)</h2>
-<div class="outline-text-2" id="text-orgea96f26">
+<div id="outline-container-org653c327" class="outline-2">
+<h2 id="org653c327">Visão Geral: Construindo Corpos por Quocientes de Polinômios (Lang, Cap. V, §1–§5)</h2>
+<div class="outline-text-2" id="text-org653c327">
 <p>
 No documento anterior, estabelecemos que o anel de polinômios \(K[x]\) sobre um corpo \(K\) é um <b><b>Domínio Euclidiano</b></b> (e, portanto, um Domínio de Ideais Principais — PID). 
 </p>
@@ -98,17 +98,17 @@ Neste estudo:
 </ol>
 </div>
 </div>
-<div id="outline-container-org4b39fdc" class="outline-2">
-<h2 id="org4b39fdc">Camada Formal em Lean 4 (<code>AlgebraicExtensions.lean</code>)</h2>
-<div class="outline-text-2" id="text-org4b39fdc">
+<div id="outline-container-orgf162a2f" class="outline-2">
+<h2 id="orgf162a2f">Camada Formal em Lean 4 (<code>AlgebraicExtensions.lean</code>)</h2>
+<div class="outline-text-2" id="text-orgf162a2f">
 </div>
-<div id="outline-container-orgc848c5b" class="outline-3">
-<h3 id="orgc848c5b">Aritmética Modular Polinomial e o Teorema de Bézout</h3>
-<div class="outline-text-3" id="text-orgc848c5b">
+<div id="outline-container-org1c13ba4" class="outline-3">
+<h3 id="org1c13ba4">Aritmética Modular Polinomial e o Teorema de Bézout</h3>
+<div class="outline-text-3" id="text-org1c13ba4">
 </div>
-<div id="outline-container-orgbc550ce" class="outline-4">
-<h4 id="orgbc550ce">Prova Matemática (LaTeX)</h4>
-<div class="outline-text-4" id="text-orgbc550ce">
+<div id="outline-container-org8f13448" class="outline-4">
+<h4 id="org8f13448">Prova Matemática (LaTeX)</h4>
+<div class="outline-text-4" id="text-org8f13448">
 <p>
 <b>Teorema 1.1 (Existência de Inverso em \(K[x]/(f(x))\)).</b> Seja \(K\) um corpo e \(f \in K[x]\) um polinômio irredutível. Para todo polinômio \(a \in K[x]\) não divisível por \(f\) (isto é, \(a \not\equiv 0 \pmod{f}\)), tem-se \(\gcd(a, f) = 1\). Pela Identidade de Bézout em \(K[x]\), existem \(u, v \in K[x]\) tais que
 \[u(x)a(x) + v(x)f(x) = 1.\]
@@ -118,9 +118,9 @@ provando que \(\overline{u(x)}\) é o inverso multiplicativo de \(\overline{a(x)
 </p>
 </div>
 </div>
-<div id="outline-container-org7f0b285" class="outline-4">
-<h4 id="org7f0b285">Implementação em Lean 4</h4>
-<div class="outline-text-4" id="text-org7f0b285">
+<div id="outline-container-orge8c1e27" class="outline-4">
+<h4 id="orge8c1e27">Implementação em Lean 4</h4>
+<div class="outline-text-4" id="text-orge8c1e27">
 <p>
 Abaixo formalizamos a relação de congruência módulo \(f\) em um anel comutativo abstrato de polinômios (via relação de divisibilidade `f ∣ (a - b)`) e provamos formalmente que a identidade de Bézout \(u \cdot a + v \cdot f = 1\) implica \(u \cdot a \equiv 1 \pmod{f}\):
 </p>
@@ -189,9 +189,9 @@ end StrangeAlgebras.Extensions
 </div>
 </div>
 </div>
-<div id="outline-container-org898be06" class="outline-2">
-<h2 id="org898be06">Motor Computacional em Rust: Extensões \(K[x]/(f(x))\) e Corpos Finitos \(\mathbb{F}_{p^n}\)</h2>
-<div class="outline-text-2" id="text-org898be06">
+<div id="outline-container-org186ccc7" class="outline-2">
+<h2 id="org186ccc7">Motor Computacional em Rust: Extensões \(K[x]/(f(x))\) e Corpos Finitos \(\mathbb{F}_{p^n}\)</h2>
+<div class="outline-text-2" id="text-org186ccc7">
 <p>
 No Rust, utilizamos uma <b>trait</b> `ModulusPoly&lt;K&gt;` para encapsular o polinômio irredutível \(f(x) \in K[x]\) em nível de tipo. Isso permite construir corpos finitos distintos — como \(\mathbb{F}_{2^4}\) (com \(x^4 + x + 1\)) e \(\mathbb{F}_{2^8}\) (corpo do padrão criptográfico AES, com \(x^8 + x^4 + x^3 + x + 1\)) — com segurança estática de tipos (impedindo somar elementos de corpos diferentes!).
 </p>
@@ -455,9 +455,9 @@ mod tests {
 </div>
 </div>
 </div>
-<div id="outline-container-org33a2f10" class="outline-2">
-<h2 id="org33a2f10">Conexão com os Próximos Capítulos do Lang (Teoria de Galois — Cap. VI)</h2>
-<div class="outline-text-2" id="text-org33a2f10">
+<div id="outline-container-org1e14627" class="outline-2">
+<h2 id="org1e14627">Conexão com os Próximos Capítulos do Lang (Teoria de Galois — Cap. VI)</h2>
+<div class="outline-text-2" id="text-org1e14627">
 <p>
 Com `ExtField&lt;K, M&gt;` e `is<sub>irreducible</sub><sub>fp</sub>` implementados, o próximo passo natural no projeto `StrangeAlgebras` é o <b><b>Capítulo VI do Lang (Teoria de Galois)</b></b>:
 </p>

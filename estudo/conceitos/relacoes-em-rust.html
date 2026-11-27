@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<!-- 2026-11-27 Fri 23:57 -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Relações em Rust</title>
+<meta name="author" content="n-rosenthal" />
+<meta name="description" content="Implementação computacional de relações binárias finitas em Rust sobre conjuntos ordenados (BTreeSet) com verificação de propriedades algébricas." />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/estudo.css">
+<link rel="alternate" type="application/atom+xml" title="Notas de estudo" href="/feed.xml">
+<script defer src="/js/grafo-local.js"></script>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Relações em Rust">
+<meta property="og:description" content="Implementação computacional de relações binárias finitas em Rust sobre conjuntos ordenados (BTreeSet) com verificação de propriedades algébricas.">
+<meta property="og:url" content="https://n-rosenthal.github.io/estudo/conceitos/relacoes-em-rust.html">
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav class="nav"><a href="/">Início</a><a href="/grafo.html">Grafo</a><a href="/feed.xml">Feed</a></nav><div class="meta-nota"><span class="selo selo-semente">semente</span><span>1 min de leitura</span><span>criada em 2026-11-27</span><span>atualizada em 2026-11-27</span></div>
+</div>
+<div id="content" class="content">
+<header>
+<h1 class="title">Relações em Rust</h1>
+</header><nav id="table-of-contents" role="doc-toc">
+<h2>&Iacute;ndice</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orgff87dcc">Visão Geral</a></li>
+<li><a href="#orgd734342">Implementação em Rust</a></li>
+<li><a href="#orga7e88b9">Conexões</a></li>
+<li><a href="#orge7bf685">Citada em</a></li>
+</ul>
+</div>
+</nav>
+<div id="outline-container-orgff87dcc" class="outline-2">
+<h2 id="orgff87dcc">Visão Geral</h2>
+<div class="outline-text-2" id="text-orgff87dcc">
+<p>
+Para computar efetivamente com o conceito de <a href="/estudo/conceitos/relacao.html">Relação</a> sobre domínios finitos, representamos \(R \subseteq A \times B\) em Rust como uma estrutura genérica <code>Relation&lt;A, B&gt;</code> apoiada em <code>BTreeSet&lt;(A, B)&gt;</code>. O uso de <code>BTreeSet</code> garante representação canônica ordenada, ausência de pares duplicados (espelhando a idempotência da união em <a href="/estudo/conceitos/relacoes-em-maude.html">Relações em Maude</a>) e igualdade estrutural determinística.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd734342" class="outline-2">
+<h2 id="orgd734342">Implementação em Rust</h2>
+<div class="outline-text-2" id="text-orgd734342">
+<div class="org-src-container">
+<pre class="src src-rust">use std::collections::BTreeSet;
+
+/// Representa uma relação binária finita R ⊆ A × B
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub struct Relation&lt;A: Ord + Clone, B: Ord + Clone&gt; {
+    pairs: BTreeSet&lt;(A, B)&gt;,
+}
+
+impl&lt;A: Ord + Clone, B: Ord + Clone&gt; Relation&lt;A, B&gt; {
+    pub fn empty() -&gt; Self {
+        Self {
+            pairs: BTreeSet::new(),
+        }
+    }
+
+    pub fn from_pairs&lt;I&gt;(iter: I) -&gt; Self
+    where
+        I: IntoIterator&lt;Item = (A, B)&gt;,
+    {
+        Self {
+            pairs: iter.into_iter().collect(),
+        }
+    }
+
+    pub fn insert(&amp;mut self, a: A, b: B) -&gt; bool {
+        self.pairs.insert((a, b))
+    }
+
+    pub fn contains(&amp;self, a: &amp;A, b: &amp;B) -&gt; bool {
+        self.pairs.contains(&amp;(a.clone(), b.clone()))
+    }
+
+    /// Relação Inversa R⁻¹ ⊆ B × A
+    pub fn inverse(&amp;self) -&gt; Relation&lt;B, A&gt; {
+        let pairs = self
+            .pairs
+            .iter()
+            .map(|(a, b)| (b.clone(), a.clone()))
+            .collect();
+        Relation { pairs }
+    }
+
+    /// Composição de Relações: other ∘ self ⊆ A × C
+    /// (a, c) ∈ other ∘ self ⇔ ∃ b ∈ B, (a, b) ∈ self ∧ (b, c) ∈ other
+    pub fn compose&lt;C: Ord + Clone&gt;(&amp;self, other: &amp;Relation&lt;B, C&gt;) -&gt; Relation&lt;A, C&gt; {
+        let mut pairs = BTreeSet::new();
+        for (a, b1) in &amp;self.pairs {
+            for (b2, c) in &amp;other.pairs {
+                if b1 == b2 {
+                    pairs.insert((a.clone(), c.clone()));
+                }
+            }
+        }
+        Relation { pairs }
+    }
+}
+
+/// Métodos exclusivos para endorrelações R ⊆ A × A sobre um domínio explícito
+impl&lt;A: Ord + Clone&gt; Relation&lt;A, A&gt; {
+    /// Relação Identidade id_A = { (a, a) | a ∈ domain }
+    pub fn identity(domain: &amp;[A]) -&gt; Self {
+        let pairs = domain
+            .iter()
+            .map(|a| (a.clone(), a.clone()))
+            .collect();
+        Self { pairs }
+    }
+
+    /// Verifica se R é reflexiva sobre `domain`: ∀ a ∈ domain, (a, a) ∈ R
+    pub fn is_reflexive(&amp;self, domain: &amp;[A]) -&gt; bool {
+        domain.iter().all(|a| self.contains(a, a))
+    }
+
+    /// Verifica se R é simétrica: R = R⁻¹
+    pub fn is_symmetric(&amp;self) -&gt; bool {
+        *self == self.inverse()
+    }
+
+    /// Verifica se R é antissimétrica: (a, b) ∈ R ∧ (b, a) ∈ R ⇒ a = b
+    pub fn is_antisymmetric(&amp;self) -&gt; bool {
+        self.pairs
+            .iter()
+            .all(|(a, b)| a == b || !self.contains(b, a))
+    }
+
+    /// Verifica se R é transitiva: (R ∘ R) ⊆ R
+    pub fn is_transitive(&amp;self) -&gt; bool {
+        let comp = self.compose(self);
+        comp.pairs.is_subset(&amp;self.pairs)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_relation_involution_and_composition() {
+        let r = Relation::from_pairs(vec![('a', 1), ('b', 2)]);
+        let s = Relation::from_pairs(vec![(1, "x"), (2, "y"), (3, "z")]);
+
+        // Teorema da Involução: (R⁻¹)⁻¹ == R
+        assert_eq!(r.inverse().inverse(), r);
+
+        // Composição s ∘ r
+        let sr = r.compose(&amp;s);
+        assert_eq!(sr, Relation::from_pairs(vec![('a', "x"), ('b', "y")]));
+
+        // Contravariância da inversa: (s ∘ r)⁻¹ == r⁻¹ ∘ s⁻¹
+        assert_eq!(sr.inverse(), s.inverse().compose(&amp;r.inverse()));
+    }
+
+    #[test]
+    fn test_endorelation_properties() {
+        let domain = vec![1, 2, 3];
+        // Relação de divisibilidade em {1, 2, 3} (ordem parcial: reflexiva, antissimétrica, transitiva)
+        let div_rel = Relation::from_pairs(vec![
+            (1, 1), (1, 2), (1, 3),
+            (2, 2),
+            (3, 3),
+        ]);
+
+        assert!(div_rel.is_reflexive(&amp;domain));
+        assert!(!div_rel.is_symmetric());
+        assert!(div_rel.is_antisymmetric());
+        assert!(div_rel.is_transitive());
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orga7e88b9" class="outline-2">
+<h2 id="orga7e88b9">Conexões</h2>
+<div class="outline-text-2" id="text-orga7e88b9">
+<ul class="org-ul">
+<li>Definição matemática abstrata: <a href="/estudo/conceitos/relacao.html">Relação</a></li>
+<li>Especificação equacional em Maude: <a href="/estudo/conceitos/relacoes-em-maude.html">Relações em Maude</a></li>
+<li>Formalização dependente em Lean 4: <a href="/estudo/conceitos/relacoes-em-lean-4.html">Relações em Lean 4</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orge7bf685" class="outline-2">
+<h2 id="orge7bf685">Citada em</h2>
+<div class="outline-text-2" id="text-orge7bf685">
+<ul class="backlinks">
+<li><a href="/estudo/conceitos/relacao.html">Relação</a></li>
+<li><a href="/estudo/conceitos/relacoes-de-equivalencia-em-rust.html">Relações de Equivalência em Rust</a></li>
+<li><a href="/estudo/conceitos/relacoes-de-ordem-em-rust.html">Relações de Ordem em Rust</a></li>
+<li><a href="/estudo/conceitos/relacoes-em-lean-4.html">Relações em Lean 4</a></li>
+<li><a href="/estudo/conceitos/relacoes-em-maude.html">Relações em Maude</a></li>
+</ul>
+
+<span class="pf-meta" data-pagefind-filter="tipo[data-v]" data-v="conceito"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="algebra"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="rust"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="conceito"></span>
+<span class="pf-meta" data-pagefind-filter="status[data-v]" data-v="semente"></span>
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<!-- 2026-11-27 Fri 23:57 -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Relações de Ordem em Maude</title>
+<meta name="author" content="n-rosenthal" />
+<meta name="description" content="Especificação de conjuntos parcialmente ordenados (Posets), elementos minimais/maximais e reticulados distributivos finitos em Maude." />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/estudo.css">
+<link rel="alternate" type="application/atom+xml" title="Notas de estudo" href="/feed.xml">
+<script defer src="/js/grafo-local.js"></script>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Relações de Ordem em Maude">
+<meta property="og:description" content="Especificação de conjuntos parcialmente ordenados (Posets), elementos minimais/maximais e reticulados distributivos finitos em Maude.">
+<meta property="og:url" content="https://n-rosenthal.github.io/estudo/conceitos/relacoes-de-ordem-em-maude.html">
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav class="nav"><a href="/">Início</a><a href="/grafo.html">Grafo</a><a href="/feed.xml">Feed</a></nav><div class="meta-nota"><span class="selo selo-semente">semente</span><span>1 min de leitura</span><span>criada em 2026-11-27</span><span>atualizada em 2026-11-27</span></div>
+</div>
+<div id="content" class="content">
+<header>
+<h1 class="title">Relações de Ordem em Maude</h1>
+</header><nav id="table-of-contents" role="doc-toc">
+<h2>&Iacute;ndice</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org698d77b">Visão Geral</a></li>
+<li><a href="#orgd7d4f18">Módulo Funcional <code>PARTIAL-ORDER</code></a></li>
+<li><a href="#orgaa1a731">Redução Executável</a></li>
+<li><a href="#org859efa2">Conexões</a></li>
+<li><a href="#org600a1b2">Citada em</a></li>
+</ul>
+</div>
+</nav>
+<div id="outline-container-org698d77b" class="outline-2">
+<h2 id="org698d77b">Visão Geral</h2>
+<div class="outline-text-2" id="text-org698d77b">
+<p>
+Esta nota concretiza o conceito de <a href="/estudo/conceitos/relacao-de-ordem-e-reticulados.html">Relação de Ordem e Reticulados</a> em Maude. Modelamos um poset finito (como o reticulado de divisibilidade de um inteiro) tanto relacionalmente (a partir da <a href="/estudo/conceitos/relacoes-em-maude.html">Relações em Maude</a> de ordem \(\le\)) quanto algebricamente, verificando a caracterização \(a \le b \iff a \wedge b = a\).
+</p>
+</div>
+</div>
+<div id="outline-container-orgd7d4f18" class="outline-2">
+<h2 id="orgd7d4f18">Módulo Funcional <code>PARTIAL-ORDER</code></h2>
+<div class="outline-text-2" id="text-orgd7d4f18">
+<div class="org-src-container">
+<pre class="src src-maude">fmod PARTIAL-ORDER is
+  protecting BOOL .
+  sorts Elt EltSet Pair Rel .
+  subsort Elt &lt; EltSet .
+  subsort Pair &lt; Rel .
+
+  --- Exemplo: divisores de 6 = {1, 2, 3, 6}
+  ops d1 d2 d3 d6 : -&gt; Elt [ctor] .
+
+  --- Conjuntos de elementos
+  op emptySet : -&gt; EltSet [ctor] .
+  op _|_      : EltSet EltSet -&gt; EltSet [ctor assoc comm id: emptySet] .
+  eq X:Elt | X:Elt = X:Elt .
+
+  --- Pares (X &lt;= Y) e Relações
+  op _&lt;=_  : Elt Elt -&gt; Pair [ctor] .
+  op empty : -&gt; Rel [ctor] .
+  op _;_   : Rel Rel -&gt; Rel [ctor assoc comm id: empty] .
+  eq (X:Elt &lt;= Y:Elt) ; (X:Elt &lt;= Y:Elt) = (X:Elt &lt;= Y:Elt) .
+
+  vars X Y Z : Elt .
+  vars R S   : Rel .
+  vars D     : EltSet .
+
+  --- Pertinência: (X &lt;= Y) ∈ R
+  op holds : Elt Elt Rel -&gt; Bool .
+  eq holds(X, Y, empty)            = false .
+  eq holds(X, Y, (X &lt;= Y) ; R)     = true .
+  eq holds(X, Y, R)                = false [owise] .
+
+  --- Verificação de Reflexividade sobre o domínio D
+  op isReflexive : EltSet Rel -&gt; Bool .
+  eq isReflexive(emptySet, R)  = true .
+  eq isReflexive((X | D), R)   = holds(X, X, R) and isReflexive(D, R) .
+
+  --- Verificação de Antissimetria: se X &lt;= Y e Y &lt;= X então X == Y
+  op isAntisymmetric : Rel -&gt; Bool .
+  eq isAntisymmetric(empty) = true .
+  ceq isAntisymmetric((X &lt;= Y) ; (Y &lt;= X) ; R) = false if X =/= Y .
+  eq isAntisymmetric((X &lt;= Y) ; R) = isAntisymmetric(R) [owise] .
+
+  --- Verificação de Transitividade: se X &lt;= Y e Y &lt;= Z então (X &lt;= Z) ∈ R
+  op checkTransPair : Pair Rel Rel -&gt; Bool .
+  eq checkTransPair((X &lt;= Y), empty, Full)          = true .
+  eq checkTransPair((X &lt;= Y), (Y &lt;= Z) ; S, Full)   =
+       holds(X, Z, Full) and checkTransPair((X &lt;= Y), S, Full) .
+  eq checkTransPair((X &lt;= Y), S, Full)              = true [owise] .
+
+  vars Full : Rel .
+  op checkTransAll : Rel Rel -&gt; Bool .
+  eq checkTransAll(empty, Full)          = true .
+  eq checkTransAll((X &lt;= Y) ; R, Full)   =
+       checkTransPair((X &lt;= Y), Full, Full) and checkTransAll(R, Full) .
+
+  op isPoset : EltSet Rel -&gt; Bool .
+  eq isPoset(D, R) = isReflexive(D, R) and isAntisymmetric(R) and checkTransAll(R, R) .
+
+  --- Verifica se M é minimal no domínio D (nenhum X != M satisfaz X &lt;= M)
+  op isMinimal : Elt EltSet Rel -&gt; Bool .
+  eq isMinimal(M:Elt, emptySet, R) = true .
+  ceq isMinimal(M:Elt, (X | D), R) = false
+   if X =/= M:Elt /\ holds(X, M:Elt, R) .
+  eq isMinimal(M:Elt, (X | D), R) = isMinimal(M:Elt, D, R) [owise] .
+endfm
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgaa1a731" class="outline-2">
+<h2 id="orgaa1a731">Redução Executável</h2>
+<div class="outline-text-2" id="text-orgaa1a731">
+<div class="org-src-container">
+<pre class="src src-maude">--- Ordem de divisibilidade sobre {1, 2, 3, 6}:
+reduce isPoset(d1 | d2 | d3 | d6,
+  (d1 &lt;= d1) ; (d2 &lt;= d2) ; (d3 &lt;= d3) ; (d6 &lt;= d6) ;
+  (d1 &lt;= d2) ; (d1 &lt;= d3) ; (d1 &lt;= d6) ; (d2 &lt;= d6) ; (d3 &lt;= d6)) .
+--- Resultado: true
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org859efa2" class="outline-2">
+<h2 id="org859efa2">Conexões</h2>
+<div class="outline-text-2" id="text-org859efa2">
+<ul class="org-ul">
+<li>Definição matemática abstrata: <a href="/estudo/conceitos/relacao-de-ordem-e-reticulados.html">Relação de Ordem e Reticulados</a></li>
+<li>Base relacional em Maude: <a href="/estudo/conceitos/relacoes-em-maude.html">Relações em Maude</a></li>
+<li>Formalização dependente em Lean 4: <a href="/estudo/conceitos/relacoes-de-ordem-em-lean-4.html">Relações de Ordem em Lean 4</a></li>
+<li>Implementação computacional em Rust: <a href="/estudo/conceitos/relacoes-de-ordem-em-rust.html">Relações de Ordem em Rust</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org600a1b2" class="outline-2">
+<h2 id="org600a1b2">Citada em</h2>
+<div class="outline-text-2" id="text-org600a1b2">
+<ul class="backlinks">
+<li><a href="/estudo/conceitos/relacao-de-ordem-e-reticulados.html">Relação de Ordem e Reticulados</a></li>
+<li><a href="/estudo/conceitos/relacoes-de-ordem-em-lean-4.html">Relações de Ordem em Lean 4</a></li>
+<li><a href="/estudo/conceitos/relacoes-de-ordem-em-rust.html">Relações de Ordem em Rust</a></li>
+</ul>
+
+<span class="pf-meta" data-pagefind-filter="tipo[data-v]" data-v="conceito"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="algebra"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="maude"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="order-theory"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="formal-specification"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="conceito"></span>
+<span class="pf-meta" data-pagefind-filter="status[data-v]" data-v="semente"></span>
+</div>
+</div>
+</div>
+</body>
+</html>

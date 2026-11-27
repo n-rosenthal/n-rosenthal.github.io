@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<!-- 2026-11-27 Fri 22:45 -->
+<!-- 2026-11-27 Fri 23:57 -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>R-Módulos, Aplicações Lineares e Forma Normal de Smith (Lean 4 + Rust)</title>
@@ -60,28 +60,28 @@
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org4467438">Visão Geral: Módulos sobre PIDs e Fatores Invariantes (Lang, Cap. III e Cap. XV)</a></li>
-<li><a href="#orgf35d1da">Camada Formal em Lean 4 (<code>Modules.lean</code>)</a>
+<li><a href="#orgdb8969d">Visão Geral: Módulos sobre PIDs e Fatores Invariantes (Lang, Cap. III e Cap. XV)</a></li>
+<li><a href="#org5cdd70a">Camada Formal em Lean 4 (<code>Modules.lean</code>)</a>
 <ul>
-<li><a href="#orga27708e">Estrutura de $R$-Módulo e Submódulo</a></li>
-<li><a href="#org4d4b0b4">Aplicações $R$-Lineares e o Núcleo (\(\ker \phi\))</a>
+<li><a href="#org1dea9a3">Estrutura de $R$-Módulo e Submódulo</a></li>
+<li><a href="#orga009870">Aplicações $R$-Lineares e o Núcleo (\(\ker \phi\))</a>
 <ul>
-<li><a href="#orgdf0b779">Prova Matemática (LaTeX)</a></li>
-<li><a href="#org352adda">Implementação e Provas em Lean 4</a></li>
+<li><a href="#org1435b2d">Prova Matemática (LaTeX)</a></li>
+<li><a href="#org2e52546">Implementação e Provas em Lean 4</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org1047711">Motor Computacional em Rust: Domínios Euclidianos e Forma Normal de Smith</a></li>
-<li><a href="#orgb9c2a4e">Cada elemento não-nulo possui uma medida inteira `euclidean<sub>norm</sub>(&amp;self) -&gt; Option&lt;usize&gt;` (valor absoluto \(|a|\) em \(\mathbb{Z}\), ou \(\deg(f)\) em \(K[x]\)).</a></li>
-<li><a href="#org2827624">Dispõe de divisão com resto `div<sub>rem</sub>` e <b><b>Algoritmo de Euclides Estendido (`extended<sub>gcd</sub>`)</b></b> que retorna \((g, u, v)\) com \(ua + vb = g\).</a></li>
-<li><a href="#org08224be">Próximo Passo: Álgebra Linear Avançada — Autovalores, Decomposição Primária e Formas de Jordan (Lang, Cap. XIV e XV)</a></li>
+<li><a href="#org0c026cb">Motor Computacional em Rust: Domínios Euclidianos e Forma Normal de Smith</a></li>
+<li><a href="#org0741bb4">Cada elemento não-nulo possui uma medida inteira `euclidean<sub>norm</sub>(&amp;self) -&gt; Option&lt;usize&gt;` (valor absoluto \(|a|\) em \(\mathbb{Z}\), ou \(\deg(f)\) em \(K[x]\)).</a></li>
+<li><a href="#org0e33a87">Dispõe de divisão com resto `div<sub>rem</sub>` e <b><b>Algoritmo de Euclides Estendido (`extended<sub>gcd</sub>`)</b></b> que retorna \((g, u, v)\) com \(ua + vb = g\).</a></li>
+<li><a href="#orgc3eb8c9">Próximo Passo: Álgebra Linear Avançada — Autovalores, Decomposição Primária e Formas de Jordan (Lang, Cap. XIV e XV)</a></li>
 </ul>
 </div>
 </nav>
-<div id="outline-container-org4467438" class="outline-2">
-<h2 id="org4467438">Visão Geral: Módulos sobre PIDs e Fatores Invariantes (Lang, Cap. III e Cap. XV)</h2>
-<div class="outline-text-2" id="text-org4467438">
+<div id="outline-container-orgdb8969d" class="outline-2">
+<h2 id="orgdb8969d">Visão Geral: Módulos sobre PIDs e Fatores Invariantes (Lang, Cap. III e Cap. XV)</h2>
+<div class="outline-text-2" id="text-orgdb8969d">
 <p>
 Nos estudos anteriores, construímos a hierarquia <b><b>Grupo \(\rightarrow\) Anel Comutativo \(\rightarrow\) Domínio Euclidiano (\(K[x]\)) \(\rightarrow\) Corpo (\(\mathbb{F}_{p^n}\))</b></b>. Agora damos o salto para a <b><b>Álgebra Linear sobre Anéis</b></b> (Lang, Capítulo III, §1–§7): substituímos o corpo de escalares por um anel comutativo arbitrário \(R\), generalizando espaços vetoriais para <b><b>$R$-módulos</b></b>.
 </p>
@@ -100,13 +100,13 @@ Esse único algoritmo resolve dois teoremas centrais do Lang simultaneamente:
 </ol>
 </div>
 </div>
-<div id="outline-container-orgf35d1da" class="outline-2">
-<h2 id="orgf35d1da">Camada Formal em Lean 4 (<code>Modules.lean</code>)</h2>
-<div class="outline-text-2" id="text-orgf35d1da">
+<div id="outline-container-org5cdd70a" class="outline-2">
+<h2 id="org5cdd70a">Camada Formal em Lean 4 (<code>Modules.lean</code>)</h2>
+<div class="outline-text-2" id="text-org5cdd70a">
 </div>
-<div id="outline-container-orga27708e" class="outline-3">
-<h3 id="orga27708e">Estrutura de $R$-Módulo e Submódulo</h3>
-<div class="outline-text-3" id="text-orga27708e">
+<div id="outline-container-org1dea9a3" class="outline-3">
+<h3 id="org1dea9a3">Estrutura de $R$-Módulo e Submódulo</h3>
+<div class="outline-text-3" id="text-org1dea9a3">
 <p>
 Um <b><b>$R$-módulo à esquerda</b></b> \(M\) consiste em um grupo abeliano aditivo \((M, +, 0, -)\) equipado com uma ação escalar \(\cdot : R \times M \to M\) distributiva e associativa (Lang, Cap. III, §1).
 </p>
@@ -150,13 +150,13 @@ structure Submodule (R : Type u) (M : Type v) [CommRing R] [AddCommGroup M] [Mod
 </div>
 </div>
 </div>
-<div id="outline-container-org4d4b0b4" class="outline-3">
-<h3 id="org4d4b0b4">Aplicações $R$-Lineares e o Núcleo (\(\ker \phi\))</h3>
-<div class="outline-text-3" id="text-org4d4b0b4">
+<div id="outline-container-orga009870" class="outline-3">
+<h3 id="orga009870">Aplicações $R$-Lineares e o Núcleo (\(\ker \phi\))</h3>
+<div class="outline-text-3" id="text-orga009870">
 </div>
-<div id="outline-container-orgdf0b779" class="outline-4">
-<h4 id="orgdf0b779">Prova Matemática (LaTeX)</h4>
-<div class="outline-text-4" id="text-orgdf0b779">
+<div id="outline-container-org1435b2d" class="outline-4">
+<h4 id="org1435b2d">Prova Matemática (LaTeX)</h4>
+<div class="outline-text-4" id="text-org1435b2d">
 <p>
 <b>Proposição 1.1 (Propriedade do Zero e Submódulo Núcleo).</b> Seja \(\phi : M \to N\) uma aplicação $R$-linear entre $R$-módulos (isto é, \(\phi(x + y) = \phi(x) + \phi(y)\) e \(\phi(r \cdot x) = r \cdot \phi(x)\)). Então:
 </p>
@@ -179,9 +179,9 @@ structure Submodule (R : Type u) (M : Type v) [CommRing R] [AddCommGroup M] [Mod
 </ol>
 </div>
 </div>
-<div id="outline-container-org352adda" class="outline-4">
-<h4 id="org352adda">Implementação e Provas em Lean 4</h4>
-<div class="outline-text-4" id="text-org352adda">
+<div id="outline-container-org2e52546" class="outline-4">
+<h4 id="org2e52546">Implementação e Provas em Lean 4</h4>
+<div class="outline-text-4" id="text-org2e52546">
 <div class="org-src-container">
 <pre class="src src-lean4">section LinearMaps
 variable {R : Type u} {M : Type v} {N : Type w}
@@ -254,20 +254,20 @@ end StrangeAlgebras.Modules
 </div>
 </div>
 </div>
-<div id="outline-container-org1047711" class="outline-2">
-<h2 id="org1047711">Motor Computacional em Rust: Domínios Euclidianos e Forma Normal de Smith</h2>
-<div class="outline-text-2" id="text-org1047711">
+<div id="outline-container-org0c026cb" class="outline-2">
+<h2 id="org0c026cb">Motor Computacional em Rust: Domínios Euclidianos e Forma Normal de Smith</h2>
+<div class="outline-text-2" id="text-org0c026cb">
 <p>
 Para que o algoritmo da <b><b>Forma Normal de Smith</b></b> funcione tanto para matrizes de inteiros (\(\mathbb{Z}\), classificando grupos abelianos) quanto para matrizes de polinômios (\(K[x]\), classificando operadores lineares), abstraímos a noção de <b><b>Domínio Euclidiano</b></b> através da <b>trait</b> `EuclideanDomain`:
 </p>
 </div>
 </div>
-<div id="outline-container-orgb9c2a4e" class="outline-2">
-<h2 id="orgb9c2a4e">Cada elemento não-nulo possui uma medida inteira `euclidean<sub>norm</sub>(&amp;self) -&gt; Option&lt;usize&gt;` (valor absoluto \(|a|\) em \(\mathbb{Z}\), ou \(\deg(f)\) em \(K[x]\)).</h2>
+<div id="outline-container-org0741bb4" class="outline-2">
+<h2 id="org0741bb4">Cada elemento não-nulo possui uma medida inteira `euclidean<sub>norm</sub>(&amp;self) -&gt; Option&lt;usize&gt;` (valor absoluto \(|a|\) em \(\mathbb{Z}\), ou \(\deg(f)\) em \(K[x]\)).</h2>
 </div>
-<div id="outline-container-org2827624" class="outline-2">
-<h2 id="org2827624">Dispõe de divisão com resto `div<sub>rem</sub>` e <b><b>Algoritmo de Euclides Estendido (`extended<sub>gcd</sub>`)</b></b> que retorna \((g, u, v)\) com \(ua + vb = g\).</h2>
-<div class="outline-text-2" id="text-org2827624">
+<div id="outline-container-org0e33a87" class="outline-2">
+<h2 id="org0e33a87">Dispõe de divisão com resto `div<sub>rem</sub>` e <b><b>Algoritmo de Euclides Estendido (`extended<sub>gcd</sub>`)</b></b> que retorna \((g, u, v)\) com \(ua + vb = g\).</h2>
+<div class="outline-text-2" id="text-org0e33a87">
 <p>
 Com `extended<sub>gcd</sub>`, quando encontramos um pivô \(a_{kk}\) que não divide algum elemento \(a_{kj}\) na mesma linha (ou \(a_{ik}\) na mesma coluna), aplicamos uma <b><b>transformação unimodular \(2 \times 2\)</b></b> (de determinante \(u \cdot (a_{kj}/g) - v \cdot (a_{kk}/g) = 1\)) que substitui \((a_{kk}, a_{kj})\) por \((g, 0)\), reduzindo estritamente a norma euclidiana do pivô até que ele divida toda a linha, toda a coluna e toda a submatriz restante!
 </p>
@@ -626,9 +626,9 @@ mod tests {
 </div>
 </div>
 </div>
-<div id="outline-container-org08224be" class="outline-2">
-<h2 id="org08224be">Próximo Passo: Álgebra Linear Avançada — Autovalores, Decomposição Primária e Formas de Jordan (Lang, Cap. XIV e XV)</h2>
-<div class="outline-text-2" id="text-org08224be">
+<div id="outline-container-orgc3eb8c9" class="outline-2">
+<h2 id="orgc3eb8c9">Próximo Passo: Álgebra Linear Avançada — Autovalores, Decomposição Primária e Formas de Jordan (Lang, Cap. XIV e XV)</h2>
+<div class="outline-text-2" id="text-orgc3eb8c9">
 <p>
 Com a Forma Normal de Smith operacional tanto sobre \(\mathbb{Z}\) quanto sobre \(K[x]\), fechamos a base estrutural dos capítulos principais do Lang:
 </p>

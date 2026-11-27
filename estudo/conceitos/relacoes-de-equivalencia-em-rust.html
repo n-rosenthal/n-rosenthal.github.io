@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<!-- 2026-11-27 Fri 23:57 -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Relações de Equivalência em Rust</title>
+<meta name="author" content="n-rosenthal" />
+<meta name="description" content="Implementação de relações de equivalência e conjuntos quocientes finitos em Rust via Partição Disjunta (Union-Find) e levantamento universal de funções." />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/estudo.css">
+<link rel="alternate" type="application/atom+xml" title="Notas de estudo" href="/feed.xml">
+<script defer src="/js/grafo-local.js"></script>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Relações de Equivalência em Rust">
+<meta property="og:description" content="Implementação de relações de equivalência e conjuntos quocientes finitos em Rust via Partição Disjunta (Union-Find) e levantamento universal de funções.">
+<meta property="og:url" content="https://n-rosenthal.github.io/estudo/conceitos/relacoes-de-equivalencia-em-rust.html">
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav class="nav"><a href="/">Início</a><a href="/grafo.html">Grafo</a><a href="/feed.xml">Feed</a></nav><div class="meta-nota"><span class="selo selo-semente">semente</span><span>2 min de leitura</span><span>criada em 2026-11-27</span><span>atualizada em 2026-11-27</span></div>
+</div>
+<div id="content" class="content">
+<header>
+<h1 class="title">Relações de Equivalência em Rust</h1>
+</header><nav id="table-of-contents" role="doc-toc">
+<h2>&Iacute;ndice</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org2679553">Visão Geral</a></li>
+<li><a href="#org3853347">Implementação em Rust</a></li>
+<li><a href="#org14545ad">Conexões</a></li>
+<li><a href="#org7fffffe">Citada em</a></li>
+</ul>
+</div>
+</nav>
+<div id="outline-container-org2679553" class="outline-2">
+<h2 id="org2679553">Visão Geral</h2>
+<div class="outline-text-2" id="text-org2679553">
+<p>
+Para representar uma <a href="/estudo/conceitos/relacao-de-equivalencia-e-conjunto-quociente.html">Relação de Equivalência e Conjunto Quociente</a> em Rust com alta eficiência, utilizamos uma estrutura de <b><b>Partição Disjunta (Union-Find com compressão de caminho e união por posto)</b></b> mapeando elementos genéricos `T: Ord + Clone` para representantes canônicos. Isso permite:
+</p>
+<ol class="org-ol">
+<li>Verificar \(a \sim b\) em tempo quase constante \(O(\alpha(n))\).</li>
+<li>Construir explicitamente o conjunto quociente \(A/{\sim}\) como uma coleção de classes de equivalência.</li>
+<li>Implementar o <b><b>levantamento universal (`quotient<sub>lift</sub>`)</b></b> verificando em tempo de execução se \(f : A \to B\) respeita a equivalência antes de induzir \(\bar{f} : A/{\sim} \to B\).</li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org3853347" class="outline-2">
+<h2 id="org3853347">Implementação em Rust</h2>
+<div class="outline-text-2" id="text-org3853347">
+<div class="org-src-container">
+<pre class="src src-rust">use std::collections::{BTreeMap, BTreeSet};
+use crate::relation::Relation;
+
+/// Representa uma Relação de Equivalência finita e seu Conjunto Quociente A / ~
+/// através de uma floresta de conjuntos disjuntos (Union-Find).
+#[derive(Clone, Debug)]
+pub struct EquivalenceRelation&lt;T: Ord + Clone&gt; {
+    elements: Vec&lt;T&gt;,
+    index_of: BTreeMap&lt;T, usize&gt;,
+    parent: Vec&lt;usize&gt;,
+    rank: Vec&lt;usize&gt;,
+}
+
+impl&lt;T: Ord + Clone&gt; EquivalenceRelation&lt;T&gt; {
+    /// Inicializa a relação de equivalência discreta (igualdade: a ~ b ⇔ a == b)
+    /// onde cada elemento do domínio forma sua própria classe unitária [a] = {a}.
+    pub fn discrete(domain: &amp;[T]) -&gt; Self {
+        let mut elements = Vec::new();
+        let mut index_of = BTreeMap::new();
+        for item in domain {
+            if !index_of.contains_key(item) {
+                let idx = elements.len();
+                elements.push(item.clone());
+                index_of.insert(item.clone(), idx);
+            }
+        }
+        let n = elements.len();
+        Self {
+            elements,
+            index_of,
+            parent: (0..n).collect(),
+            rank: vec![0; n],
+        }
+    }
+
+    /// Constrói o fecho de equivalência de uma `Relation&lt;T, T&gt;` arbitrária sobre `domain`
+    pub fn from_relation(domain: &amp;[T], rel: &amp;Relation&lt;T, T&gt;) -&gt; Self {
+        let mut eq_rel = Self::discrete(domain);
+        for a in domain {
+            for b in domain {
+                if rel.contains(a, b) {
+                    eq_rel.relate(a, b);
+                }
+            }
+        }
+        eq_rel
+    }
+
+    fn find_idx(&amp;mut self, i: usize) -&gt; usize {
+        if self.parent[i] != i {
+            let root = self.find_idx(self.parent[i]);
+            self.parent[i] = root; // Compressão de caminho
+        }
+        self.parent[i]
+    }
+
+    /// Identifica dois elementos (impõe a ~ b e fecha por simetria e transitividade)
+    pub fn relate(&amp;mut self, a: &amp;T, b: &amp;T) -&gt; bool {
+        let (&amp;ia, &amp;ib) = match (self.index_of.get(a), self.index_of.get(b)) {
+            (Some(ia), Some(ib)) =&gt; (ia, ib),
+            _ =&gt; return false,
+        };
+        let ra = self.find_idx(ia);
+        let rb = self.find_idx(ib);
+        if ra == rb {
+            return false; // Já pertencem à mesma classe
+        }
+        if self.rank[ra] &lt; self.rank[rb] {
+            self.parent[ra] = rb;
+        } else if self.rank[ra] &gt; self.rank[rb] {
+            self.parent[rb] = ra;
+        } else {
+            self.parent[rb] = ra;
+            self.rank[ra] += 1;
+        }
+        true
+    }
+
+    /// Testa se a ~ b
+    pub fn are_equivalent(&amp;mut self, a: &amp;T, b: &amp;T) -&gt; bool {
+        match (self.index_of.get(a), self.index_of.get(b)) {
+            (Some(&amp;ia), Some(&amp;ib)) =&gt; self.find_idx(ia) == self.find_idx(ib),
+            _ =&gt; false,
+        }
+    }
+
+    /// Projeção canônica π : A → A/~ (retorna o representante canônico da classe [a])
+    pub fn project(&amp;mut self, a: &amp;T) -&gt; Option&lt;T&gt; {
+        let &amp;ia = self.index_of.get(a)?;
+        let root = self.find_idx(ia);
+        Some(self.elements[root].clone())
+    }
+
+    /// Retorna o Conjunto Quociente A/~ explícito como lista de classes de equivalência
+    pub fn quotient_set(&amp;mut self) -&gt; Vec&lt;BTreeSet&lt;T&gt;&gt; {
+        let mut classes: BTreeMap&lt;usize, BTreeSet&lt;T&gt;&gt; = BTreeMap::new();
+        for idx in 0..self.elements.len() {
+            let root = self.find_idx(idx);
+            classes
+                .entry(root)
+                .or_default()
+                .insert(self.elements[idx].clone());
+        }
+        classes.into_values().collect()
+    }
+
+    /// Propriedade Universal do Quociente:
+    /// Dada f : T → B, verifica se (a ~ b ⇒ f(a) == f(b)).
+    /// Em caso afirmativo, retorna o mapa induzido f̄ : A/~ → B (indexado pelo representante).
+    pub fn lift&lt;B, F&gt;(&amp;mut self, f: F) -&gt; Result&lt;BTreeMap&lt;T, B&gt;, &amp;'static str&gt;
+    where
+        B: PartialEq,
+        F: Fn(&amp;T) -&gt; B,
+    {
+        let mut lifted: BTreeMap&lt;T, B&gt; = BTreeMap::new();
+        for idx in 0..self.elements.len() {
+            let root = self.find_idx(idx);
+            let rep = self.elements[root].clone();
+            let val = f(&amp;self.elements[idx]);
+
+            if let Some(existing) = lifted.get(&amp;rep) {
+                if existing != &amp;val {
+                    return Err("A função não é constante nas classes de equivalência!");
+                }
+            } else {
+                lifted.insert(rep, val);
+            }
+        }
+        Ok(lifted)
+    }
+
+    /// Converte de volta para `Relation&lt;T, T&gt;` explícita e verifica os 3 axiomas
+    pub fn to_relation(&amp;mut self) -&gt; Relation&lt;T, T&gt; {
+        let mut pairs = BTreeSet::new();
+        for i in 0..self.elements.len() {
+            for j in 0..self.elements.len() {
+                if self.find_idx(i) == self.find_idx(j) {
+                    pairs.insert((self.elements[i].clone(), self.elements[j].clone()));
+                }
+            }
+        }
+        Relation::from_pairs(pairs)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_quotient_partition_and_axioms() {
+        let domain = vec![0, 1, 2, 3, 4, 5];
+        // Congruência módulo 3 em {0, 1, 2, 3, 4, 5}
+        let mut mod3 = EquivalenceRelation::discrete(&amp;domain);
+        mod3.relate(&amp;0, &amp;3);
+        mod3.relate(&amp;1, &amp;4);
+        mod3.relate(&amp;2, &amp;5);
+
+        // O conjunto quociente Z_6 / ~ deve ter exatamente 3 classes de 2 elementos
+        let classes = mod3.quotient_set();
+        assert_eq!(classes.len(), 3);
+        assert!(mod3.are_equivalent(&amp;1, &amp;4));
+        assert!(!mod3.are_equivalent(&amp;1, &amp;5));
+
+        // Verifica os axiomas de relação de equivalência na relação gerada
+        let rel = mod3.to_relation();
+        assert!(rel.is_reflexive(&amp;domain));
+        assert!(rel.is_symmetric());
+        assert!(rel.is_transitive());
+    }
+
+    #[test]
+    fn test_universal_property_lift() {
+        let domain = vec![0, 1, 2, 3, 4, 5];
+        let mut mod3 = EquivalenceRelation::discrete(&amp;domain);
+        mod3.relate(&amp;0, &amp;3);
+        mod3.relate(&amp;1, &amp;4);
+        mod3.relate(&amp;2, &amp;5);
+
+        // f(x) = (x * x) % 3 respeita congruência módulo 3 → levantamento bem-definido!
+        let valid_lift = mod3.lift(|x| (x * x) % 3);
+        assert!(valid_lift.is_ok());
+        assert_eq!(valid_lift.unwrap().len(), 3);
+
+        // g(x) = x % 2 NÃO respeita congruência módulo 3 (0 ~ 3, mas 0%2 != 3%2) → erro!
+        let invalid_lift = mod3.lift(|x| x % 2);
+        assert!(invalid_lift.is_err());
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org14545ad" class="outline-2">
+<h2 id="org14545ad">Conexões</h2>
+<div class="outline-text-2" id="text-org14545ad">
+<ul class="org-ul">
+<li>Definição matemática abstrata: <a href="/estudo/conceitos/relacao-de-equivalencia-e-conjunto-quociente.html">Relação de Equivalência e Conjunto Quociente</a></li>
+<li>Base relacional em Rust: <a href="/estudo/conceitos/relacoes-em-rust.html">Relações em Rust</a></li>
+<li>Especificação em Maude: <a href="/estudo/conceitos/relacoes-de-equivalencia-em-maude.html">Relações de Equivalência em Maude</a></li>
+<li>Formalização em Lean 4: <a href="/estudo/conceitos/relacoes-de-equivalencia-em-lean-4.html">Relações de Equivalência em Lean 4</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org7fffffe" class="outline-2">
+<h2 id="org7fffffe">Citada em</h2>
+<div class="outline-text-2" id="text-org7fffffe">
+<ul class="backlinks">
+<li><a href="/estudo/conceitos/relacao-de-equivalencia-e-conjunto-quociente.html">Relação de Equivalência e Conjunto Quociente</a></li>
+<li><a href="/estudo/conceitos/relacoes-de-equivalencia-em-lean-4.html">Relações de Equivalência em Lean 4</a></li>
+<li><a href="/estudo/conceitos/relacoes-de-equivalencia-em-maude.html">Relações de Equivalência em Maude</a></li>
+</ul>
+
+<span class="pf-meta" data-pagefind-filter="tipo[data-v]" data-v="conceito"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="algebra"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="rust"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="conceito"></span>
+<span class="pf-meta" data-pagefind-filter="status[data-v]" data-v="semente"></span>
+</div>
+</div>
+</div>
+</body>
+</html>

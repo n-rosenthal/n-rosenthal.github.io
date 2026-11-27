@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<!-- 2026-11-27 Fri 23:57 -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Relações de Equivalência em Lean 4</title>
+<meta name="author" content="n-rosenthal" />
+<meta name="description" content="Formalização de Equivalence, Setoid e do tipo quociente nativo (Quotient / Quot.lift) em Lean 4, com provas da igualdade de classes e propriedade universal." />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/estudo.css">
+<link rel="alternate" type="application/atom+xml" title="Notas de estudo" href="/feed.xml">
+<script defer src="/js/grafo-local.js"></script>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Relações de Equivalência em Lean 4">
+<meta property="og:description" content="Formalização de Equivalence, Setoid e do tipo quociente nativo (Quotient / Quot.lift) em Lean 4, com provas da igualdade de classes e propriedade universal.">
+<meta property="og:url" content="https://n-rosenthal.github.io/estudo/conceitos/relacoes-de-equivalencia-em-lean-4.html">
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav class="nav"><a href="/">Início</a><a href="/grafo.html">Grafo</a><a href="/feed.xml">Feed</a></nav><div class="meta-nota"><span class="selo selo-semente">semente</span><span>1 min de leitura</span><span>criada em 2026-11-27</span><span>atualizada em 2026-11-27</span></div>
+</div>
+<div id="content" class="content">
+<header>
+<h1 class="title">Relações de Equivalência em Lean 4</h1>
+</header><nav id="table-of-contents" role="doc-toc">
+<h2>&Iacute;ndice</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orga3c843e">Visão Geral</a></li>
+<li><a href="#orgedb1cbd">Formalização e Provas em Lean 4</a></li>
+<li><a href="#org2e76305">Conexões</a></li>
+<li><a href="#orge70ac17">Citada em</a></li>
+</ul>
+</div>
+</nav>
+<div id="outline-container-orga3c843e" class="outline-2">
+<h2 id="orga3c843e">Visão Geral</h2>
+<div class="outline-text-2" id="text-orga3c843e">
+<p>
+O núcleo do Lean 4 possui suporte nativo a tipos quocientes (<code>Quot</code> e <code>Quotient</code>), tornando a construção de <a href="/estudo/conceitos/relacao-de-equivalencia-e-conjunto-quociente.html">Relação de Equivalência e Conjunto Quociente</a> uma operação primitiva do sistema de tipos. Aqui conectamos as definições de <a href="/estudo/conceitos/relacoes-em-lean-4.html">Relações em Lean 4</a> à estrutura <code>Equivalence</code>, provamos o <b><b>Teorema Fundamental das Classes de Equivalência</b></b> (\(a \sim b \iff [a] = [b]\)) e demonstramos o levantamento de funções (<code>Quotient.lift</code>) pela Propriedade Universal.
+</p>
+</div>
+</div>
+<div id="outline-container-orgedb1cbd" class="outline-2">
+<h2 id="orgedb1cbd">Formalização e Provas em Lean 4</h2>
+<div class="outline-text-2" id="text-orgedb1cbd">
+<div class="org-src-container">
+<pre class="src src-lean4">import StrangeAlgebras.Relation
+
+namespace StrangeAlgebras.Concepts
+
+/-- Estrutura que empacota uma relação binária R : α → α → Prop
+    junto com as provas de reflexividade, simetria e transitividade. -/
+structure EquivRel (α : Type u) where
+  rel   : Rel α α
+  refl  : Reflexive rel
+  symm  : Symmetric rel
+  trans : Transitive rel
+
+/-- Classe de equivalência [a]_~ representada como subconjunto (predicado α → Prop) -/
+def equivClass {α : Type u} (E : EquivRel α) (a : α) : α → Prop :=
+  fun x =&gt; E.rel x a
+
+/-- Teorema 1a: Todo elemento pertence à sua própria classe de equivalência -/
+theorem mem_equivClass_self {α : Type u} (E : EquivRel α) (a : α) :
+    equivClass E a a :=
+  E.refl a
+
+/-- Teorema 1b (Teorema Fundamental): a ~ b ↔ [a]_~ = [b]_~ -/
+theorem equivClass_eq_iff {α : Type u} (E : EquivRel α) (a b : α) :
+    E.rel a b ↔ equivClass E a = equivClass E b := by
+  constructor
+  · -- Direção (→): se a ~ b, então [a] = [b] por extensionalidade funcional e proposicional
+    intro hab
+    funext x
+    apply propext
+    constructor
+    · intro hxa -- x ~ a e a ~ b → x ~ b
+      exact E.trans hxa hab
+    · intro hxb -- x ~ b e b ~ a → x ~ a
+      exact E.trans hxb (E.symm hab)
+  · -- Direção (←): se [a] = [b], como a ∈ [a], temos a ∈ [b], ou seja, a ~ b
+    intro h_eq
+    have ha : equivClass E a a := E.refl a
+    rw [h_eq] at ha
+    exact ha
+
+/-- Conexão com o tipo Quotient nativo do Lean 4 (Setoid):
+    Converte nossa `EquivRel α` em um `Setoid α` da biblioteca padrão. -/
+def toSetoid {α : Type u} (E : EquivRel α) : Setoid α where
+  r := E.rel
+  iseqv := {
+    refl  := E.refl
+    symm  := @E.symm
+    trans := @E.trans
+  }
+
+/-- Exemplo concreto: Congruência módulo n sobre os Inteiros (a ≡ b mod n) -/
+def intModSetoid (n : Int) : Setoid Int where
+  r a b := (a % n) = (b % n)
+  iseqv := {
+    refl  := fun _ =&gt; rfl
+    symm  := fun h =&gt; h.symm
+    trans := fun h1 h2 =&gt; h1.trans h2
+  }
+
+/-- Exemplo da Propriedade Universal (Quotient.lift):
+    A função de paridade `isEven : Int → Bool` respeita a congruência módulo 2,
+    logo desce para uma função bem-definida sobre `Quotient (intModSetoid 2)`. -/
+def isEvenMod2 : Quotient (intModSetoid 2) → Bool :=
+  Quotient.lift
+    (fun x : Int =&gt; x % 2 == 0)
+    (fun (a b : Int) (h : a % 2 = b % 2) =&gt; by
+      dsimp
+      rw [h])
+
+end StrangeAlgebras.Concepts
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org2e76305" class="outline-2">
+<h2 id="org2e76305">Conexões</h2>
+<div class="outline-text-2" id="text-org2e76305">
+<ul class="org-ul">
+<li>Definição matemática abstrata: <a href="/estudo/conceitos/relacao-de-equivalencia-e-conjunto-quociente.html">Relação de Equivalência e Conjunto Quociente</a></li>
+<li>Base relacional em Lean 4: <a href="/estudo/conceitos/relacoes-em-lean-4.html">Relações em Lean 4</a></li>
+<li>Especificação em Maude: <a href="/estudo/conceitos/relacoes-de-equivalencia-em-maude.html">Relações de Equivalência em Maude</a></li>
+<li>Implementação em Rust: <a href="/estudo/conceitos/relacoes-de-equivalencia-em-rust.html">Relações de Equivalência em Rust</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orge70ac17" class="outline-2">
+<h2 id="orge70ac17">Citada em</h2>
+<div class="outline-text-2" id="text-orge70ac17">
+<ul class="backlinks">
+<li><a href="/estudo/conceitos/relacao-de-equivalencia-e-conjunto-quociente.html">Relação de Equivalência e Conjunto Quociente</a></li>
+<li><a href="/estudo/conceitos/relacoes-de-equivalencia-em-maude.html">Relações de Equivalência em Maude</a></li>
+<li><a href="/estudo/conceitos/relacoes-de-equivalencia-em-rust.html">Relações de Equivalência em Rust</a></li>
+</ul>
+
+<span class="pf-meta" data-pagefind-filter="tipo[data-v]" data-v="conceito"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="algebra"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="lean"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="formal-specification"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="conceito"></span>
+<span class="pf-meta" data-pagefind-filter="status[data-v]" data-v="semente"></span>
+</div>
+</div>
+</div>
+</body>
+</html>

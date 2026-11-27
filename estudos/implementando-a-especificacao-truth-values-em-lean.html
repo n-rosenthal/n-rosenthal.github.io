@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<!-- 2026-11-27 Fri 22:45 -->
+<!-- 2026-11-27 Fri 23:57 -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Implementando a Especificação Truth-Values em Lean</title>
@@ -60,50 +60,50 @@
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org5e02856">Especificação <code>TRUTH-VALUES</code> em Maude</a></li>
-<li><a href="#orgd2a8e5d">Especificação <code>TruthValue</code> em Lean 4</a>
+<li><a href="#org89198a4">Especificação <code>TRUTH-VALUES</code> em Maude</a></li>
+<li><a href="#org16fb0d9">Especificação <code>TruthValue</code> em Lean 4</a>
 <ul>
-<li><a href="#orgc6be087">Sorte e Construtores</a></li>
-<li><a href="#org230538b"><i>Namespace</i> <code>TruthValue</code> e Operações</a></li>
-<li><a href="#org450596e">Representação (Notação Mixfix)</a></li>
+<li><a href="#org1c5032a">Sorte e Construtores</a></li>
+<li><a href="#org112c413"><i>Namespace</i> <code>TruthValue</code> e Operações</a></li>
+<li><a href="#org5e1333d">Representação (Notação Mixfix)</a></li>
 </ul>
 </li>
-<li><a href="#orgf949ddc">Axiomas, Provas Formais e Construção de Provas no Lean</a>
+<li><a href="#org7787349">Axiomas, Provas Formais e Construção de Provas no Lean</a>
 <ul>
-<li><a href="#org463255b">Metodologia de Geração de Provas no Lean 4</a></li>
-<li><a href="#org6baeedf">Comutatividade e Associatividade da Conjunção (\(\land\))</a>
+<li><a href="#org22f74dc">Metodologia de Geração de Provas no Lean 4</a></li>
+<li><a href="#org09efe43">Comutatividade e Associatividade da Conjunção (\(\land\))</a>
 <ul>
-<li><a href="#orgd394785">Prova</a></li>
-<li><a href="#org01fd732">Implementação e Passo a Passo em Lean 4</a></li>
+<li><a href="#org5400c57">Prova</a></li>
+<li><a href="#orga80b2f4">Implementação e Passo a Passo em Lean 4</a></li>
 </ul>
 </li>
-<li><a href="#org1739c69">Comutatividade e Associatividade da Disjunção (\(\lor\))</a>
+<li><a href="#orgaa5d48f">Comutatividade e Associatividade da Disjunção (\(\lor\))</a>
 <ul>
-<li><a href="#orgd476c75">Prova</a></li>
-<li><a href="#org010e2db">Implementação em Lean 4</a></li>
+<li><a href="#orgbdffbfd">Prova</a></li>
+<li><a href="#orgfa1ab8a">Implementação em Lean 4</a></li>
 </ul>
 </li>
-<li><a href="#org62bc6c9">Leis de Identidade, Anulação e Dupla Negação</a>
+<li><a href="#org3ae8b4f">Leis de Identidade, Anulação e Dupla Negação</a>
 <ul>
-<li><a href="#org489f263">Prova</a></li>
-<li><a href="#orge3a2faf">Implementação em Lean 4 (Demonstração via Reescrita <code>rw</code> vs. Casos)</a></li>
+<li><a href="#org740c78b">Prova</a></li>
+<li><a href="#orgb580c7c">Implementação em Lean 4 (Demonstração via Reescrita <code>rw</code> vs. Casos)</a></li>
 </ul>
 </li>
-<li><a href="#org35c2e5b">Leis de De Morgan e Distributividade</a>
+<li><a href="#org5159e9c">Leis de De Morgan e Distributividade</a>
 <ul>
-<li><a href="#org238662d">Prova</a></li>
-<li><a href="#orgf85bfe0">Implementação em Lean 4</a></li>
+<li><a href="#org9d96732">Prova</a></li>
+<li><a href="#orgee7e90b">Implementação em Lean 4</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org0042570">Verificação e Execução</a></li>
+<li><a href="#org786401f">Verificação e Execução</a></li>
 </ul>
 </div>
 </nav>
-<div id="outline-container-org5e02856" class="outline-2">
-<h2 id="org5e02856">Especificação <code>TRUTH-VALUES</code> em Maude</h2>
-<div class="outline-text-2" id="text-org5e02856">
+<div id="outline-container-org89198a4" class="outline-2">
+<h2 id="org89198a4">Especificação <code>TRUTH-VALUES</code> em Maude</h2>
+<div class="outline-text-2" id="text-org89198a4">
 <p>
 Na especificação algébrica em Maude, definimos um módulo funcional (<code>fmod</code>) composto pelo sorte <code>Truth-Value</code>, dois construtores livres (<code>[ctor]</code>) e operações equacionais. Os atributos <code>[assoc comm]</code> instruem o motor de reescrita a realizar casamento de padrões módulo associatividade e comutatividade sem exigir equações explícitas para essas leis.
 </p>
@@ -140,16 +140,16 @@ endfm
 </div>
 </div>
 </div>
-<div id="outline-container-orgd2a8e5d" class="outline-2">
-<h2 id="orgd2a8e5d">Especificação <code>TruthValue</code> em Lean 4</h2>
-<div class="outline-text-2" id="text-orgd2a8e5d">
+<div id="outline-container-org16fb0d9" class="outline-2">
+<h2 id="org16fb0d9">Especificação <code>TruthValue</code> em Lean 4</h2>
+<div class="outline-text-2" id="text-org16fb0d9">
 <p>
 Diferente do Maude, onde a lógica subjacente é a lógica equacional de reescrita, o Lean 4 baseia-se no Cálculo de Construções Indutivas. Sob a correspondência de Curry-Howard, tipos indutivos correspondem a sortes com construtores livres, definições recursivas correspondem às equações direcionadas, e teoremas correspondem a tipos proposicionais habitados por termos de prova.
 </p>
 </div>
-<div id="outline-container-orgc6be087" class="outline-3">
-<h3 id="orgc6be087">Sorte e Construtores</h3>
-<div class="outline-text-3" id="text-orgc6be087">
+<div id="outline-container-org1c5032a" class="outline-3">
+<h3 id="org1c5032a">Sorte e Construtores</h3>
+<div class="outline-text-3" id="text-org1c5032a">
 <p>
 Definimos indutivamente o tipo <code>TruthValue</code> enumerando exaustivamente seus dois construtores canônicos (<code>t</code> e <code>f</code>). O Lean gera automaticamente o princípio de indução/recursão (<code>TruthValue.rec</code>), que fundamenta todas as provas por análise de casos.
 </p>
@@ -164,9 +164,9 @@ inductive TruthValue where
 </div>
 </div>
 </div>
-<div id="outline-container-org230538b" class="outline-3">
-<h3 id="org230538b"><i>Namespace</i> <code>TruthValue</code> e Operações</h3>
-<div class="outline-text-3" id="text-org230538b">
+<div id="outline-container-org112c413" class="outline-3">
+<h3 id="org112c413"><i>Namespace</i> <code>TruthValue</code> e Operações</h3>
+<div class="outline-text-3" id="text-org112c413">
 <p>
 No <i>namespace</i> <code>TruthValue</code>, definimos as operações via casamento de padrões (<i>pattern matching</i>). Cada cláusula corresponde a uma equação redutora ($&iota;$-redução) no núcleo do Lean.
 </p>
@@ -192,9 +192,9 @@ def lor : TruthValue → TruthValue → TruthValue
 </div>
 </div>
 </div>
-<div id="outline-container-org450596e" class="outline-3">
-<h3 id="org450596e">Representação (Notação Mixfix)</h3>
-<div class="outline-text-3" id="text-org450596e">
+<div id="outline-container-org5e1333d" class="outline-3">
+<h3 id="org5e1333d">Representação (Notação Mixfix)</h3>
+<div class="outline-text-3" id="text-org5e1333d">
 <p>
 Em Maude, os sublinhados (<code>_</code>) indicam posições de argumentos em operadores <i>mixfix</i>. No Lean 4, utilizamos <code>scoped prefix</code> e <code>scoped infixl</code> para declarar a precedência e associatividade à esquerda dos símbolos <code>¬</code>, <code>∧</code> e <code>∨</code> exclusivamente dentro do <i>namespace</i> <code>TruthValue</code>, evitando colisões com os conectivos lógicos nativos de <code>Prop</code>.
 </p>
@@ -209,16 +209,16 @@ scoped infixl:30 " ∨ " =&gt; lor
 </div>
 </div>
 </div>
-<div id="outline-container-orgf949ddc" class="outline-2">
-<h2 id="orgf949ddc">Axiomas, Provas Formais e Construção de Provas no Lean</h2>
-<div class="outline-text-2" id="text-orgf949ddc">
+<div id="outline-container-org7787349" class="outline-2">
+<h2 id="org7787349">Axiomas, Provas Formais e Construção de Provas no Lean</h2>
+<div class="outline-text-2" id="text-org7787349">
 <p>
 No Maude, os atributos <code>[assoc comm]</code> são assumidos pelo motor de reescrita. No Lean 4, nenhuma propriedade algébrica é assumida gratuitamente: precisamos construir um termo de prova para cada igualdade.
 </p>
 </div>
-<div id="outline-container-org463255b" class="outline-3">
-<h3 id="org463255b">Metodologia de Geração de Provas no Lean 4</h3>
-<div class="outline-text-3" id="text-org463255b">
+<div id="outline-container-org22f74dc" class="outline-3">
+<h3 id="org22f74dc">Metodologia de Geração de Provas no Lean 4</h3>
+<div class="outline-text-3" id="text-org22f74dc">
 <p>
 Para provar identidades sobre tipos indutivos finitos como <code>TruthValue</code>, o modo de táticas (<code>by</code>) do Lean opera transformando o estado da meta (<i>goal state</i>) em três etapas:
 </p>
@@ -234,13 +234,13 @@ Para provar identidades sobre tipos indutivos finitos como <code>TruthValue</cod
 </p>
 </div>
 </div>
-<div id="outline-container-org6baeedf" class="outline-3">
-<h3 id="org6baeedf">Comutatividade e Associatividade da Conjunção (\(\land\))</h3>
-<div class="outline-text-3" id="text-org6baeedf">
+<div id="outline-container-org09efe43" class="outline-3">
+<h3 id="org09efe43">Comutatividade e Associatividade da Conjunção (\(\land\))</h3>
+<div class="outline-text-3" id="text-org09efe43">
 </div>
-<div id="outline-container-orgd394785" class="outline-4">
-<h4 id="orgd394785">Prova</h4>
-<div class="outline-text-4" id="text-orgd394785">
+<div id="outline-container-org5400c57" class="outline-4">
+<h4 id="org5400c57">Prova</h4>
+<div class="outline-text-4" id="text-org5400c57">
 <p>
 <b>Proposição 1.1 (Comutatividade de \(\land\)).</b> Para quaisquer \(p, q \in \mathsf{TruthValue}\), tem-se \(p \land q = q \land p\).
 </p>
@@ -270,9 +270,9 @@ Para provar identidades sobre tipos indutivos finitos como <code>TruthValue</cod
 </ul>
 </div>
 </div>
-<div id="outline-container-org01fd732" class="outline-4">
-<h4 id="org01fd732">Implementação e Passo a Passo em Lean 4</h4>
-<div class="outline-text-4" id="text-org01fd732">
+<div id="outline-container-orga80b2f4" class="outline-4">
+<h4 id="orga80b2f4">Implementação e Passo a Passo em Lean 4</h4>
+<div class="outline-text-4" id="text-orga80b2f4">
 <p>
 Note que, na associatividade de \(\land\), como as equações definicionais fazem casamento de padrões no <b>primeiro</b> argumento, basta abrir casos apenas sobre <code>p</code> (embora <code>cases p &lt;;&gt; cases q &lt;;&gt; cases r</code> também feche todas as 8 folhas):
 </p>
@@ -300,13 +300,13 @@ theorem land_assoc (p q r : TruthValue) : ((p ∧ q) ∧ r) = (p ∧ (q ∧ r)) 
 </div>
 </div>
 </div>
-<div id="outline-container-org1739c69" class="outline-3">
-<h3 id="org1739c69">Comutatividade e Associatividade da Disjunção (\(\lor\))</h3>
-<div class="outline-text-3" id="text-org1739c69">
+<div id="outline-container-orgaa5d48f" class="outline-3">
+<h3 id="orgaa5d48f">Comutatividade e Associatividade da Disjunção (\(\lor\))</h3>
+<div class="outline-text-3" id="text-orgaa5d48f">
 </div>
-<div id="outline-container-orgd476c75" class="outline-4">
-<h4 id="orgd476c75">Prova</h4>
-<div class="outline-text-4" id="text-orgd476c75">
+<div id="outline-container-orgbdffbfd" class="outline-4">
+<h4 id="orgbdffbfd">Prova</h4>
+<div class="outline-text-4" id="text-orgbdffbfd">
 <p>
 <b>Proposição 2.1 (Comutatividade de \(\lor\)).</b> Para quaisquer \(p, q \in \mathsf{TruthValue}\), tem-se \(p \lor q = q \lor p\).
 </p>
@@ -336,9 +336,9 @@ theorem land_assoc (p q r : TruthValue) : ((p ∧ q) ∧ r) = (p ∧ (q ∧ r)) 
 </ul>
 </div>
 </div>
-<div id="outline-container-org010e2db" class="outline-4">
-<h4 id="org010e2db">Implementação em Lean 4</h4>
-<div class="outline-text-4" id="text-org010e2db">
+<div id="outline-container-orgfa1ab8a" class="outline-4">
+<h4 id="orgfa1ab8a">Implementação em Lean 4</h4>
+<div class="outline-text-4" id="text-orgfa1ab8a">
 <div class="org-src-container">
 <pre class="src src-lean4">theorem lor_comm (p q : TruthValue) : (p ∨ q) = (q ∨ p) := by
   cases p &lt;;&gt; cases q &lt;;&gt; rfl
@@ -354,13 +354,13 @@ theorem lor_assoc (p q r : TruthValue) : ((p ∨ q) ∨ r) = (p ∨ (q ∨ r)) :
 </div>
 </div>
 </div>
-<div id="outline-container-org62bc6c9" class="outline-3">
-<h3 id="org62bc6c9">Leis de Identidade, Anulação e Dupla Negação</h3>
-<div class="outline-text-3" id="text-org62bc6c9">
+<div id="outline-container-org3ae8b4f" class="outline-3">
+<h3 id="org3ae8b4f">Leis de Identidade, Anulação e Dupla Negação</h3>
+<div class="outline-text-3" id="text-org3ae8b4f">
 </div>
-<div id="outline-container-org489f263" class="outline-4">
-<h4 id="org489f263">Prova</h4>
-<div class="outline-text-4" id="text-org489f263">
+<div id="outline-container-org740c78b" class="outline-4">
+<h4 id="org740c78b">Prova</h4>
+<div class="outline-text-4" id="text-org740c78b">
 <p>
 <b>Proposição 3.1 (Involução / Dupla Negação).</b> Para todo \(p \in \mathsf{TruthValue}\), \(\neg(\neg p) = p\).
 </p>
@@ -383,9 +383,9 @@ theorem lor_assoc (p q r : TruthValue) : ((p ∨ q) ∨ r) = (p ∨ (q ∨ r)) :
 </p>
 </div>
 </div>
-<div id="outline-container-orge3a2faf" class="outline-4">
-<h4 id="orge3a2faf">Implementação em Lean 4 (Demonstração via Reescrita <code>rw</code> vs. Casos)</h4>
-<div class="outline-text-4" id="text-orge3a2faf">
+<div id="outline-container-orgb580c7c" class="outline-4">
+<h4 id="orgb580c7c">Implementação em Lean 4 (Demonstração via Reescrita <code>rw</code> vs. Casos)</h4>
+<div class="outline-text-4" id="text-orgb580c7c">
 <p>
 Aqui ilustramos duas estratégias no Lean: redução direta por casos (<code>neg_neg</code>) e prova equacional reutilizando lemas anteriores com a tática de reescrita <code>rw</code> (<code>land_true</code> e <code>lor_false</code>):
 </p>
@@ -412,13 +412,13 @@ theorem lor_false (p : TruthValue) : (p ∨ f) = p := by
 </div>
 </div>
 </div>
-<div id="outline-container-org35c2e5b" class="outline-3">
-<h3 id="org35c2e5b">Leis de De Morgan e Distributividade</h3>
-<div class="outline-text-3" id="text-org35c2e5b">
+<div id="outline-container-org5159e9c" class="outline-3">
+<h3 id="org5159e9c">Leis de De Morgan e Distributividade</h3>
+<div class="outline-text-3" id="text-org5159e9c">
 </div>
-<div id="outline-container-org238662d" class="outline-4">
-<h4 id="org238662d">Prova</h4>
-<div class="outline-text-4" id="text-org238662d">
+<div id="outline-container-org9d96732" class="outline-4">
+<h4 id="org9d96732">Prova</h4>
+<div class="outline-text-4" id="text-org9d96732">
 <p>
 <b>Proposição 4.1 (Leis de De Morgan).</b> Para quaisquer \(p, q \in \mathsf{TruthValue}\):
 </p>
@@ -459,9 +459,9 @@ theorem lor_false (p : TruthValue) : (p ∨ f) = p := by
 </ul>
 </div>
 </div>
-<div id="outline-container-orgf85bfe0" class="outline-4">
-<h4 id="orgf85bfe0">Implementação em Lean 4</h4>
-<div class="outline-text-4" id="text-orgf85bfe0">
+<div id="outline-container-orgee7e90b" class="outline-4">
+<h4 id="orgee7e90b">Implementação em Lean 4</h4>
+<div class="outline-text-4" id="text-orgee7e90b">
 <p>
 Como nas provas em LaTeX acima todas as reduções dependem apenas do construtor de <code>p</code>, basta executar <code>cases p &lt;;&gt; rfl</code> para fechar as três propriedades:
 </p>
@@ -483,9 +483,9 @@ end TruthValue
 </div>
 </div>
 </div>
-<div id="outline-container-org0042570" class="outline-2">
-<h2 id="org0042570">Verificação e Execução</h2>
-<div class="outline-text-2" id="text-org0042570">
+<div id="outline-container-org786401f" class="outline-2">
+<h2 id="org786401f">Verificação e Execução</h2>
+<div class="outline-text-2" id="text-org786401f">
 <p>
 Para extrair o código-fonte e verificar todas as provas no compilador do Lean 4 a partir do Emacs:
 </p>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<!-- 2026-11-27 Fri 23:57 -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Relação</title>
+<meta name="author" content="n-rosenthal" />
+<meta name="description" content="Definição conjuntista de relação binária, operações algébricas (inversa e composição) e propriedades estruturais fundamentais." />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/estudo.css">
+<link rel="alternate" type="application/atom+xml" title="Notas de estudo" href="/feed.xml">
+<script defer src="/js/grafo-local.js"></script>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Relação">
+<meta property="og:description" content="Definição conjuntista de relação binária, operações algébricas (inversa e composição) e propriedades estruturais fundamentais.">
+<meta property="og:url" content="https://n-rosenthal.github.io/estudo/conceitos/relacao.html">
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav class="nav"><a href="/">Início</a><a href="/grafo.html">Grafo</a><a href="/feed.xml">Feed</a></nav><div class="meta-nota"><span class="selo selo-semente">semente</span><span>3 min de leitura</span><span>criada em 2026-11-27</span><span>atualizada em 2026-11-27</span></div>
+</div>
+<div id="content" class="content">
+<header>
+<h1 class="title">Relação</h1>
+</header><nav id="table-of-contents" role="doc-toc">
+<h2>&Iacute;ndice</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orgd878038">Definição Formal</a></li>
+<li><a href="#org99a20ac">Operações Fundamentais</a></li>
+<li><a href="#org0ce4a9a">Propriedades de Endorrelações (\(R \subseteq A \times A\))</a></li>
+<li><a href="#org85ac005">Teorema Elementar (Involução da Inversa)</a></li>
+<li><a href="#org85852b2">Realizações Computacionais e Formais</a></li>
+<li><a href="#org8ac4343">Citada em</a></li>
+</ul>
+</div>
+</nav>
+<div id="outline-container-orgd878038" class="outline-2">
+<h2 id="orgd878038">Definição Formal</h2>
+<div class="outline-text-2" id="text-orgd878038">
+<p>
+Sejam \(A\) e \(B\) dois conjuntos. Uma <b><b>relação binária</b></b> \(R\) de \(A\) em \(B\) é um subconjunto do produto cartesiano \(A \times B\):
+\[R \subseteq A \times B.\]
+Escrevemos \(a \mathrel{R} b\) (ou \((a, b) \in R\)) para indicar que \(a \in A\) está relacionado com \(b \in B\). Quando \(A = B\), dizemos que \(R\) é uma <b><b>relação homogênea</b></b> (ou endorrelação) sobre \(A\).
+</p>
+</div>
+</div>
+<div id="outline-container-org99a20ac" class="outline-2">
+<h2 id="org99a20ac">Operações Fundamentais</h2>
+<div class="outline-text-2" id="text-org99a20ac">
+<ol class="org-ol">
+<li><b>Relação Identidade (\(\mathrm{id}_A\)):</b>
+\[\mathrm{id}_A = \{ (a, a) \mid a \in A \}.\]</li>
+<li><b>Relação Inversa ou Transposta (\(R^{-1}\)):</b> Dada \(R \subseteq A \times B\), definimos \(R^{-1} \subseteq B \times A\) por
+\[R^{-1} = \{ (b, a) \in B \times A \mid (a, b) \in R \}.\]</li>
+<li><b>Composição de Relações (\(S \circ R\)):</b> Dadas \(R \subseteq A \times B\) e \(S \subseteq B \times C\), a composta \(S \circ R \subseteq A \times C\) é
+\[S \circ R = \{ (a, c) \in A \times C \mid \exists b \in B,\; (a, b) \in R \;\land\; (b, c) \in S \}.\]</li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org0ce4a9a" class="outline-2">
+<h2 id="org0ce4a9a">Propriedades de Endorrelações (\(R \subseteq A \times A\))</h2>
+<div class="outline-text-2" id="text-org0ce4a9a">
+<ul class="org-ul">
+<li><b>Reflexiva:</b> \(\forall a \in A,\; (a, a) \in R\) (equivalente a \(\mathrm{id}_A \subseteq R\)).</li>
+<li><b>Simétrica:</b> \(\forall a, b \in A,\; (a, b) \in R \implies (b, a) \in R\) (equivalente a \(R = R^{-1}\)).</li>
+<li><b>Antissimétrica:</b> \(\forall a, b \in A,\; ((a, b) \in R \land (b, a) \in R) \implies a = b\) (equivalente a \(R \cap R^{-1} \subseteq \mathrm{id}_A\)).</li>
+<li><b>Transitiva:</b> \(\forall a, b, c \in A,\; ((a, b) \in R \land (b, c) \in R) \implies (a, c) \in R\) (equivalente a \(R \circ R \subseteq R\)).</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org85ac005" class="outline-2">
+<h2 id="org85ac005">Teorema Elementar (Involução da Inversa)</h2>
+<div class="outline-text-2" id="text-org85ac005">
+<p>
+<b>Proposição.</b> Para toda relação \(R \subseteq A \times B\), vale \((R^{-1})^{-1} = R\).
+</p>
+
+<p>
+<i>Demonstração.</i> Por dupla inclusão conjuntista:
+\[(a, b) \in (R^{-1})^{-1} \iff (b, a) \in R^{-1} \iff (a, b) \in R. \quad \blacksquare\]
+</p>
+</div>
+</div>
+<div id="outline-container-org85852b2" class="outline-2">
+<h2 id="org85852b2">Realizações Computacionais e Formais</h2>
+<div class="outline-text-2" id="text-org85852b2">
+<ul class="org-ul">
+<li>Especificação equacional em Maude: <a href="/estudo/conceitos/relacoes-em-maude.html">Relações em Maude</a></li>
+<li>Formalização dependente e provas em Lean 4: <a href="/estudo/conceitos/relacoes-em-lean-4.html">Relações em Lean 4</a></li>
+<li>Estrutura de dados e operações finitas em Rust: <a href="/estudo/conceitos/relacoes-em-rust.html">Relações em Rust</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org8ac4343" class="outline-2">
+<h2 id="org8ac4343">Citada em</h2>
+<div class="outline-text-2" id="text-org8ac4343">
+<ul class="backlinks">
+<li><a href="/estudo/conceitos/relacao-de-equivalencia-e-conjunto-quociente.html">Relação de Equivalência e Conjunto Quociente</a></li>
+<li><a href="/estudo/conceitos/relacao-de-ordem-e-reticulados.html">Relação de Ordem e Reticulados</a></li>
+<li><a href="/estudo/conceitos/relacoes-em-lean-4.html">Relações em Lean 4</a></li>
+<li><a href="/estudo/conceitos/relacoes-em-maude.html">Relações em Maude</a></li>
+<li><a href="/estudo/conceitos/relacoes-em-rust.html">Relações em Rust</a></li>
+</ul>
+
+<span class="pf-meta" data-pagefind-filter="tipo[data-v]" data-v="conceito"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="algebra"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="conceito"></span>
+<span class="pf-meta" data-pagefind-filter="status[data-v]" data-v="semente"></span>
+</div>
+</div>
+</div>
+</body>
+</html>
