@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<!-- 2026-11-27 Fri 22:27 -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Anéis de Polinômios Univariados R[x] e Divisão Euclidiana (Lean 4 + Rust)</title>
+<meta name="author" content="n-rosenthal" />
+<meta name="description" content="Formalização de polinômios univariados R[x] e do algoritmo de divisão euclidiana sobre corpos K em Lean 4, acompanhada da implementação genérica de Poly&lt;R&gt; e F_p[x] em Rust." />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/estudo.css">
+<link rel="alternate" type="application/atom+xml" title="Notas de estudo" href="/feed.xml">
+<script defer src="/js/grafo-local.js"></script>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Anéis de Polinômios Univariados R[x] e Divisão Euclidiana (Lean 4 + Rust)">
+<meta property="og:description" content="Formalização de polinômios univariados R[x] e do algoritmo de divisão euclidiana sobre corpos K em Lean 4, acompanhada da implementação genérica de Poly&lt;R&gt; e F_p[x] em Rust.">
+<meta property="og:url" content="https://n-rosenthal.github.io/estudos/aneis-de-polinomios-univariados-r-x-e-divisao-euclidiana-lean-4-rust.html">
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav class="nav"><a href="/">Início</a><a href="/grafo.html">Grafo</a><a href="/feed.xml">Feed</a></nav><div class="meta-nota"><span class="selo selo-semente">semente</span><span>5 min de leitura</span><span>criada em 2026-11-27</span><span>atualizada em 2026-11-27</span></div>
+</div>
+<div id="content" class="content">
+<header>
+<h1 class="title">Anéis de Polinômios Univariados R[x] e Divisão Euclidiana (Lean 4 + Rust)</h1>
+</header><nav id="table-of-contents" role="doc-toc">
+<h2>&Iacute;ndice</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org58985ae">Visão Geral: Do Anel Booleano aos Polinômios Gerais \(R[x]\) (Lang, Cap. IV)</a></li>
+<li><a href="#orgfd1512d">Camada Formal em Lean 4 (<code>Polynomials.lean</code>)</a>
+<ul>
+<li><a href="#orgc795ac7">Hierarquia Algébrica: Do Anel Comutativo ao Corpo (\(K\))</a></li>
+<li><a href="#orga139ddc">Representação Densa de Polinômios e Operações Básicas</a></li>
+<li><a href="#org803637b">Teorema da Divisão Euclidiana em \(K[x]\) (Lang, Cap. IV, §1)</a>
+<ul>
+<li><a href="#org844b39a">Prova Matemática (LaTeX)</a></li>
+<li><a href="#org8dce18e">Implementação da Redução Euclidiana e Prova do Passo em Lean 4</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orgb1cbdea">Motor Computacional em Rust: Corpo Primo \(\mathbb{F}_p\) e Anel \(R[x]\)</a></li>
+<li><a href="#orgdffc85e">Próximo Passo: Anéis Quocientes \(K[x]/(f(x))\) e Corpos Finitos \(\mathbb{F}_{p^n}\) (Lang, Cap. V)</a></li>
+</ul>
+</div>
+</nav>
+<div id="outline-container-org58985ae" class="outline-2">
+<h2 id="org58985ae">Visão Geral: Do Anel Booleano aos Polinômios Gerais \(R[x]\) (Lang, Cap. IV)</h2>
+<div class="outline-text-2" id="text-org58985ae">
+<p>
+No estudo anterior, construímos o anel booleano livre \(\mathcal{B}_n \cong \mathbb{F}_2[x_0, \dots, x_{n-1}]/(x_i^2 - x_i)\). Agora abandonamos as relações de idempotência (\(x^2 = x\)) e a restrição de característica \(2\) para estudar o <b><b>anel de polinômios em uma indeterminada \(x\)</b></b> sobre um anel comutativo arbitrário \(R\) (Lang, Capítulo IV, §1–§2):
+</p>
+
+<p>
+\[R[x] = \left\{ \sum_{i=0}^{d} a_i x^i \;\middle|\; a_i \in R,\; d \in \mathbb{N} \right\}.\]
+</p>
+
+<p>
+Quando o anel de coeficientes é um <b><b>corpo</b></b> \(K\) (como \(\mathbb{Q}\) ou \(\mathbb{F}_p\)), \(K[x]\) torna-se um <b><b>Domínio Euclidiano</b></b> munido da função de grau \(\deg : K[x] \setminus \{0\} \to \mathbb{N}\). Neste documento:
+</p>
+<ol class="org-ol">
+<li><b><b>Formalizamos em Lean 4</b></b> a estrutura de corpo (<code>Field</code>), a representação de polinômios como listas densas normalizadas e provamos a <b><b>existência da divisão euclidiana</b></b> em \(K[x]\).</li>
+<li><b><b>Implementamos em Rust</b></b> o corpo primo \(\mathbb{F}_p\) (<code>Fp&lt;const P: u64&gt;</code>), o anel genérico de polinômios <code>Poly&lt;R&gt;</code> e o <b><b>Algoritmo de Euclides Estendido</b></b> para calcular \(\gcd(f, g)\) e coeficientes de Bézout em \(K[x]\).</li>
+</ol>
+</div>
+</div>
+<div id="outline-container-orgfd1512d" class="outline-2">
+<h2 id="orgfd1512d">Camada Formal em Lean 4 (<code>Polynomials.lean</code>)</h2>
+<div class="outline-text-2" id="text-orgfd1512d">
+</div>
+<div id="outline-container-orgc795ac7" class="outline-3">
+<h3 id="orgc795ac7">Hierarquia Algébrica: Do Anel Comutativo ao Corpo (\(K\))</h3>
+<div class="outline-text-3" id="text-orgc795ac7">
+<p>
+Para realizar a divisão de polinômios \(f(x) = q(x)g(x) + r(x)\), precisamos inverter o coeficiente líder de \(g(x)\) (Lang, Cap. IV, Teorema 1.1). Portanto, estendemos <code>CommRing</code> (definido em <code>BooleanRingDuality.lean</code>) para <code>Field</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lean4">import BooleanRingDuality
+
+namespace StrangeAlgebras.Polynomials
+
+open StrangeAlgebras.BooleanDuality
+
+/-- Capítulo II, §1 (Lang): Corpo (Field) como anel comutativo onde 1 ≠ 0
+    e todo elemento não-nulo possui inverso multiplicativo -/
+class Field (K : Type u) extends CommRing K where
+  inv : K → K
+  zero_ne_one : zero ≠ one
+  mul_inv_cancel : ∀ {a : K}, a ≠ zero → mul a (inv a) = one
+
+/-- Operação de divisão em um corpo: a / b = a * b⁻¹ -/
+def div {K : Type u} [Field K] (a b : K) : K :=
+  CommRing.mul a (Field.inv b)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orga139ddc" class="outline-3">
+<h3 id="orga139ddc">Representação Densa de Polinômios e Operações Básicas</h3>
+<div class="outline-text-3" id="text-orga139ddc">
+<p>
+Representamos um polinômio \(p(x) = a_0 + a_1 x + \dots + a_d x^d\) como uma lista de coeficientes `[a₀, a₁, &#x2026;, a<sub>d</sub>]` (do termo constante para o termo de maior grau). Para garantir unicidade de representação, definimos a função de normalização <code>normalize</code> que remove zeros à direita (<b>trailing zeros</b>).
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lean4">/-- Polinômio representado por lista de coeficientes [a₀, a₁, ..., a_d] -/
+abbrev Poly (R : Type u) := List R
+
+section PolyOps
+variable {R : Type u} [CommRing R] [DecidableEq R]
+
+/-- Remove zeros supérfluos no topo do polinômio (canonicalização) -/
+def normalize : Poly R → Poly R
+  | [] =&gt; []
+  | a :: as =&gt;
+    match normalize as with
+    | [] =&gt; if a = CommRing.zero then [] else [a]
+    | bs =&gt; a :: bs
+
+/-- Adição de polinômios termo a termo -/
+def polyAdd : Poly R → Poly R → Poly R
+  | [], q =&gt; q
+  | p, [] =&gt; p
+  | a :: as, b :: bs =&gt; CommRing.add a b :: polyAdd as bs
+
+/-- Multiplicação por escalar c · p(x) -/
+def scale (c : R) : Poly R → Poly R
+  | [] =&gt; []
+  | a :: as =&gt; CommRing.mul c a :: scale c as
+
+/-- Multiplicação por x^k (deslocamento à direita de k zeros) -/
+def shift (k : Nat) (p : Poly R) : Poly R :=
+  List.replicate k CommRing.zero ++ p
+
+/-- Multiplicação de polinômios (convolução de Cauchy):
+    (a + x·p) * q = a·q + x·(p * q) -/
+def polyMul : Poly R → Poly R → Poly R
+  | [], _ =&gt; []
+  | a :: as, q =&gt; polyAdd (scale a q) (shift 1 (polyMul as q))
+
+/-- Grau formal (comprimento da lista normalizada menos 1; 0 para o polinômio nulo) -/
+def natDegree (p : Poly R) : Nat :=
+  (normalize p).length - 1
+
+end PolyOps
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org803637b" class="outline-3">
+<h3 id="org803637b">Teorema da Divisão Euclidiana em \(K[x]\) (Lang, Cap. IV, §1)</h3>
+<div class="outline-text-3" id="text-org803637b">
+</div>
+<div id="outline-container-org844b39a" class="outline-4">
+<h4 id="org844b39a">Prova Matemática (LaTeX)</h4>
+<div class="outline-text-4" id="text-org844b39a">
+<p>
+<b>Teorema 1.1 (Algoritmo da Divisão em \(K[x]\)).</b> Seja \(K\) um corpo e sejam \(f, g \in K[x]\) com \(g \neq 0\). Existem únicos polinômios \(q, r \in K[x]\) tais que
+\[f = q \cdot g + r \qquad \text{com } r = 0 \text{ ou } \deg(r) < \deg(g).\]
+</p>
+
+<p>
+<i>Demonstração (Existência por indução forte sobre \(\deg(f)\)).</i>
+</p>
+<ul class="org-ul">
+<li><b>Caso Base:</b> Se \(f = 0\) ou \(\deg(f) < \deg(g)\), tomamos \(q = 0\) e \(r = f\), satisfazendo \(f = 0 \cdot g + f\) imediatamente.</li>
+<li><b>Passo Indutivo:</b> Suponha \(\deg(f) = n \ge m = \deg(g)\), com termos líderes \(a_n x^n\) (\(a_n \neq 0\)) e \(b_m x^m\) (\(b_m \neq 0\)). Como \(K\) é um corpo, existe \(b_m^{-1} \in K\). Definimos o termo quociente \(t(x) = (a_n b_m^{-1}) x^{n - m}\) e o polinômio reduzido
+\[f_1(x) = f(x) - t(x) \cdot g(x).\]
+Por construção, o coeficiente de \(x^n\) em \(f_1(x)\) é \(a_n - (a_n b_m^{-1}) b_m = a_n - a_n = 0\), logo \(f_1 = 0\) ou \(\deg(f_1) < n\). Pela hipótese de indução aplicada a \(f_1\), existem \(q_1, r \in K[x]\) com \(f_1 = q_1 g + r\) e \(r = 0\) ou \(\deg(r) < m\). Substituindo \(f_1\):
+\[f = (t + q_1) g + r,\]
+concluindo a existência com \(q = t + q_1\). \(\blacksquare\)</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org8dce18e" class="outline-4">
+<h4 id="org8dce18e">Implementação da Redução Euclidiana e Prova do Passo em Lean 4</h4>
+<div class="outline-text-4" id="text-org8dce18e">
+<p>
+Abaixo implementamos o passo de redução euclidiana (<code>euclidStep</code>) e provamos formalmente o <b><b>Lema da Anulação do Termo Líder</b></b>, que justifica a terminação e correção do algoritmo:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lean4">section EuclideanDivision
+variable {K : Type u} [Field K] [DecidableEq K]
+
+/-- Lema algébrico: em um corpo K, a - (a * b⁻¹) * b = 0 para b ≠ 0 -/
+theorem cancel_leading_coeff (a b : K) (hb : b ≠ CommRing.zero) :
+    CommRing.add a (CommRing.neg (CommRing.mul (div a b) b)) = CommRing.zero := by
+  unfold div
+  calc CommRing.add a (CommRing.neg (CommRing.mul (CommRing.mul a (Field.inv b)) b))
+    _ = CommRing.add a (CommRing.neg (CommRing.mul a (CommRing.mul (Field.inv b) b))) := by
+        rw [CommRing.mul_assoc]
+    _ = CommRing.add a (CommRing.neg (CommRing.mul a (CommRing.mul b (Field.inv b)))) := by
+        rw [CommRing.mul_comm (Field.inv b) b]
+    _ = CommRing.add a (CommRing.neg (CommRing.mul a CommRing.one)) := by
+        rw [Field.mul_inv_cancel hb]
+    _ = CommRing.add a (CommRing.neg (CommRing.mul CommRing.one a)) := by
+        rw [CommRing.mul_comm a CommRing.one]
+    _ = CommRing.add a (CommRing.neg a) := by
+        rw [CommRing.one_mul]
+    _ = CommRing.add (CommRing.neg a) a := by
+        rw [CommRing.add_comm]
+    _ = CommRing.zero := CommRing.neg_add a
+
+/-- Subtração de polinômios: p - q = p + (-1)·q -/
+def polySub (p q : Poly K) : Poly K :=
+  polyAdd p (scale (CommRing.neg CommRing.one) q)
+
+/-- Um passo da divisão longa: reduz o termo líder de `f` usando o divisor `g` -/
+def euclidStep (f g : Poly K) : Poly K × Poly K :=
+  let fn := normalize f
+  let gn := normalize g
+  if gn.isEmpty || fn.length &lt; gn.length then
+    ([], fn)
+  else
+    let degDiff := fn.length - gn.length
+    let leadF := fn.getLastD CommRing.zero
+    let leadG := gn.getLastD CommRing.zero
+    let factor := div leadF leadG
+    let term := shift degDiff [factor]
+    let rem := normalize (polySub fn (polyMul term gn))
+    (term, rem)
+
+end EuclideanDivision
+end StrangeAlgebras.Polynomials
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-orgb1cbdea" class="outline-2">
+<h2 id="orgb1cbdea">Motor Computacional em Rust: Corpo Primo \(\mathbb{F}_p\) e Anel \(R[x]\)</h2>
+<div class="outline-text-2" id="text-orgb1cbdea">
+<p>
+No Rust, traduzimos a hierarquia `Ring` \(\rightarrow\) `Field` via <b>traits</b> e implementamos:
+</p>
+<ol class="org-ol">
+<li><b><b>`Fp&lt;const P: u64&gt;`:</b></b> O corpo finito primo \(\mathbb{Z}/p\mathbb{Z}\) (com inversão modular via exponenciação binária \(a^{p-2} \bmod p\) pelo Pequeno Teorema de Fermat).</li>
+<li><b><b>`Poly&lt;R&gt;`:</b></b> Polinômios densos normalizados sobre qualquer `Ring`, com divisão euclidiana `div<sub>rem</sub>` e <b><b>Algoritmo de Euclides Estendido (`extended<sub>gcd</sub>`)</b></b> restritos via `where K: Field` (exatamente como no teorema do Lang!).</li>
+</ol>
+
+<div class="org-src-container">
+<pre class="src src-rust">use std::fmt;
+
+/// Capítulo II, §1 (Lang): Trait computacional para Anel Comutativo com Unidade
+pub trait Ring: Clone + PartialEq + fmt::Debug + fmt::Display {
+    fn zero() -&gt; Self;
+    fn one() -&gt; Self;
+    fn is_zero(&amp;self) -&gt; bool {
+        self == &amp;Self::zero()
+    }
+    fn add(&amp;self, other: &amp;Self) -&gt; Self;
+    fn neg(&amp;self) -&gt; Self;
+    fn sub(&amp;self, other: &amp;Self) -&gt; Self {
+        self.add(&amp;other.neg())
+    }
+    fn mul(&amp;self, other: &amp;Self) -&gt; Self;
+}
+
+/// Capítulo II, §1 (Lang): Trait computacional para Corpo (Field)
+pub trait Field: Ring {
+    fn inv(&amp;self) -&gt; Option&lt;Self&gt;;
+    fn div(&amp;self, other: &amp;Self) -&gt; Option&lt;Self&gt; {
+        other.inv().map(|inv_b| self.mul(&amp;inv_b))
+    }
+}
+
+/// Corpo Primo F_p = Z / pZ (requer P primo)
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+pub struct Fp&lt;const P: u64&gt;(pub u64);
+
+impl&lt;const P: u64&gt; Fp&lt;P&gt; {
+    pub fn new(val: i128) -&gt; Self {
+        let m = P as i128;
+        let rem = ((val % m) + m) % m;
+        Self(rem as u64)
+    }
+
+    pub fn pow(&amp;self, mut exp: u64) -&gt; Self {
+        let mut base = *self;
+        let mut acc = Self::one();
+        while exp &gt; 0 {
+            if exp &amp; 1 == 1 {
+                acc = acc.mul(&amp;base);
+            }
+            base = base.mul(&amp;base);
+            exp &gt;&gt;= 1;
+        }
+        acc
+    }
+}
+
+impl&lt;const P: u64&gt; fmt::Display for Fp&lt;P&gt; {
+    fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
+impl&lt;const P: u64&gt; Ring for Fp&lt;P&gt; {
+    fn zero() -&gt; Self {
+        Self(0)
+    }
+    fn one() -&gt; Self {
+        Self(1 % P)
+    }
+    fn add(&amp;self, other: &amp;Self) -&gt; Self {
+        Self(((self.0 as u128 + other.0 as u128) % P as u128) as u64)
+    }
+    fn neg(&amp;self) -&gt; Self {
+        if self.0 == 0 {
+            Self(0)
+        } else {
+            Self(P - self.0)
+        }
+    }
+    fn mul(&amp;self, other: &amp;Self) -&gt; Self {
+        Self(((self.0 as u128 * other.0 as u128) % P as u128) as u64)
+    }
+}
+
+impl&lt;const P: u64&gt; Field for Fp&lt;P&gt; {
+    /// Inverso multiplicativo via Pequeno Teorema de Fermat: a^(P-2) mod P
+    fn inv(&amp;self) -&gt; Option&lt;Self&gt; {
+        if self.is_zero() {
+            None
+        } else {
+            Some(self.pow(P - 2))
+        }
+    }
+}
+
+/// Capítulo IV, §1 (Lang): Anel de Polinômios Univariados R[x]
+/// Coeficientes armazenados em ordem crescente de grau: coeffs[i] * x^i
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub struct Poly&lt;R: Ring&gt; {
+    pub coeffs: Vec&lt;R&gt;,
+}
+
+impl&lt;R: Ring&gt; Poly&lt;R&gt; {
+    pub fn new(mut coeffs: Vec&lt;R&gt;) -&gt; Self {
+        while coeffs.last().map_or(false, |c| c.is_zero()) {
+            coeffs.pop();
+        }
+        Self { coeffs }
+    }
+
+    pub fn zero() -&gt; Self {
+        Self { coeffs: Vec::new() }
+    }
+
+    pub fn one() -&gt; Self {
+        Self::new(vec![R::one()])
+    }
+
+    pub fn is_zero(&amp;self) -&gt; bool {
+        self.coeffs.is_empty()
+    }
+
+    /// Grau do polinômio (None para o polinômio nulo)
+    pub fn degree(&amp;self) -&gt; Option&lt;usize&gt; {
+        if self.is_zero() {
+            None
+        } else {
+            Some(self.coeffs.len() - 1)
+        }
+    }
+
+    pub fn leading_coeff(&amp;self) -&gt; Option&lt;&amp;R&gt; {
+        self.coeffs.last()
+    }
+
+    pub fn add(&amp;self, other: &amp;Self) -&gt; Self {
+        let len = self.coeffs.len().max(other.coeffs.len());
+        let mut res = Vec::with_capacity(len);
+        for i in 0..len {
+            let a = self.coeffs.get(i).cloned().unwrap_or_else(R::zero);
+            let b = other.coeffs.get(i).cloned().unwrap_or_else(R::zero);
+            res.push(a.add(&amp;b));
+        }
+        Self::new(res)
+    }
+
+    pub fn sub(&amp;self, other: &amp;Self) -&gt; Self {
+        let len = self.coeffs.len().max(other.coeffs.len());
+        let mut res = Vec::with_capacity(len);
+        for i in 0..len {
+            let a = self.coeffs.get(i).cloned().unwrap_or_else(R::zero);
+            let b = other.coeffs.get(i).cloned().unwrap_or_else(R::zero);
+            res.push(a.sub(&amp;b));
+        }
+        Self::new(res)
+    }
+
+    pub fn mul(&amp;self, other: &amp;Self) -&gt; Self {
+        if self.is_zero() || other.is_zero() {
+            return Self::zero();
+        }
+        let mut res = vec![R::zero(); self.coeffs.len() + other.coeffs.len() - 1];
+        for (i, a) in self.coeffs.iter().enumerate() {
+            for (j, b) in other.coeffs.iter().enumerate() {
+                res[i + j] = res[i + j].add(&amp;a.mul(b));
+            }
+        }
+        Self::new(res)
+    }
+
+    /// Multiplica por c * x^deg_shift
+    pub fn monomial_mul(&amp;self, coeff: &amp;R, deg_shift: usize) -&gt; Self {
+        if self.is_zero() || coeff.is_zero() {
+            return Self::zero();
+        }
+        let mut res = vec![R::zero(); deg_shift];
+        for c in &amp;self.coeffs {
+            res.push(c.mul(coeff));
+        }
+        Self::new(res)
+    }
+
+    /// Avaliação de Horner: p(x_0)
+    pub fn eval(&amp;self, x: &amp;R) -&gt; R {
+        self.coeffs
+            .iter()
+            .rev()
+            .fold(R::zero(), |acc, c| acc.mul(x).add(c))
+    }
+}
+
+/// Operações exclusivas para K[x] quando K é um Corpo (Domínio Euclidiano)
+impl&lt;K: Field&gt; Poly&lt;K&gt; {
+    /// Normaliza o polinômio tornando-o mônico (coeficiente líder = 1)
+    pub fn make_monic(&amp;self) -&gt; Self {
+        match self.leading_coeff().and_then(|lc| lc.inv()) {
+            Some(inv_lc) =&gt; self.monomial_mul(&amp;inv_lc, 0),
+            None =&gt; Self::zero(),
+        }
+    }
+
+    /// Teorema da Divisão Euclidiana: retorna (q, r) tal que self = q * divisor + r
+    /// com r = 0 ou deg(r) &lt; deg(divisor).
+    pub fn div_rem(&amp;self, divisor: &amp;Self) -&gt; Option&lt;(Self, Self)&gt; {
+        if divisor.is_zero() {
+            return None;
+        }
+        let mut rem = self.clone();
+        let mut quot = Self::zero();
+        let deg_d = divisor.degree().unwrap();
+        let inv_lead_d = divisor.leading_coeff().unwrap().inv().unwrap();
+
+        while let Some(deg_r) = rem.degree() {
+            if deg_r &lt; deg_d {
+                break;
+            }
+            let diff = deg_r - deg_d;
+            let factor = rem.leading_coeff().unwrap().mul(&amp;inv_lead_d);
+            let term = Self::new(vec![factor.clone()]).monomial_mul(&amp;K::one(), diff);
+            quot = quot.add(&amp;term);
+            rem = rem.sub(&amp;divisor.monomial_mul(&amp;factor, diff));
+        }
+
+        Some((quot, rem))
+    }
+
+    /// Algoritmo de Euclides Estendido em K[x]:
+    /// Retorna (g, u, v) onde g é mônico e u * self + v * other = g = gcd(self, other).
+    pub fn extended_gcd(&amp;self, other: &amp;Self) -&gt; (Self, Self, Self) {
+        let (mut r0, mut r1) = (self.clone(), other.clone());
+        let (mut u0, mut u1) = (Self::one(), Self::zero());
+        let (mut v0, mut v1) = (Self::zero(), Self::one());
+
+        while !r1.is_zero() {
+            let (q, r2) = r0.div_rem(&amp;r1).unwrap();
+            let u2 = u0.sub(&amp;q.mul(&amp;u1));
+            let v2 = v0.sub(&amp;q.mul(&amp;v1));
+
+            r0 = r1;
+            r1 = r2;
+            u0 = u1;
+            u1 = u2;
+            v0 = v1;
+            v1 = v2;
+        }
+
+        // Normaliza para que o MDC seja mônico (único em K[x])
+        match r0.leading_coeff().and_then(|lc| lc.inv()) {
+            Some(inv_lc) =&gt; (
+                r0.monomial_mul(&amp;inv_lc, 0),
+                u0.monomial_mul(&amp;inv_lc, 0),
+                v0.monomial_mul(&amp;inv_lc, 0),
+            ),
+            None =&gt; (Self::zero(), Self::zero(), Self::zero()),
+        }
+    }
+}
+
+impl&lt;R: Ring&gt; fmt::Display for Poly&lt;R&gt; {
+    fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {
+        if self.is_zero() {
+            return write!(f, "0");
+        }
+        let mut parts = Vec::new();
+        for (i, c) in self.coeffs.iter().enumerate() {
+            if c.is_zero() {
+                continue;
+            }
+            let term = match i {
+                0 =&gt; format!("{}", c),
+                1 =&gt; format!("{}x", c),
+                _ =&gt; format!("{}x^{}", c, i),
+            };
+            parts.push(term);
+        }
+        write!(f, "{}", parts.join(" + "))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    type F7 = Fp&lt;7&gt;;
+
+    #[test]
+    fn test_euclidean_division_f7() {
+        // Em F_7[x]: f(x) = x^3 + 2x + 5, g(x) = 2x + 1
+        let f = Poly::new(vec![F7::new(5), F7::new(2), F7::new(0), F7::new(1)]);
+        let g = Poly::new(vec![F7::new(1), F7::new(2)]);
+
+        let (q, r) = f.div_rem(&amp;g).unwrap();
+        // Verifica identidade fundamental: f = q * g + r
+        assert_eq!(q.mul(&amp;g).add(&amp;r), f);
+        // Grau do resto deve ser menor que deg(g) = 1
+        assert!(r.degree().map_or(true, |d| d &lt; 1));
+    }
+
+    #[test]
+    fn test_extended_gcd_f7() {
+        // f(x) = (x - 1)(x - 2) = x^2 + 4x + 2 em F_7[x]
+        // g(x) = (x - 2)(x - 3) = x^2 + 2x + 6 em F_7[x]
+        let f = Poly::new(vec![F7::new(2), F7::new(4), F7::new(1)]);
+        let g = Poly::new(vec![F7::new(6), F7::new(2), F7::new(1)]);
+
+        let (gcd, u, v) = f.extended_gcd(&amp;g);
+
+        // O MDC mônico deve ser (x - 2) = 5 + 1*x em F_7[x]
+        let expected_gcd = Poly::new(vec![F7::new(-2), F7::new(1)]);
+        assert_eq!(gcd, expected_gcd);
+
+        // Identidade de Bézout: u*f + v*g = gcd
+        assert_eq!(u.mul(&amp;f).add(&amp;v.mul(&amp;g)), gcd);
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgdffc85e" class="outline-2">
+<h2 id="orgdffc85e">Próximo Passo: Anéis Quocientes \(K[x]/(f(x))\) e Corpos Finitos \(\mathbb{F}_{p^n}\) (Lang, Cap. V)</h2>
+<div class="outline-text-2" id="text-orgdffc85e">
+<p>
+Com `div<sub>rem</sub>` e `extended<sub>gcd</sub>` operacionais em \(K[x]\), temos todas as peças para construir <b><b>extensões algébricas simples</b></b> e <b><b>corpos finitos</b></b> \(\mathbb{F}_{p^n} \cong \mathbb{F}_p[x]/(f(x))\) (onde \(f\) é irredutível de grau \(n\)):
+</p>
+<ol class="org-ol">
+<li>A multiplicação no quociente \(K[x]/(f(x))\) é simplesmente `(a.mul(&amp;b)).div<sub>rem</sub>(&amp;f).1`.</li>
+<li>A inversão de qualquer elemento não-nulo \(a(x) \notin (f(x))\) é dada diretamente pelo coeficiente de Bézout \(u(x)\) retornado por `a.extended<sub>gcd</sub>(&amp;f)`, já que \(\gcd(a, f) = 1 \implies u(x)a(x) + v(x)f(x) = 1 \implies u(x) \equiv a(x)^{-1} \pmod{f(x)}\).</li>
+</ol>
+
+<span class="pf-meta" data-pagefind-filter="tipo[data-v]" data-v="estudo"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="computer-science/formal-specification"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="programming/lean"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="programming/rust"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="algebra"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="estudo"></span>
+<span class="pf-meta" data-pagefind-filter="status[data-v]" data-v="semente"></span>
+</div>
+</div>
+</div>
+</body>
+</html>

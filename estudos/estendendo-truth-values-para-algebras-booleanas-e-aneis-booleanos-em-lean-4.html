@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<!-- 2026-11-27 Fri 22:27 -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Estendendo Truth-Values para Álgebras Booleanas e Anéis Booleanos em Lean 4</title>
+<meta name="author" content="n-rosenthal" />
+<meta name="description" content="Extensão do módulo TRUTH-VALUES (Maude) para o módulo BOOLEAN completo, formalizando implicação, equivalência, XOR e instanciando as estruturas de Álgebra Booleana e Anel Booleano em Lean 4." />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/estudo.css">
+<link rel="alternate" type="application/atom+xml" title="Notas de estudo" href="/feed.xml">
+<script defer src="/js/grafo-local.js"></script>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Estendendo Truth-Values para Álgebras Booleanas e Anéis Booleanos em Lean 4">
+<meta property="og:description" content="Extensão do módulo TRUTH-VALUES (Maude) para o módulo BOOLEAN completo, formalizando implicação, equivalência, XOR e instanciando as estruturas de Álgebra Booleana e Anel Booleano em Lean 4.">
+<meta property="og:url" content="https://n-rosenthal.github.io/estudos/estendendo-truth-values-para-algebras-booleanas-e-aneis-booleanos-em-lean-4.html">
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav class="nav"><a href="/">Início</a><a href="/grafo.html">Grafo</a><a href="/feed.xml">Feed</a></nav><div class="meta-nota"><span class="selo selo-semente">semente</span><span>8 min de leitura</span><span>criada em 2026-11-27</span><span>atualizada em 2026-11-27</span></div>
+</div>
+<div id="content" class="content">
+<header>
+<h1 class="title">Estendendo Truth-Values para Álgebras Booleanas e Anéis Booleanos em Lean 4</h1>
+</header><nav id="table-of-contents" role="doc-toc">
+<h2>&Iacute;ndice</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org9454e4c">Extensão da Especificação em Maude: O Módulo <code>BOOLEAN</code></a></li>
+<li><a href="#org697d7bd">Extensão <code>TruthValue</code> em Lean 4</a>
+<ul>
+<li><a href="#orge784eae">Importação e Operadores Derivados</a></li>
+<li><a href="#orgbb0d0df">Notação Mixfix Estendida</a></li>
+</ul>
+</li>
+<li><a href="#orgd4fbbf8">Teoremas Lógicos, Provas em LaTeX e Construção em Lean 4</a>
+<ul>
+<li><a href="#orge336f3b">Metodologia de Prova: Reescrita Simbólica vs. Análise de Casos</a></li>
+<li><a href="#org71ea2a1">1. Caracterização da Implicação e Contraposição</a>
+<ul>
+<li><a href="#org31af17f">Prova Matemática (LaTeX)</a></li>
+<li><a href="#orgd16db9e">Implementação em Lean 4</a></li>
+</ul>
+</li>
+<li><a href="#org12ec38b">2. Propriedades da Equivalência (\(\Leftrightarrow\))</a>
+<ul>
+<li><a href="#org4552213">Prova Matemática (LaTeX)</a></li>
+<li><a href="#org6dae0fc">Implementação em Lean 4</a></li>
+</ul>
+</li>
+<li><a href="#orgdb13598">3. Estrutura de Grupo Abeliano e Anel Booleano (\(\oplus, \land\))</a>
+<ul>
+<li><a href="#org82067f0">Prova Matemática (LaTeX)</a></li>
+<li><a href="#org5d1a0fc">Implementação em Lean 4</a></li>
+</ul>
+</li>
+<li><a href="#org147bf3e">4. Leis de Absorção (Estrutura de Reticulado Distributivo)</a>
+<ul>
+<li><a href="#orgb6991d2">Prova Matemática (LaTeX)</a></li>
+<li><a href="#org95d5b22">Implementação em Lean 4</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orgd1c9af6">Integrando com a Hierarquia Algébrica (<code>StrangeAlgebras</code>)</a>
+<ul>
+<li><a href="#orga9eab61">Compilação Conjunta via Org-Babel</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav>
+<div id="outline-container-org9454e4c" class="outline-2">
+<h2 id="org9454e4c">Extensão da Especificação em Maude: O Módulo <code>BOOLEAN</code></h2>
+<div class="outline-text-2" id="text-org9454e4c">
+<p>
+Na especificação algébrica em Maude (Clavel et al., <i>All About Maude</i>), o módulo funcional <code>BOOLEAN</code> importa (<code>protecting</code>) o módulo básico <code>TRUTH-VALUES</code> e introduz conectivos derivados — implicação (<code>_implies_</code>), equivalência (<code>_iff_</code>) e disjunção exclusiva (<code>_xor_</code>) — definidos por equações redutoras sobre os construtores <code>true</code> e <code>false</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-maude">fmod BOOLEAN is
+ protecting TRUTH-VALUES .
+
+ --- Novos operadores derivados sobre Truth-Value
+ op _implies_ : Truth-Value Truth-Value -&gt; Truth-Value .
+ op _iff_     : Truth-Value Truth-Value -&gt; Truth-Value [comm] .
+ op _xor_     : Truth-Value Truth-Value -&gt; Truth-Value [assoc comm] .
+
+ --- Variáveis
+ vars P Q : Truth-Value .
+
+ --- Equações para Implicação
+ eq true  implies P = P    .
+ eq false implies P = true .
+
+ --- Equações para Equivalência (Bicondicional)
+ eq true  iff P = P      .
+ eq false iff P = \not P .
+
+ --- Equações para Disjunção Exclusiva (XOR)
+ eq false xor P = P      .
+ eq true  xor P = \not P .
+endfm
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org697d7bd" class="outline-2">
+<h2 id="org697d7bd">Extensão <code>TruthValue</code> em Lean 4</h2>
+<div class="outline-text-2" id="text-org697d7bd">
+<p>
+No Lean 4, estendemos o módulo anterior importando <code>TruthValues</code> (ou definindo os novos operadores diretamente no <i>namespace</i> <code>TruthValue</code>). Além de reproduzir as equações do Maude, estabelecemos a ponte com a Álgebra Abstrata (Lang, Capítulos I e II): provamos que \((\mathsf{TruthValue}, \oplus, \land, \mathsf{f}, \mathsf{t})\) forma um <b><b>Anel Booleano</b></b> (um anel comutativo com unidade onde todo elemento é idempotente: \(x^2 = x\)).
+</p>
+</div>
+<div id="outline-container-orge784eae" class="outline-3">
+<h3 id="orge784eae">Importação e Operadores Derivados</h3>
+<div class="outline-text-3" id="text-orge784eae">
+<div class="org-src-container">
+<pre class="src src-lean4">import TruthValues
+
+namespace TruthValue
+
+-- Implicação material (implies)
+def implies : TruthValue → TruthValue → TruthValue
+  | t, p =&gt; p
+  | f, _ =&gt; t
+
+-- Equivalência lógica / bicondicional (iff)
+def iff : TruthValue → TruthValue → TruthValue
+  | t, p =&gt; p
+  | f, p =&gt; neg p
+
+-- Disjunção exclusiva / soma booleana (xor)
+def xor : TruthValue → TruthValue → TruthValue
+  | f, p =&gt; p
+  | t, p =&gt; neg p
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgbb0d0df" class="outline-3">
+<h3 id="orgbb0d0df">Notação Mixfix Estendida</h3>
+<div class="outline-text-3" id="text-orgbb0d0df">
+<p>
+Atribuímos precedências compatíveis com a hierarquia lógica padrão: negação (<code>75</code>) \(>\) conjunção (<code>35</code>) \(>\) disjunção/XOR (<code>30</code>) \(>\) implicação (<code>25</code>, associativa à direita) \(>\) equivalência (<code>20</code>).
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lean4">scoped infixr:25 " ⇒ " =&gt; implies
+scoped infixl:20 " ⇔ " =&gt; iff
+scoped infixl:30 " ⊕ " =&gt; xor
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-orgd4fbbf8" class="outline-2">
+<h2 id="orgd4fbbf8">Teoremas Lógicos, Provas em LaTeX e Construção em Lean 4</h2>
+<div class="outline-text-2" id="text-orgd4fbbf8">
+</div>
+<div id="outline-container-orge336f3b" class="outline-3">
+<h3 id="orge336f3b">Metodologia de Prova: Reescrita Simbólica vs. Análise de Casos</h3>
+<div class="outline-text-3" id="text-orge336f3b">
+<p>
+Neste módulo avançado, combinamos duas técnicas complementares no Lean 4:
+</p>
+<ol class="org-ol">
+<li><b>Redução Direta (<code>cases ... &lt;;&gt; rfl</code>):</b> Para identidades primitivas que dependem diretamente da definição por casamento de padrões das operações.</li>
+<li><b>Cálculo Equacional (<code>calc</code> + <code>rw</code>):</b> Para derivar teoremas complexos (como a lei de absorção ou distributividade do anel) exclusivamente a partir de lemas já provados, sem precisar expandir tabelas-verdade.</li>
+</ol>
+
+<p>
+&#x2014;
+</p>
+</div>
+</div>
+<div id="outline-container-org71ea2a1" class="outline-3">
+<h3 id="org71ea2a1">1. Caracterização da Implicação e Contraposição</h3>
+<div class="outline-text-3" id="text-org71ea2a1">
+</div>
+<div id="outline-container-org31af17f" class="outline-4">
+<h4 id="org31af17f">Prova Matemática (LaTeX)</h4>
+<div class="outline-text-4" id="text-org31af17f">
+<p>
+<b>Proposição 1.1 (Eliminação da Implicação).</b> Para quaisquer \(p, q \in \mathsf{TruthValue}\),
+\[(p \Rightarrow q) = (\neg p) \lor q.\]
+</p>
+
+<p>
+<i>Demonstração.</i> Analisamos os dois construtores do antecedente \(p\) usando as equações definicionais \(I_1: (\mathsf{t} \Rightarrow q) = q\) e \(I_2: (\mathsf{f} \Rightarrow q) = \mathsf{t}\):
+</p>
+<ul class="org-ul">
+<li><b>Caso \(p = \mathsf{t}\):</b> \((\mathsf{t} \Rightarrow q) \stackrel{I_1}{=} q\), enquanto \((\neg \mathsf{t}) \lor q = \mathsf{f} \lor q = q\).</li>
+<li><b>Caso \(p = \mathsf{f}\):</b> \((\mathsf{f} \Rightarrow q) \stackrel{I_2}{=} \mathsf{t}\), enquanto \((\neg \mathsf{f}) \lor q = \mathsf{t} \lor q = \mathsf{t}\). \(\blacksquare\)</li>
+</ul>
+
+<p>
+<b>Proposição 1.2 (Lei da Contraposição).</b> Para quaisquer \(p, q \in \mathsf{TruthValue}\),
+\[(p \Rightarrow q) = (\neg q \Rightarrow \neg p).\]
+</p>
+
+<p>
+<i>Demonstração.</i> Usando a Proposição 1.1, a comutatividade de \(\lor\) e a dupla negação (\(\neg\neg p = p\)):
+\[(p \Rightarrow q) \stackrel{\text{Prop. 1.1}}{=} (\neg p) \lor q \stackrel{\text{Prop. 3.1}}{=} (\neg p) \lor (\neg \neg q) \stackrel{\text{Com. }\lor}{=} (\neg \neg q) \lor (\neg p) \stackrel{\text{Prop. 1.1}}{=} (\neg q \Rightarrow \neg p). \quad \blacksquare\]
+</p>
+</div>
+</div>
+<div id="outline-container-orgd16db9e" class="outline-4">
+<h4 id="orgd16db9e">Implementação em Lean 4</h4>
+<div class="outline-text-4" id="text-orgd16db9e">
+<p>
+Abaixo, demonstramos <code>implies_eq_not_or</code> por casos e derivamos <code>contraposition</code> simbolicamente usando <code>calc</code> e <code>rw</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lean4">theorem implies_eq_not_or (p q : TruthValue) : (p ⇒ q) = (¬ p ∨ q) := by
+  cases p &lt;;&gt; rfl
+
+theorem contraposition (p q : TruthValue) : (p ⇒ q) = (¬ q ⇒ ¬ p) := by
+  calc (p ⇒ q) = (¬ p ∨ q)       := implies_eq_not_or p q
+       _       = (¬ p ∨ ¬ (¬ q)) := by rw [neg_neg]
+       _       = (¬ (¬ q) ∨ ¬ p) := lor_comm (¬ p) (¬ (¬ q))
+       _       = (¬ q ⇒ ¬ p)     := (implies_eq_not_or (¬ q) (¬ p)).symm
+</pre>
+</div>
+
+<p>
+&#x2014;
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org12ec38b" class="outline-3">
+<h3 id="org12ec38b">2. Propriedades da Equivalência (\(\Leftrightarrow\))</h3>
+<div class="outline-text-3" id="text-org12ec38b">
+</div>
+<div id="outline-container-org4552213" class="outline-4">
+<h4 id="org4552213">Prova Matemática (LaTeX)</h4>
+<div class="outline-text-4" id="text-org4552213">
+<p>
+<b>Proposição 2.1 (Reflexividade e Comutatividade de \(\Leftrightarrow\)).</b> Para quaisquer \(p, q \in \mathsf{TruthValue}\):
+</p>
+<ol class="org-ol">
+<li>\((p \Leftrightarrow p) = \mathsf{t}\)</li>
+<li>\((p \Leftrightarrow q) = (q \Leftrightarrow p)\)</li>
+</ol>
+
+<p>
+<i>Demonstração.</i> Pelas equações \(B_1: (\mathsf{t} \Leftrightarrow x) = x\) e \(B_2: (\mathsf{f} \Leftrightarrow x) = \neg x\):
+</p>
+<ol class="org-ol">
+<li>Se \(p = \mathsf{t}\), \((\mathsf{t} \Leftrightarrow \mathsf{t}) \stackrel{B_1}{=} \mathsf{t}\). Se \(p = \mathsf{f}\), \((\mathsf{f} \Leftrightarrow \mathsf{f}) \stackrel{B_2}{=} \neg \mathsf{f} = \mathsf{t}\).</li>
+<li>Abrindo os quatro casos para \((p, q)\):
+<ul class="org-ul">
+<li>\((p, q) = (\mathsf{t}, \mathsf{t})\): \(\mathsf{t} \Leftrightarrow \mathsf{t} = \mathsf{t}\).</li>
+<li>\((p, q) = (\mathsf{t}, \mathsf{f})\): \((\mathsf{t} \Leftrightarrow \mathsf{f}) = \mathsf{f} = \neg \mathsf{t} = (\mathsf{f} \Leftrightarrow \mathsf{t})\).</li>
+<li>\((p, q) = (\mathsf{f}, \mathsf{t})\): \((\mathsf{f} \Leftrightarrow \mathsf{t}) = \neg \mathsf{t} = \mathsf{f} = (\mathsf{t} \Leftrightarrow \mathsf{f})\).</li>
+<li>\((p, q) = (\mathsf{f}, \mathsf{f})\): \((\mathsf{f} \Leftrightarrow \mathsf{f}) = \mathsf{t}\). \(\blacksquare\)</li>
+</ul></li>
+</ol>
+
+<p>
+<b>Proposição 2.2 (Decomposição em Dupla Implicação).</b> Para quaisquer \(p, q \in \mathsf{TruthValue}\),
+\[(p \Leftrightarrow q) = (p \Rightarrow q) \land (q \Rightarrow p).\]
+</p>
+
+<p>
+<i>Demonstração.</i> Analisando os dois casos para \(p\):
+</p>
+<ul class="org-ul">
+<li><b>Caso \(p = \mathsf{t}\):</b> \((\mathsf{t} \Leftrightarrow q) = q\), enquanto \((\mathsf{t} \Rightarrow q) \land (q \Rightarrow \mathsf{t}) = q \land \mathsf{t} = q\).</li>
+<li><b>Caso \(p = \mathsf{f}\):</b> \((\mathsf{f} \Leftrightarrow q) = \neg q\), enquanto \((\mathsf{f} \Rightarrow q) \land (q \Rightarrow \mathsf{f}) = \mathsf{t} \land (\neg q) = \neg q\). \(\blacksquare\)</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org6dae0fc" class="outline-4">
+<h4 id="org6dae0fc">Implementação em Lean 4</h4>
+<div class="outline-text-4" id="text-org6dae0fc">
+<div class="org-src-container">
+<pre class="src src-lean4">theorem iff_refl (p : TruthValue) : (p ⇔ p) = t := by
+  cases p &lt;;&gt; rfl
+
+theorem iff_comm (p q : TruthValue) : (p ⇔ q) = (q ⇔ p) := by
+  cases p &lt;;&gt; cases q &lt;;&gt; rfl
+
+theorem iff_eq_implies_and (p q : TruthValue) : (p ⇔ q) = ((p ⇒ q) ∧ (q ⇒ p)) := by
+  cases p &lt;;&gt; cases q &lt;;&gt; rfl
+</pre>
+</div>
+
+<p>
+&#x2014;
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgdb13598" class="outline-3">
+<h3 id="orgdb13598">3. Estrutura de Grupo Abeliano e Anel Booleano (\(\oplus, \land\))</h3>
+<div class="outline-text-3" id="text-orgdb13598">
+<p>
+Na Álgebra de Lang (Capítulo II, §1), um <b><b>Anel Booleano</b></b> é um anel com unidade \((R, +, \cdot, 0, 1)\) em que todo elemento é idempotente (\(x \cdot x = x\)). Em \(\mathsf{TruthValue}\), o papel da adição \(+\) é desempenhado pelo \(\mathsf{xor}\) (\(\oplus\)), com elemento neutro \(0 = \mathsf{f}\), e o papel da multiplicação \(\cdot\) é desempenhado pelo \(\mathsf{and}\) (\(\land\)), com unidade \(1 = \mathsf{t}\).
+</p>
+</div>
+<div id="outline-container-org82067f0" class="outline-4">
+<h4 id="org82067f0">Prova Matemática (LaTeX)</h4>
+<div class="outline-text-4" id="text-org82067f0">
+<p>
+<b>Teorema 3.1 (Grupo Abeliano Aditivo).</b> \((\mathsf{TruthValue}, \oplus, \mathsf{f})\) é um grupo abeliano em que todo elemento é seu próprio inverso aditivo (\(p \oplus p = \mathsf{f}\), i.e., anel de característica \(2\)).
+</p>
+
+<p>
+<i>Demonstração.</i> Pelas equações \(X_1: (\mathsf{f} \oplus x) = x\) e \(X_2: (\mathsf{t} \oplus x) = \neg x\):
+</p>
+<ol class="org-ol">
+<li><b>Identidade:</b> \(\mathsf{f} \oplus p \stackrel{X_1}{=} p\) e, por comutatividade, \(p \oplus \mathsf{f} = p\).</li>
+<li><b>Auto-inverso (Característica 2):</b> Se \(p = \mathsf{f}\), \(\mathsf{f} \oplus \mathsf{f} = \mathsf{f}\). Se \(p = \mathsf{t}\), \(\mathsf{t} \oplus \mathsf{t} = \neg \mathsf{t} = \mathsf{f}\). Logo, \(-p = p\).</li>
+<li><b>Comutatividade e Associatividade:</b> Verificadas diretamente sobre os construtores \(\mathsf{t}\) e \(\mathsf{f}\), observando que \(\neg(\neg x) = x\) garante \((p \oplus q) \oplus r = p \oplus (q \oplus r)\). \(\blacksquare\)</li>
+</ol>
+
+<p>
+<b>Teorema 3.2 (Axiomas de Anel Booleano).</b> Para quaisquer \(p, q, r \in \mathsf{TruthValue}\):
+</p>
+<ol class="org-ol">
+<li><b>Distributividade:</b> \(p \land (q \oplus r) = (p \land q) \oplus (p \land r)\).</li>
+<li><b>Idempotência Multiplicativa:</b> \(p \land p = p\).</li>
+</ol>
+
+<p>
+<i>Demonstração.</i>
+</p>
+<ol class="org-ol">
+<li>Analisamos os construtores de \(p\):
+<ul class="org-ul">
+<li><b>Caso \(p = \mathsf{t}\):</b> \(\mathsf{t} \land (q \oplus r) = q \oplus r = (\mathsf{t} \land q) \oplus (\mathsf{t} \land r)\).</li>
+<li><b>Caso \(p = \mathsf{f}\):</b> \(\mathsf{f} \land (q \oplus r) = \mathsf{f} = \mathsf{f} \oplus \mathsf{f} = (\mathsf{f} \land q) \oplus (\mathsf{f} \land r)\).</li>
+</ul></li>
+<li>Para \(p = \mathsf{t}\), \(\mathsf{t} \land \mathsf{t} = \mathsf{t}\); para \(p = \mathsf{f}\), \(\mathsf{f} \land \mathsf{f} = \mathsf{f}\). \(\blacksquare\)</li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org5d1a0fc" class="outline-4">
+<h4 id="org5d1a0fc">Implementação em Lean 4</h4>
+<div class="outline-text-4" id="text-org5d1a0fc">
+<div class="org-src-container">
+<pre class="src src-lean4">-- Axiomas de Grupo Abeliano para (TruthValue, ⊕, f)
+theorem xor_comm (p q : TruthValue) : (p ⊕ q) = (q ⊕ p) := by
+  cases p &lt;;&gt; cases q &lt;;&gt; rfl
+
+theorem xor_assoc (p q r : TruthValue) : ((p ⊕ q) ⊕ r) = (p ⊕ (q ⊕ r)) := by
+  cases p &lt;;&gt; cases q &lt;;&gt; cases r &lt;;&gt; rfl
+
+theorem false_xor (p : TruthValue) : (f ⊕ p) = p := rfl
+
+theorem xor_false (p : TruthValue) : (p ⊕ f) = p := by
+  rw [xor_comm]
+  rfl
+
+theorem xor_self (p : TruthValue) : (p ⊕ p) = f := by
+  cases p &lt;;&gt; rfl
+
+-- Axiomas de Anel Booleano para (TruthValue, ⊕, ∧, f, t)
+theorem land_xor_distrib (p q r : TruthValue) : (p ∧ (q ⊕ r)) = ((p ∧ q) ⊕ (p ∧ r)) := by
+  cases p &lt;;&gt; rfl
+
+theorem land_idem (p : TruthValue) : (p ∧ p) = p := by
+  cases p &lt;;&gt; rfl
+</pre>
+</div>
+
+<p>
+&#x2014;
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org147bf3e" class="outline-3">
+<h3 id="org147bf3e">4. Leis de Absorção (Estrutura de Reticulado Distributivo)</h3>
+<div class="outline-text-3" id="text-org147bf3e">
+<p>
+Para completar a caracterização de \((\mathsf{TruthValue}, \land, \lor, \neg, \mathsf{f}, \mathsf{t})\) como uma <b><b>Álgebra Booleana</b></b> no sentido estrito, provamos as duas leis de absorção e as leis de complementaridade.
+</p>
+</div>
+<div id="outline-container-orgb6991d2" class="outline-4">
+<h4 id="orgb6991d2">Prova Matemática (LaTeX)</h4>
+<div class="outline-text-4" id="text-orgb6991d2">
+<p>
+<b>Proposição 4.1 (Leis de Absorção e Complementaridade).</b> Para quaisquer \(p, q \in \mathsf{TruthValue}\):
+</p>
+<ol class="org-ol">
+<li>\(p \land (p \lor q) = p\) e \(p \lor (p \land q) = p\) (Absorção).</li>
+<li>\(p \land (\neg p) = \mathsf{f}\) e \(p \lor (\neg p) = \mathsf{t}\) (Complementaridade / Terceiro Excluído).</li>
+</ol>
+
+<p>
+<i>Demonstração.</i>
+</p>
+<ol class="org-ol">
+<li>Se \(p = \mathsf{t}\), \(\mathsf{t} \land (\mathsf{t} \lor q) = \mathsf{t} \lor q = \mathsf{t}\) e \(\mathsf{t} \lor (\mathsf{t} \land q) = \mathsf{t}\). Se \(p = \mathsf{f}\), \(\mathsf{f} \land (\mathsf{f} \lor q) = \mathsf{f}\) e \(\mathsf{f} \lor (\mathsf{f} \land q) = \mathsf{f} \lor \mathsf{f} = \mathsf{f}\).</li>
+<li>Se \(p = \mathsf{t}\), \(\mathsf{t} \land \mathsf{f} = \mathsf{f}\) e \(\mathsf{t} \lor \mathsf{f} = \mathsf{t}\). Se \(p = \mathsf{f}\), \(\mathsf{f} \land \mathsf{t} = \mathsf{f}\) e \(\mathsf{f} \lor \mathsf{t} = \mathsf{t}\). \(\blacksquare\)</li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org95d5b22" class="outline-4">
+<h4 id="org95d5b22">Implementação em Lean 4</h4>
+<div class="outline-text-4" id="text-org95d5b22">
+<div class="org-src-container">
+<pre class="src src-lean4">theorem land_lor_absorb (p q : TruthValue) : (p ∧ (p ∨ q)) = p := by
+  cases p &lt;;&gt; rfl
+
+theorem lor_land_absorb (p q : TruthValue) : (p ∨ (p ∧ q)) = p := by
+  cases p &lt;;&gt; rfl
+
+theorem land_not_self (p : TruthValue) : (p ∧ ¬ p) = f := by
+  cases p &lt;;&gt; rfl
+
+theorem lor_not_self (p : TruthValue) : (p ∨ ¬ p) = t := by
+  cases p &lt;;&gt; rfl
+
+end TruthValue
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-orgd1c9af6" class="outline-2">
+<h2 id="orgd1c9af6">Integrando com a Hierarquia Algébrica (<code>StrangeAlgebras</code>)</h2>
+<div class="outline-text-2" id="text-orgd1c9af6">
+<p>
+Com as provas acima verificadas, <code>TruthValue</code> pode instanciar diretamente as classes algébricas que estamos construindo para a Álgebra de Lang:
+</p>
+<ol class="org-ol">
+<li><b>(TruthValue, ⊕, f)</b> instancia <code>AbelianGroup</code> (onde `inv := id`, pois todo elemento tem ordem \(2\)).</li>
+<li><b>(TruthValue, ∧, t)</b> instancia <code>CommMonoid</code>.</li>
+<li>A combinação <b>(TruthValue, ⊕, ∧, f, t)</b> instancia <code>BooleanRing</code>, ilustrando a dualidade de Stone clássica entre Álgebras Booleanas e Anéis Booleanos.</li>
+</ol>
+</div>
+<div id="outline-container-orga9eab61" class="outline-3">
+<h3 id="orga9eab61">Compilação Conjunta via Org-Babel</h3>
+<div class="outline-text-3" id="text-orga9eab61">
+<ol class="org-ol">
+<li>No documento anterior, execute <code>C-c C-v t</code> para gerar <code>TruthValues.lean</code>.</li>
+<li>Neste documento, execute <code>C-c C-v t</code> para gerar <code>BooleanAlgebra.lean</code>.</li>
+<li><p>
+No terminal, verifique ambos os módulos em sequência:
+</p>
+<div class="org-src-container">
+<pre class="src src-bash">lean TruthValues.lean &amp;&amp; lean BooleanAlgebra.lean
+</pre>
+</div></li>
+</ol>
+
+<span class="pf-meta" data-pagefind-filter="tipo[data-v]" data-v="estudo"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="computer-science/formal-specification"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="programming/lean"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="algebra"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="estudo"></span>
+<span class="pf-meta" data-pagefind-filter="status[data-v]" data-v="semente"></span>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

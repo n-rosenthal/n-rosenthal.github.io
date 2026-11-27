@@ -6,11 +6,39 @@
   <id>https://n-rosenthal.github.io/</id>
   <updated>2026-11-27T00:00:00Z</updated>
   <entry>
+    <title>Anéis de Polinômios Univariados R[x] e Divisão Euclidiana (Lean 4 + Rust)</title>
+    <link href="https://n-rosenthal.github.io/estudos/aneis-de-polinomios-univariados-r-x-e-divisao-euclidiana-lean-4-rust.html"/>
+    <id>https://n-rosenthal.github.io/estudos/aneis-de-polinomios-univariados-r-x-e-divisao-euclidiana-lean-4-rust.html</id>
+    <updated>2026-11-27T00:00:00Z</updated>
+    <summary>Formalização de polinômios univariados R[x] e do algoritmo de divisão euclidiana sobre corpos K em Lean 4, acompanhada da implementação genérica de Poly&lt;R&gt; e F_p[x] em Rust.</summary>
+  </entry>
+  <entry>
+    <title>Dualidade entre Álgebras Booleanas e Anéis Booleanos em Lean 4 e Maude</title>
+    <link href="https://n-rosenthal.github.io/estudos/dualidade-entre-algebras-booleanas-e-aneis-booleanos-em-lean-4-e-maude.html"/>
+    <id>https://n-rosenthal.github.io/estudos/dualidade-entre-algebras-booleanas-e-aneis-booleanos-em-lean-4-e-maude.html</id>
+    <updated>2026-11-27T00:00:00Z</updated>
+    <summary>Formalização da equivalência categórica/algébrica entre Álgebras Booleanas e Anéis Booleanos (Lang, Cap. II) e instanciação das estruturas algébricas sobre TruthValue em Lean 4.</summary>
+  </entry>
+  <entry>
+    <title>Estendendo Truth-Values para Álgebras Booleanas e Anéis Booleanos em Lean 4</title>
+    <link href="https://n-rosenthal.github.io/estudos/estendendo-truth-values-para-algebras-booleanas-e-aneis-booleanos-em-lean-4.html"/>
+    <id>https://n-rosenthal.github.io/estudos/estendendo-truth-values-para-algebras-booleanas-e-aneis-booleanos-em-lean-4.html</id>
+    <updated>2026-11-27T00:00:00Z</updated>
+    <summary>Extensão do módulo TRUTH-VALUES (Maude) para o módulo BOOLEAN completo, formalizando implicação, equivalência, XOR e instanciando as estruturas de Álgebra Booleana e Anel Booleano em Lean 4.</summary>
+  </entry>
+  <entry>
     <title>Implementando a Especificação Truth-Values em Lean</title>
     <link href="https://n-rosenthal.github.io/estudos/implementando-a-especificacao-truth-values-em-lean.html"/>
     <id>https://n-rosenthal.github.io/estudos/implementando-a-especificacao-truth-values-em-lean.html</id>
     <updated>2026-11-27T00:00:00Z</updated>
     <summary>Especificação algébrica do módulo TRUTH-VALUES (Maude) traduzida para Lean 4 com provas formais em LaTeX e demonstração da construção de termos de prova.</summary>
+  </entry>
+  <entry>
+    <title>Polinômios de Zhegalkin, Anéis Booleanos Livres e Transformada de Möbius (Lean 4 + Rust)</title>
+    <link href="https://n-rosenthal.github.io/estudos/polinomios-de-zhegalkin-aneis-booleanos-livres-e-transformada-de-mobius-lean-4-rust.html"/>
+    <id>https://n-rosenthal.github.io/estudos/polinomios-de-zhegalkin-aneis-booleanos-livres-e-transformada-de-mobius-lean-4-rust.html</id>
+    <updated>2026-11-27T00:00:00Z</updated>
+    <summary>Formalização do Anel Booleano Livre em n geradores (Forma Normal Algébrica / Zhegalkin) em Lean 4 com provas em LaTeX e implementação de alta performance da Transformada Rápida de Möbius em Rust.</summary>
   </entry>
   <entry>
     <title>Análise Formal de Conceitos (FCA) e Reticulados de Conceitos em Rust</title>

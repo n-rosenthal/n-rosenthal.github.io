@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<!-- 2026-11-27 Fri 22:14 -->
+<!-- 2026-11-27 Fri 22:27 -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Operações Fundamentais sobre Pré-ordens em Rust</title>
@@ -60,17 +60,17 @@
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgfe09448">Implementação</a>
+<li><a href="#org4e5e7ca">Implementação</a>
 <ul>
-<li><a href="#org5cf00bc">Importações</a></li>
-<li><a href="#org0d01630">Dualidade (\( P^{\text{op}} \))</a></li>
-<li><a href="#org571a8df">Conjuntos Inferiores (<i>Downsets</i>) e Superiores (<i>Upsets</i>)</a></li>
-<li><a href="#org6bc1b64">Quociente Poset (\( P / {\sim} \))</a></li>
-<li><a href="#org509faf8">Cotas, Ínfimo (<i>Meet</i>) e Supremo (<i>Join</i>)</a></li>
-<li><a href="#org22a406d">Instâncias Concretas do Traço <code>Preorder</code></a></li>
-<li><a href="#org5bf39d4">Representações</a>
+<li><a href="#org2868be0">Importações</a></li>
+<li><a href="#org63e4199">Dualidade (\( P^{\text{op}} \))</a></li>
+<li><a href="#org9d945c5">Conjuntos Inferiores (<i>Downsets</i>) e Superiores (<i>Upsets</i>)</a></li>
+<li><a href="#org4688e3b">Quociente Poset (\( P / {\sim} \))</a></li>
+<li><a href="#orga7ffdbb">Cotas, Ínfimo (<i>Meet</i>) e Supremo (<i>Join</i>)</a></li>
+<li><a href="#orgc219055">Instâncias Concretas do Traço <code>Preorder</code></a></li>
+<li><a href="#orge6f3c85">Representações</a>
 <ul>
-<li><a href="#org80f32d1"><code>Display</code></a></li>
+<li><a href="#org05550bf"><code>Display</code></a></li>
 </ul>
 </li>
 </ul>
@@ -78,16 +78,16 @@
 </ul>
 </div>
 </nav>
-<div id="outline-container-orgfe09448" class="outline-2">
-<h2 id="orgfe09448">Implementação</h2>
-<div class="outline-text-2" id="text-orgfe09448">
+<div id="outline-container-org4e5e7ca" class="outline-2">
+<h2 id="org4e5e7ca">Implementação</h2>
+<div class="outline-text-2" id="text-org4e5e7ca">
 <p>
 Este módulo estende as definições base (<code>Preorder</code>, <code>Relation</code>, <code>PreorderSet</code> e <code>PartialOrderSet</code>) com as construções estruturais fundamentais da teoria da ordem.
 </p>
 </div>
-<div id="outline-container-org5cf00bc" class="outline-3">
-<h3 id="org5cf00bc">Importações</h3>
-<div class="outline-text-3" id="text-org5cf00bc">
+<div id="outline-container-org2868be0" class="outline-3">
+<h3 id="org2868be0">Importações</h3>
+<div class="outline-text-3" id="text-org2868be0">
 <div class="org-src-container">
 <pre class="src src-rust">use std::collections::{BTreeSet, HashSet};
 use std::fmt;
@@ -98,9 +98,9 @@ use crate::{PartialOrderSet, Preorder, PreorderSet, Relation};
 </div>
 </div>
 </div>
-<div id="outline-container-org0d01630" class="outline-3">
-<h3 id="org0d01630">Dualidade (\( P^{\text{op}} \))</h3>
-<div class="outline-text-3" id="text-org0d01630">
+<div id="outline-container-org63e4199" class="outline-3">
+<h3 id="org63e4199">Dualidade (\( P^{\text{op}} \))</h3>
+<div class="outline-text-3" id="text-org63e4199">
 <p>
 Toda pré-ordem \( P = (S, \preceq) \) possui uma <b>pré-ordem dual</b> (ou oposta) \( P^{\text{op}} = (S, \preceq^{\text{op}}) \) sobre o mesmo domínio, definida pela inversão da relação:
 </p>
@@ -145,9 +145,9 @@ impl&lt;T: Eq + Hash + Clone&gt; PreorderSet&lt;T&gt; {
 </div>
 </div>
 </div>
-<div id="outline-container-org571a8df" class="outline-3">
-<h3 id="org571a8df">Conjuntos Inferiores (<i>Downsets</i>) e Superiores (<i>Upsets</i>)</h3>
-<div class="outline-text-3" id="text-org571a8df">
+<div id="outline-container-org9d945c5" class="outline-3">
+<h3 id="org9d945c5">Conjuntos Inferiores (<i>Downsets</i>) e Superiores (<i>Upsets</i>)</h3>
+<div class="outline-text-3" id="text-org9d945c5">
 <p>
 Seja \( (S, \preceq) \) uma pré-ordem e \( X \subseteq S \) um subconjunto qualquer:
 </p>
@@ -211,9 +211,9 @@ Quando \( X = \{x\} \) é unitário, \( \downarrow x \) e \( \uparrow x \) são 
 </div>
 </div>
 </div>
-<div id="outline-container-org6bc1b64" class="outline-3">
-<h3 id="org6bc1b64">Quociente Poset (\( P / {\sim} \))</h3>
-<div class="outline-text-3" id="text-org6bc1b64">
+<div id="outline-container-org4688e3b" class="outline-3">
+<h3 id="org4688e3b">Quociente Poset (\( P / {\sim} \))</h3>
+<div class="outline-text-3" id="text-org4688e3b">
 <p>
 A construção fundamental que conecta pré-ordens a ordens parciais é o <b>quociente pela equivalência induzida</b> (\( x \sim y \iff x \preceq y \land y \preceq x \)).
 </p>
@@ -269,9 +269,9 @@ impl&lt;T: Ord + Hash + Clone&gt; PreorderSet&lt;T&gt; {
 </div>
 </div>
 </div>
-<div id="outline-container-org509faf8" class="outline-3">
-<h3 id="org509faf8">Cotas, Ínfimo (<i>Meet</i>) e Supremo (<i>Join</i>)</h3>
-<div class="outline-text-3" id="text-org509faf8">
+<div id="outline-container-orga7ffdbb" class="outline-3">
+<h3 id="orga7ffdbb">Cotas, Ínfimo (<i>Meet</i>) e Supremo (<i>Join</i>)</h3>
+<div class="outline-text-3" id="text-orga7ffdbb">
 <p>
 Dado um subconjunto \( X \subseteq S \) em uma pré-ordem \( (S, \preceq) \):
 </p>
@@ -327,9 +327,9 @@ Diferentemente de uma ordem parcial — onde o ínfimo e o supremo, quando exist
 </div>
 </div>
 </div>
-<div id="outline-container-org22a406d" class="outline-3">
-<h3 id="org22a406d">Instâncias Concretas do Traço <code>Preorder</code></h3>
-<div class="outline-text-3" id="text-org22a406d">
+<div id="outline-container-orgc219055" class="outline-3">
+<h3 id="orgc219055">Instâncias Concretas do Traço <code>Preorder</code></h3>
+<div class="outline-text-3" id="text-orgc219055">
 <p>
 Dois modelos canônicos ilustram pré-ordens genuínas (nas quais a antissimetria falha, gerando classes de equivalência não triviais):
 </p>
@@ -386,13 +386,13 @@ where
 </div>
 </div>
 </div>
-<div id="outline-container-org5bf39d4" class="outline-3">
-<h3 id="org5bf39d4">Representações</h3>
-<div class="outline-text-3" id="text-org5bf39d4">
+<div id="outline-container-orge6f3c85" class="outline-3">
+<h3 id="orge6f3c85">Representações</h3>
+<div class="outline-text-3" id="text-orge6f3c85">
 </div>
-<div id="outline-container-org80f32d1" class="outline-4">
-<h4 id="org80f32d1"><code>Display</code></h4>
-<div class="outline-text-4" id="text-org80f32d1">
+<div id="outline-container-org05550bf" class="outline-4">
+<h4 id="org05550bf"><code>Display</code></h4>
+<div class="outline-text-4" id="text-org05550bf">
 <div class="org-src-container">
 <pre class="src src-rust">impl&lt;T: fmt::Display&gt; fmt::Display for Dual&lt;T&gt; {
     fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {
