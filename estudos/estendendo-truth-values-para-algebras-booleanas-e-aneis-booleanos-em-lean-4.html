@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<!-- 2026-11-27 Fri 22:27 -->
+<!-- 2026-11-27 Fri 22:45 -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Estendendo Truth-Values para Álgebras Booleanas e Anéis Booleanos em Lean 4</title>
@@ -60,53 +60,53 @@
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org9454e4c">Extensão da Especificação em Maude: O Módulo <code>BOOLEAN</code></a></li>
-<li><a href="#org697d7bd">Extensão <code>TruthValue</code> em Lean 4</a>
+<li><a href="#org1671e22">Extensão da Especificação em Maude: O Módulo <code>BOOLEAN</code></a></li>
+<li><a href="#org00efcab">Extensão <code>TruthValue</code> em Lean 4</a>
 <ul>
-<li><a href="#orge784eae">Importação e Operadores Derivados</a></li>
-<li><a href="#orgbb0d0df">Notação Mixfix Estendida</a></li>
+<li><a href="#org5bac168">Importação e Operadores Derivados</a></li>
+<li><a href="#org73f7665">Notação Mixfix Estendida</a></li>
 </ul>
 </li>
-<li><a href="#orgd4fbbf8">Teoremas Lógicos, Provas em LaTeX e Construção em Lean 4</a>
+<li><a href="#orgb5a7c01">Teoremas Lógicos, Provas em LaTeX e Construção em Lean 4</a>
 <ul>
-<li><a href="#orge336f3b">Metodologia de Prova: Reescrita Simbólica vs. Análise de Casos</a></li>
-<li><a href="#org71ea2a1">1. Caracterização da Implicação e Contraposição</a>
+<li><a href="#org1d3edfa">Metodologia de Prova: Reescrita Simbólica vs. Análise de Casos</a></li>
+<li><a href="#orga5cf5a3">1. Caracterização da Implicação e Contraposição</a>
 <ul>
-<li><a href="#org31af17f">Prova Matemática (LaTeX)</a></li>
-<li><a href="#orgd16db9e">Implementação em Lean 4</a></li>
+<li><a href="#org6288ad6">Prova Matemática (LaTeX)</a></li>
+<li><a href="#org952ea1b">Implementação em Lean 4</a></li>
 </ul>
 </li>
-<li><a href="#org12ec38b">2. Propriedades da Equivalência (\(\Leftrightarrow\))</a>
+<li><a href="#orgc83ffd7">2. Propriedades da Equivalência (\(\Leftrightarrow\))</a>
 <ul>
-<li><a href="#org4552213">Prova Matemática (LaTeX)</a></li>
-<li><a href="#org6dae0fc">Implementação em Lean 4</a></li>
+<li><a href="#orga400a6c">Prova Matemática (LaTeX)</a></li>
+<li><a href="#orgc8fd589">Implementação em Lean 4</a></li>
 </ul>
 </li>
-<li><a href="#orgdb13598">3. Estrutura de Grupo Abeliano e Anel Booleano (\(\oplus, \land\))</a>
+<li><a href="#orgd4b66da">3. Estrutura de Grupo Abeliano e Anel Booleano (\(\oplus, \land\))</a>
 <ul>
-<li><a href="#org82067f0">Prova Matemática (LaTeX)</a></li>
-<li><a href="#org5d1a0fc">Implementação em Lean 4</a></li>
+<li><a href="#org78f6fb2">Prova Matemática (LaTeX)</a></li>
+<li><a href="#org4ded072">Implementação em Lean 4</a></li>
 </ul>
 </li>
-<li><a href="#org147bf3e">4. Leis de Absorção (Estrutura de Reticulado Distributivo)</a>
+<li><a href="#org605e866">4. Leis de Absorção (Estrutura de Reticulado Distributivo)</a>
 <ul>
-<li><a href="#orgb6991d2">Prova Matemática (LaTeX)</a></li>
-<li><a href="#org95d5b22">Implementação em Lean 4</a></li>
+<li><a href="#orgd504d39">Prova Matemática (LaTeX)</a></li>
+<li><a href="#org8109260">Implementação em Lean 4</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgd1c9af6">Integrando com a Hierarquia Algébrica (<code>StrangeAlgebras</code>)</a>
+<li><a href="#orge088bd2">Integrando com a Hierarquia Algébrica (<code>StrangeAlgebras</code>)</a>
 <ul>
-<li><a href="#orga9eab61">Compilação Conjunta via Org-Babel</a></li>
+<li><a href="#orgaf348e9">Compilação Conjunta via Org-Babel</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </nav>
-<div id="outline-container-org9454e4c" class="outline-2">
-<h2 id="org9454e4c">Extensão da Especificação em Maude: O Módulo <code>BOOLEAN</code></h2>
-<div class="outline-text-2" id="text-org9454e4c">
+<div id="outline-container-org1671e22" class="outline-2">
+<h2 id="org1671e22">Extensão da Especificação em Maude: O Módulo <code>BOOLEAN</code></h2>
+<div class="outline-text-2" id="text-org1671e22">
 <p>
 Na especificação algébrica em Maude (Clavel et al., <i>All About Maude</i>), o módulo funcional <code>BOOLEAN</code> importa (<code>protecting</code>) o módulo básico <code>TRUTH-VALUES</code> e introduz conectivos derivados — implicação (<code>_implies_</code>), equivalência (<code>_iff_</code>) e disjunção exclusiva (<code>_xor_</code>) — definidos por equações redutoras sobre os construtores <code>true</code> e <code>false</code>.
 </p>
@@ -139,16 +139,16 @@ endfm
 </div>
 </div>
 </div>
-<div id="outline-container-org697d7bd" class="outline-2">
-<h2 id="org697d7bd">Extensão <code>TruthValue</code> em Lean 4</h2>
-<div class="outline-text-2" id="text-org697d7bd">
+<div id="outline-container-org00efcab" class="outline-2">
+<h2 id="org00efcab">Extensão <code>TruthValue</code> em Lean 4</h2>
+<div class="outline-text-2" id="text-org00efcab">
 <p>
 No Lean 4, estendemos o módulo anterior importando <code>TruthValues</code> (ou definindo os novos operadores diretamente no <i>namespace</i> <code>TruthValue</code>). Além de reproduzir as equações do Maude, estabelecemos a ponte com a Álgebra Abstrata (Lang, Capítulos I e II): provamos que \((\mathsf{TruthValue}, \oplus, \land, \mathsf{f}, \mathsf{t})\) forma um <b><b>Anel Booleano</b></b> (um anel comutativo com unidade onde todo elemento é idempotente: \(x^2 = x\)).
 </p>
 </div>
-<div id="outline-container-orge784eae" class="outline-3">
-<h3 id="orge784eae">Importação e Operadores Derivados</h3>
-<div class="outline-text-3" id="text-orge784eae">
+<div id="outline-container-org5bac168" class="outline-3">
+<h3 id="org5bac168">Importação e Operadores Derivados</h3>
+<div class="outline-text-3" id="text-org5bac168">
 <div class="org-src-container">
 <pre class="src src-lean4">import TruthValues
 
@@ -172,9 +172,9 @@ def xor : TruthValue → TruthValue → TruthValue
 </div>
 </div>
 </div>
-<div id="outline-container-orgbb0d0df" class="outline-3">
-<h3 id="orgbb0d0df">Notação Mixfix Estendida</h3>
-<div class="outline-text-3" id="text-orgbb0d0df">
+<div id="outline-container-org73f7665" class="outline-3">
+<h3 id="org73f7665">Notação Mixfix Estendida</h3>
+<div class="outline-text-3" id="text-org73f7665">
 <p>
 Atribuímos precedências compatíveis com a hierarquia lógica padrão: negação (<code>75</code>) \(>\) conjunção (<code>35</code>) \(>\) disjunção/XOR (<code>30</code>) \(>\) implicação (<code>25</code>, associativa à direita) \(>\) equivalência (<code>20</code>).
 </p>
@@ -188,13 +188,13 @@ scoped infixl:30 " ⊕ " =&gt; xor
 </div>
 </div>
 </div>
-<div id="outline-container-orgd4fbbf8" class="outline-2">
-<h2 id="orgd4fbbf8">Teoremas Lógicos, Provas em LaTeX e Construção em Lean 4</h2>
-<div class="outline-text-2" id="text-orgd4fbbf8">
+<div id="outline-container-orgb5a7c01" class="outline-2">
+<h2 id="orgb5a7c01">Teoremas Lógicos, Provas em LaTeX e Construção em Lean 4</h2>
+<div class="outline-text-2" id="text-orgb5a7c01">
 </div>
-<div id="outline-container-orge336f3b" class="outline-3">
-<h3 id="orge336f3b">Metodologia de Prova: Reescrita Simbólica vs. Análise de Casos</h3>
-<div class="outline-text-3" id="text-orge336f3b">
+<div id="outline-container-org1d3edfa" class="outline-3">
+<h3 id="org1d3edfa">Metodologia de Prova: Reescrita Simbólica vs. Análise de Casos</h3>
+<div class="outline-text-3" id="text-org1d3edfa">
 <p>
 Neste módulo avançado, combinamos duas técnicas complementares no Lean 4:
 </p>
@@ -208,13 +208,13 @@ Neste módulo avançado, combinamos duas técnicas complementares no Lean 4:
 </p>
 </div>
 </div>
-<div id="outline-container-org71ea2a1" class="outline-3">
-<h3 id="org71ea2a1">1. Caracterização da Implicação e Contraposição</h3>
-<div class="outline-text-3" id="text-org71ea2a1">
+<div id="outline-container-orga5cf5a3" class="outline-3">
+<h3 id="orga5cf5a3">1. Caracterização da Implicação e Contraposição</h3>
+<div class="outline-text-3" id="text-orga5cf5a3">
 </div>
-<div id="outline-container-org31af17f" class="outline-4">
-<h4 id="org31af17f">Prova Matemática (LaTeX)</h4>
-<div class="outline-text-4" id="text-org31af17f">
+<div id="outline-container-org6288ad6" class="outline-4">
+<h4 id="org6288ad6">Prova Matemática (LaTeX)</h4>
+<div class="outline-text-4" id="text-org6288ad6">
 <p>
 <b>Proposição 1.1 (Eliminação da Implicação).</b> Para quaisquer \(p, q \in \mathsf{TruthValue}\),
 \[(p \Rightarrow q) = (\neg p) \lor q.\]
@@ -239,9 +239,9 @@ Neste módulo avançado, combinamos duas técnicas complementares no Lean 4:
 </p>
 </div>
 </div>
-<div id="outline-container-orgd16db9e" class="outline-4">
-<h4 id="orgd16db9e">Implementação em Lean 4</h4>
-<div class="outline-text-4" id="text-orgd16db9e">
+<div id="outline-container-org952ea1b" class="outline-4">
+<h4 id="org952ea1b">Implementação em Lean 4</h4>
+<div class="outline-text-4" id="text-org952ea1b">
 <p>
 Abaixo, demonstramos <code>implies_eq_not_or</code> por casos e derivamos <code>contraposition</code> simbolicamente usando <code>calc</code> e <code>rw</code>:
 </p>
@@ -264,13 +264,13 @@ theorem contraposition (p q : TruthValue) : (p ⇒ q) = (¬ q ⇒ ¬ p) := by
 </div>
 </div>
 </div>
-<div id="outline-container-org12ec38b" class="outline-3">
-<h3 id="org12ec38b">2. Propriedades da Equivalência (\(\Leftrightarrow\))</h3>
-<div class="outline-text-3" id="text-org12ec38b">
+<div id="outline-container-orgc83ffd7" class="outline-3">
+<h3 id="orgc83ffd7">2. Propriedades da Equivalência (\(\Leftrightarrow\))</h3>
+<div class="outline-text-3" id="text-orgc83ffd7">
 </div>
-<div id="outline-container-org4552213" class="outline-4">
-<h4 id="org4552213">Prova Matemática (LaTeX)</h4>
-<div class="outline-text-4" id="text-org4552213">
+<div id="outline-container-orga400a6c" class="outline-4">
+<h4 id="orga400a6c">Prova Matemática (LaTeX)</h4>
+<div class="outline-text-4" id="text-orga400a6c">
 <p>
 <b>Proposição 2.1 (Reflexividade e Comutatividade de \(\Leftrightarrow\)).</b> Para quaisquer \(p, q \in \mathsf{TruthValue}\):
 </p>
@@ -307,9 +307,9 @@ theorem contraposition (p q : TruthValue) : (p ⇒ q) = (¬ q ⇒ ¬ p) := by
 </ul>
 </div>
 </div>
-<div id="outline-container-org6dae0fc" class="outline-4">
-<h4 id="org6dae0fc">Implementação em Lean 4</h4>
-<div class="outline-text-4" id="text-org6dae0fc">
+<div id="outline-container-orgc8fd589" class="outline-4">
+<h4 id="orgc8fd589">Implementação em Lean 4</h4>
+<div class="outline-text-4" id="text-orgc8fd589">
 <div class="org-src-container">
 <pre class="src src-lean4">theorem iff_refl (p : TruthValue) : (p ⇔ p) = t := by
   cases p &lt;;&gt; rfl
@@ -328,16 +328,16 @@ theorem iff_eq_implies_and (p q : TruthValue) : (p ⇔ q) = ((p ⇒ q) ∧ (q �
 </div>
 </div>
 </div>
-<div id="outline-container-orgdb13598" class="outline-3">
-<h3 id="orgdb13598">3. Estrutura de Grupo Abeliano e Anel Booleano (\(\oplus, \land\))</h3>
-<div class="outline-text-3" id="text-orgdb13598">
+<div id="outline-container-orgd4b66da" class="outline-3">
+<h3 id="orgd4b66da">3. Estrutura de Grupo Abeliano e Anel Booleano (\(\oplus, \land\))</h3>
+<div class="outline-text-3" id="text-orgd4b66da">
 <p>
 Na Álgebra de Lang (Capítulo II, §1), um <b><b>Anel Booleano</b></b> é um anel com unidade \((R, +, \cdot, 0, 1)\) em que todo elemento é idempotente (\(x \cdot x = x\)). Em \(\mathsf{TruthValue}\), o papel da adição \(+\) é desempenhado pelo \(\mathsf{xor}\) (\(\oplus\)), com elemento neutro \(0 = \mathsf{f}\), e o papel da multiplicação \(\cdot\) é desempenhado pelo \(\mathsf{and}\) (\(\land\)), com unidade \(1 = \mathsf{t}\).
 </p>
 </div>
-<div id="outline-container-org82067f0" class="outline-4">
-<h4 id="org82067f0">Prova Matemática (LaTeX)</h4>
-<div class="outline-text-4" id="text-org82067f0">
+<div id="outline-container-org78f6fb2" class="outline-4">
+<h4 id="org78f6fb2">Prova Matemática (LaTeX)</h4>
+<div class="outline-text-4" id="text-org78f6fb2">
 <p>
 <b>Teorema 3.1 (Grupo Abeliano Aditivo).</b> \((\mathsf{TruthValue}, \oplus, \mathsf{f})\) é um grupo abeliano em que todo elemento é seu próprio inverso aditivo (\(p \oplus p = \mathsf{f}\), i.e., anel de característica \(2\)).
 </p>
@@ -372,9 +372,9 @@ Na Álgebra de Lang (Capítulo II, §1), um <b><b>Anel Booleano</b></b> é um an
 </ol>
 </div>
 </div>
-<div id="outline-container-org5d1a0fc" class="outline-4">
-<h4 id="org5d1a0fc">Implementação em Lean 4</h4>
-<div class="outline-text-4" id="text-org5d1a0fc">
+<div id="outline-container-org4ded072" class="outline-4">
+<h4 id="org4ded072">Implementação em Lean 4</h4>
+<div class="outline-text-4" id="text-org4ded072">
 <div class="org-src-container">
 <pre class="src src-lean4">-- Axiomas de Grupo Abeliano para (TruthValue, ⊕, f)
 theorem xor_comm (p q : TruthValue) : (p ⊕ q) = (q ⊕ p) := by
@@ -407,16 +407,16 @@ theorem land_idem (p : TruthValue) : (p ∧ p) = p := by
 </div>
 </div>
 </div>
-<div id="outline-container-org147bf3e" class="outline-3">
-<h3 id="org147bf3e">4. Leis de Absorção (Estrutura de Reticulado Distributivo)</h3>
-<div class="outline-text-3" id="text-org147bf3e">
+<div id="outline-container-org605e866" class="outline-3">
+<h3 id="org605e866">4. Leis de Absorção (Estrutura de Reticulado Distributivo)</h3>
+<div class="outline-text-3" id="text-org605e866">
 <p>
 Para completar a caracterização de \((\mathsf{TruthValue}, \land, \lor, \neg, \mathsf{f}, \mathsf{t})\) como uma <b><b>Álgebra Booleana</b></b> no sentido estrito, provamos as duas leis de absorção e as leis de complementaridade.
 </p>
 </div>
-<div id="outline-container-orgb6991d2" class="outline-4">
-<h4 id="orgb6991d2">Prova Matemática (LaTeX)</h4>
-<div class="outline-text-4" id="text-orgb6991d2">
+<div id="outline-container-orgd504d39" class="outline-4">
+<h4 id="orgd504d39">Prova Matemática (LaTeX)</h4>
+<div class="outline-text-4" id="text-orgd504d39">
 <p>
 <b>Proposição 4.1 (Leis de Absorção e Complementaridade).</b> Para quaisquer \(p, q \in \mathsf{TruthValue}\):
 </p>
@@ -434,9 +434,9 @@ Para completar a caracterização de \((\mathsf{TruthValue}, \land, \lor, \neg, 
 </ol>
 </div>
 </div>
-<div id="outline-container-org95d5b22" class="outline-4">
-<h4 id="org95d5b22">Implementação em Lean 4</h4>
-<div class="outline-text-4" id="text-org95d5b22">
+<div id="outline-container-org8109260" class="outline-4">
+<h4 id="org8109260">Implementação em Lean 4</h4>
+<div class="outline-text-4" id="text-org8109260">
 <div class="org-src-container">
 <pre class="src src-lean4">theorem land_lor_absorb (p q : TruthValue) : (p ∧ (p ∨ q)) = p := by
   cases p &lt;;&gt; rfl
@@ -457,9 +457,9 @@ end TruthValue
 </div>
 </div>
 </div>
-<div id="outline-container-orgd1c9af6" class="outline-2">
-<h2 id="orgd1c9af6">Integrando com a Hierarquia Algébrica (<code>StrangeAlgebras</code>)</h2>
-<div class="outline-text-2" id="text-orgd1c9af6">
+<div id="outline-container-orge088bd2" class="outline-2">
+<h2 id="orge088bd2">Integrando com a Hierarquia Algébrica (<code>StrangeAlgebras</code>)</h2>
+<div class="outline-text-2" id="text-orge088bd2">
 <p>
 Com as provas acima verificadas, <code>TruthValue</code> pode instanciar diretamente as classes algébricas que estamos construindo para a Álgebra de Lang:
 </p>
@@ -469,9 +469,9 @@ Com as provas acima verificadas, <code>TruthValue</code> pode instanciar diretam
 <li>A combinação <b>(TruthValue, ⊕, ∧, f, t)</b> instancia <code>BooleanRing</code>, ilustrando a dualidade de Stone clássica entre Álgebras Booleanas e Anéis Booleanos.</li>
 </ol>
 </div>
-<div id="outline-container-orga9eab61" class="outline-3">
-<h3 id="orga9eab61">Compilação Conjunta via Org-Babel</h3>
-<div class="outline-text-3" id="text-orga9eab61">
+<div id="outline-container-orgaf348e9" class="outline-3">
+<h3 id="orgaf348e9">Compilação Conjunta via Org-Babel</h3>
+<div class="outline-text-3" id="text-orgaf348e9">
 <ol class="org-ol">
 <li>No documento anterior, execute <code>C-c C-v t</code> para gerar <code>TruthValues.lean</code>.</li>
 <li>Neste documento, execute <code>C-c C-v t</code> para gerar <code>BooleanAlgebra.lean</code>.</li>

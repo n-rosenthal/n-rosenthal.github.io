@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<!-- 2026-11-27 Fri 22:27 -->
+<!-- 2026-11-27 Fri 22:45 -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Polinômios de Zhegalkin, Anéis Booleanos Livres e Transformada de Möbius (Lean 4 + Rust)</title>
@@ -60,32 +60,32 @@
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgbe6e991">Visão Geral: Do Valor de Verdade ao Anel Booleano Livre</a></li>
-<li><a href="#orgd5b4a51">Camada Formal em Lean 4 (<code>Zhegalkin.lean</code>)</a>
+<li><a href="#org58fa1f0">Visão Geral: Do Valor de Verdade ao Anel Booleano Livre</a></li>
+<li><a href="#org92995f1">Camada Formal em Lean 4 (<code>Zhegalkin.lean</code>)</a>
 <ul>
-<li><a href="#orgcf9583f">Representação de Vetores de Bits e Funções Booleanas</a></li>
-<li><a href="#org64a807d">Teorema 1: Estrutura de Anel Booleano sobre \(\mathcal{B}_n\)</a>
+<li><a href="#orgad27ae6">Representação de Vetores de Bits e Funções Booleanas</a></li>
+<li><a href="#org87174c1">Teorema 1: Estrutura de Anel Booleano sobre \(\mathcal{B}_n\)</a>
 <ul>
-<li><a href="#org2986ca0">Prova Matemática (LaTeX)</a></li>
-<li><a href="#orgfb82132">Implementação em Lean 4</a></li>
+<li><a href="#org87a052d">Prova Matemática (LaTeX)</a></li>
+<li><a href="#orgefa0b13">Implementação em Lean 4</a></li>
 </ul>
 </li>
-<li><a href="#orgf52f292">Expansão de Shannon (Decomposição de Boole)</a>
+<li><a href="#org514c9c3">Expansão de Shannon (Decomposição de Boole)</a>
 <ul>
-<li><a href="#org6bd5d6b">Prova Matemática (LaTeX)</a></li>
-<li><a href="#orgd98423a">Implementação em Lean 4</a></li>
+<li><a href="#orge13287b">Prova Matemática (LaTeX)</a></li>
+<li><a href="#org740854a">Implementação em Lean 4</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org789f5da">Motor Computacional em Rust: Transformada Rápida de Möbius</a></li>
-<li><a href="#org0d33646">Roteiro de Verificação e Próximo Capítulo</a></li>
+<li><a href="#orgf72c0b5">Motor Computacional em Rust: Transformada Rápida de Möbius</a></li>
+<li><a href="#org741d14a">Roteiro de Verificação e Próximo Capítulo</a></li>
 </ul>
 </div>
 </nav>
-<div id="outline-container-orgbe6e991" class="outline-2">
-<h2 id="orgbe6e991">Visão Geral: Do Valor de Verdade ao Anel Booleano Livre</h2>
-<div class="outline-text-2" id="text-orgbe6e991">
+<div id="outline-container-org58fa1f0" class="outline-2">
+<h2 id="org58fa1f0">Visão Geral: Do Valor de Verdade ao Anel Booleano Livre</h2>
+<div class="outline-text-2" id="text-org58fa1f0">
 <p>
 Nos três documentos anteriores, partimos de <code>TruthValue</code> (\(\mathbb{F}_2\)) e provamos que \((\mathsf{TruthValue}, \oplus, \land, \mathsf{f}, \mathsf{t})\) é um <b><b>Anel Booleano</b></b> de característica \(2\). 
 </p>
@@ -109,13 +109,13 @@ Neste estudo:
 </ol>
 </div>
 </div>
-<div id="outline-container-orgd5b4a51" class="outline-2">
-<h2 id="orgd5b4a51">Camada Formal em Lean 4 (<code>Zhegalkin.lean</code>)</h2>
-<div class="outline-text-2" id="text-orgd5b4a51">
+<div id="outline-container-org92995f1" class="outline-2">
+<h2 id="org92995f1">Camada Formal em Lean 4 (<code>Zhegalkin.lean</code>)</h2>
+<div class="outline-text-2" id="text-org92995f1">
 </div>
-<div id="outline-container-orgcf9583f" class="outline-3">
-<h3 id="orgcf9583f">Representação de Vetores de Bits e Funções Booleanas</h3>
-<div class="outline-text-3" id="text-orgcf9583f">
+<div id="outline-container-orgad27ae6" class="outline-3">
+<h3 id="orgad27ae6">Representação de Vetores de Bits e Funções Booleanas</h3>
+<div class="outline-text-3" id="text-orgad27ae6">
 <p>
 Representamos uma valoração de \(n\) variáveis booleanas como um vetor <code>Fin n → TruthValue</code> (ou indexada por um subconjunto <code>Finset (Fin n)</code>). Uma função booleana de \(n\) variáveis é simplesmente o espaço funcional <code>(Fin n → TruthValue) → TruthValue</code>.
 </p>
@@ -142,13 +142,13 @@ def fnMul  {n : Nat} (f g : BoolFn n) : BoolFn n := fun v =&gt; TruthValue.land 
 </div>
 </div>
 </div>
-<div id="outline-container-org64a807d" class="outline-3">
-<h3 id="org64a807d">Teorema 1: Estrutura de Anel Booleano sobre \(\mathcal{B}_n\)</h3>
-<div class="outline-text-3" id="text-org64a807d">
+<div id="outline-container-org87174c1" class="outline-3">
+<h3 id="org87174c1">Teorema 1: Estrutura de Anel Booleano sobre \(\mathcal{B}_n\)</h3>
+<div class="outline-text-3" id="text-org87174c1">
 </div>
-<div id="outline-container-org2986ca0" class="outline-4">
-<h4 id="org2986ca0">Prova Matemática (LaTeX)</h4>
-<div class="outline-text-4" id="text-org2986ca0">
+<div id="outline-container-org87a052d" class="outline-4">
+<h4 id="org87a052d">Prova Matemática (LaTeX)</h4>
+<div class="outline-text-4" id="text-org87a052d">
 <p>
 <b>Teorema 1.1 (Anel Booleano de Funções).</b> Para todo \(n \in \mathbb{N}\), o conjunto \(\mathcal{B}_n = (\mathsf{Fin}\ n \to \mathsf{TruthValue}) \to \mathsf{TruthValue}\) munido das operações pontuais \((f \oplus g)(v) = f(v) \oplus g(v)\) e \((f \land g)(v) = f(v) \land g(v)\) forma um Anel Booleano.
 </p>
@@ -158,9 +158,9 @@ def fnMul  {n : Nat} (f g : BoolFn n) : BoolFn n := fun v =&gt; TruthValue.land 
 </p>
 </div>
 </div>
-<div id="outline-container-orgfb82132" class="outline-4">
-<h4 id="orgfb82132">Implementação em Lean 4</h4>
-<div class="outline-text-4" id="text-orgfb82132">
+<div id="outline-container-orgefa0b13" class="outline-4">
+<h4 id="orgefa0b13">Implementação em Lean 4</h4>
+<div class="outline-text-4" id="text-orgefa0b13">
 <p>
 No Lean 4, a tática <code>funext v</code> introduz um vetor arbitrário \(v : \mathsf{Fin}\ n \to \mathsf{TruthValue}\) e reduz a igualdade entre funções à igualdade entre seus valores pontuais:
 </p>
@@ -188,16 +188,16 @@ instance (n : Nat) : BooleanRing (BoolFn n) where
 </div>
 </div>
 </div>
-<div id="outline-container-orgf52f292" class="outline-3">
-<h3 id="orgf52f292">Expansão de Shannon (Decomposição de Boole)</h3>
-<div class="outline-text-3" id="text-orgf52f292">
+<div id="outline-container-org514c9c3" class="outline-3">
+<h3 id="org514c9c3">Expansão de Shannon (Decomposição de Boole)</h3>
+<div class="outline-text-3" id="text-org514c9c3">
 <p>
 A existência da Forma Normal Algébrica fundamenta-se na <b><b>Expansão de Shannon</b></b> (decomposição em relação a uma variável \(x_i\)):
 </p>
 </div>
-<div id="outline-container-org6bd5d6b" class="outline-4">
-<h4 id="org6bd5d6b">Prova Matemática (LaTeX)</h4>
-<div class="outline-text-4" id="text-org6bd5d6b">
+<div id="outline-container-orge13287b" class="outline-4">
+<h4 id="orge13287b">Prova Matemática (LaTeX)</h4>
+<div class="outline-text-4" id="text-orge13287b">
 <p>
 <b>Teorema 2.1 (Expansão de Shannon sobre \(\mathbb{F}_2\)).</b> Para toda função booleana \(f(x_0, \dots, x_{n-1})\) e qualquer variável \(x_i\):
 \[f(\mathbf{x}) = f(\mathbf{x}|_{x_i = \mathsf{f}}) \oplus \Big( x_i \land \big( f(\mathbf{x}|_{x_i = \mathsf{f}}) \oplus f(\mathbf{x}|_{x_i = \mathsf{t}}) \big) \Big).\]
@@ -212,9 +212,9 @@ A existência da Forma Normal Algébrica fundamenta-se na <b><b>Expansão de Sha
 </ul>
 </div>
 </div>
-<div id="outline-container-orgd98423a" class="outline-4">
-<h4 id="orgd98423a">Implementação em Lean 4</h4>
-<div class="outline-text-4" id="text-orgd98423a">
+<div id="outline-container-org740854a" class="outline-4">
+<h4 id="org740854a">Implementação em Lean 4</h4>
+<div class="outline-text-4" id="text-org740854a">
 <div class="org-src-container">
 <pre class="src src-lean4">/-- Substituição da i-ésima coordenada de um vetor v por um valor b -/
 def update {n : Nat} (v : Fin n → TruthValue) (i : Fin n) (b : TruthValue) : Fin n → TruthValue :=
@@ -247,9 +247,9 @@ end StrangeAlgebras.Zhegalkin
 </div>
 </div>
 </div>
-<div id="outline-container-org789f5da" class="outline-2">
-<h2 id="org789f5da">Motor Computacional em Rust: Transformada Rápida de Möbius</h2>
-<div class="outline-text-2" id="text-org789f5da">
+<div id="outline-container-orgf72c0b5" class="outline-2">
+<h2 id="orgf72c0b5">Motor Computacional em Rust: Transformada Rápida de Möbius</h2>
+<div class="outline-text-2" id="text-orgf72c0b5">
 <p>
 A Expansão de Shannon aplicada iterativamente para \(i = 0, 1, \dots, n-1\) fornece exatamente o algoritmo <b><b>butterfly XOR</b></b> (Transformada Rápida de Möbius sobre o reticulado booleano \(2^{\{0,\dots,n-1\}}\)).
 </p>
@@ -423,9 +423,9 @@ mod tests {
 </div>
 </div>
 </div>
-<div id="outline-container-org0d33646" class="outline-2">
-<h2 id="org0d33646">Roteiro de Verificação e Próximo Capítulo</h2>
-<div class="outline-text-2" id="text-org0d33646">
+<div id="outline-container-org741d14a" class="outline-2">
+<h2 id="org741d14a">Roteiro de Verificação e Próximo Capítulo</h2>
+<div class="outline-text-2" id="text-org741d14a">
 <ol class="org-ol">
 <li><b><b>Sincronização:</b></b> Execute <code>C-c C-v t</code> para extrair tanto o arquivo Lean (`lean/StrangeAlgebras/Zhegalkin.lean`) quanto o módulo Rust (`rust/crates/ch02-rings/src/zhegalkin.rs`).</li>
 <li><b><b>Validação:</b></b> Rode <code>lake build</code> para verificar a prova formal da Expansão de Shannon e <code>cargo test</code> para validar a Transformada Rápida de Möbius.</li>

@@ -6,6 +6,13 @@
   <id>https://n-rosenthal.github.io/</id>
   <updated>2026-11-27T00:00:00Z</updated>
   <entry>
+    <title>Álgebra Homológica: Complexos de Cadeias, Homologia Simplicial e Torção (Lean 4 + Rust)</title>
+    <link href="https://n-rosenthal.github.io/estudos/algebra-homologica-complexos-de-cadeias-homologia-simplicial-e-torcao-lean-4-rust.html"/>
+    <id>https://n-rosenthal.github.io/estudos/algebra-homologica-complexos-de-cadeias-homologia-simplicial-e-torcao-lean-4-rust.html</id>
+    <updated>2026-11-27T00:00:00Z</updated>
+    <summary>Formalização de complexos de cadeias e da inclusão im(∂_{n+1}) ⊆ ker(∂_n) em Lean 4 com provas em LaTeX, acompanhada da computação exata de grupos de homologia inteira H_k (números de Betti e torção) via Forma Normal de Smith em Rust.</summary>
+  </entry>
+  <entry>
     <title>Anéis de Polinômios Univariados R[x] e Divisão Euclidiana (Lean 4 + Rust)</title>
     <link href="https://n-rosenthal.github.io/estudos/aneis-de-polinomios-univariados-r-x-e-divisao-euclidiana-lean-4-rust.html"/>
     <id>https://n-rosenthal.github.io/estudos/aneis-de-polinomios-univariados-r-x-e-divisao-euclidiana-lean-4-rust.html</id>
@@ -27,6 +34,27 @@
     <summary>Extensão do módulo TRUTH-VALUES (Maude) para o módulo BOOLEAN completo, formalizando implicação, equivalência, XOR e instanciando as estruturas de Álgebra Booleana e Anel Booleano em Lean 4.</summary>
   </entry>
   <entry>
+    <title>Extensões Algébricas Simples K[x]/(f(x)) e Corpos Finitos F_{p^n} (Lean 4 + Rust)</title>
+    <link href="https://n-rosenthal.github.io/estudos/extensoes-algebricas-simples-k-x-f-x-e-corpos-finitos-f-p-n-lean-4-rust.html"/>
+    <id>https://n-rosenthal.github.io/estudos/extensoes-algebricas-simples-k-x-f-x-e-corpos-finitos-f-p-n-lean-4-rust.html</id>
+    <updated>2026-11-27T00:00:00Z</updated>
+    <summary>Formalização de extensões algébricas simples K[x]/(f(x)) e inversão via Identidade de Bézout em Lean 4, acompanhada da implementação computacional de corpos finitos F_{p^n} e do Teste de Irredutibilidade de Rabin em Rust.</summary>
+  </entry>
+  <entry>
+    <title>Produtos Tensoriais, Propriedade Universal Bilinear e Álgebra Exterior (Lean 4 + Rust)</title>
+    <link href="https://n-rosenthal.github.io/estudos/formalizacao-de-aplicacoes-r-bilineares-e-da-propriedade-universal-do-produto-tensorial-em-lean-4-com-provas-em-latex-acompanhada-da-implementacao-computacional-do-produto-de-kronecker-e-da-algebra-exterior-v-em-rust.html"/>
+    <id>https://n-rosenthal.github.io/estudos/formalizacao-de-aplicacoes-r-bilineares-e-da-propriedade-universal-do-produto-tensorial-em-lean-4-com-provas-em-latex-acompanhada-da-implementacao-computacional-do-produto-de-kronecker-e-da-algebra-exterior-v-em-rust.html</id>
+    <updated>2026-11-27T00:00:00Z</updated>
+    <summary>Formalização de aplicações R-bilineares e da propriedade universal do produto tensorial em Lean 4 com provas em LaTeX, acompanhada da implementação computacional do Produto de Kronecker e da Álgebra Exterior Λ(V) em Rust.</summary>
+  </entry>
+  <entry>
+    <title>Teoria de Galois Finita, Automorfismo de Frobenius, Norma e Traço (Lean 4 + Rust)</title>
+    <link href="https://n-rosenthal.github.io/estudos/formalizacao-de-f-automorfismos-e-grupos-de-galois-em-lean-4-com-provas-em-latex-acompanhada-da-implementacao-computacional-do-endomorfismo-de-frobenius-norma-traco-e-polinomio-minimo-em-rust.html"/>
+    <id>https://n-rosenthal.github.io/estudos/formalizacao-de-f-automorfismos-e-grupos-de-galois-em-lean-4-com-provas-em-latex-acompanhada-da-implementacao-computacional-do-endomorfismo-de-frobenius-norma-traco-e-polinomio-minimo-em-rust.html</id>
+    <updated>2026-11-27T00:00:00Z</updated>
+    <summary>Formalização de F-automorfismos e grupos de Galois em Lean 4 com provas em LaTeX, acompanhada da implementação computacional do endomorfismo de Frobenius, Norma, Traço e Polinômio Mínimo em Rust.</summary>
+  </entry>
+  <entry>
     <title>Implementando a Especificação Truth-Values em Lean</title>
     <link href="https://n-rosenthal.github.io/estudos/implementando-a-especificacao-truth-values-em-lean.html"/>
     <id>https://n-rosenthal.github.io/estudos/implementando-a-especificacao-truth-values-em-lean.html</id>
@@ -39,6 +67,13 @@
     <id>https://n-rosenthal.github.io/estudos/polinomios-de-zhegalkin-aneis-booleanos-livres-e-transformada-de-mobius-lean-4-rust.html</id>
     <updated>2026-11-27T00:00:00Z</updated>
     <summary>Formalização do Anel Booleano Livre em n geradores (Forma Normal Algébrica / Zhegalkin) em Lean 4 com provas em LaTeX e implementação de alta performance da Transformada Rápida de Möbius em Rust.</summary>
+  </entry>
+  <entry>
+    <title>R-Módulos, Aplicações Lineares e Forma Normal de Smith (Lean 4 + Rust)</title>
+    <link href="https://n-rosenthal.github.io/estudos/r-modulos-aplicacoes-lineares-e-forma-normal-de-smith-lean-4-rust.html"/>
+    <id>https://n-rosenthal.github.io/estudos/r-modulos-aplicacoes-lineares-e-forma-normal-de-smith-lean-4-rust.html</id>
+    <updated>2026-11-27T00:00:00Z</updated>
+    <summary>Formalização de R-módulos e aplicações R-lineares em Lean 4 com provas em LaTeX, acompanhada da implementação computacional de Domínios Euclidianos, matrizes e Forma Normal de Smith em Rust.</summary>
   </entry>
   <entry>
     <title>Análise Formal de Conceitos (FCA) e Reticulados de Conceitos em Rust</title>
@@ -171,17 +206,5 @@
     <id>https://n-rosenthal.github.io/estudos/resolucao-de-um-breve-exercicio-em-especificacao-formal-maude-tipos-sortes-e-especies-kinds.html</id>
     <updated>2026-11-17T00:00:00Z</updated>
     <summary>Estudo sobre determinação de tipos em Maude</summary>
-  </entry>
-  <entry>
-    <title>Documentos e Corpus</title>
-    <link href="https://n-rosenthal.github.io/estudos/documentos-e-corpus.html"/>
-    <id>https://n-rosenthal.github.io/estudos/documentos-e-corpus.html</id>
-    <updated>2026-11-16T00:00:00Z</updated>
-  </entry>
-  <entry>
-    <title>Introdução ao Processamento de Linguagem Natural</title>
-    <link href="https://n-rosenthal.github.io/estudos/introducao-ao-processamento-de-linguagem-natural.html"/>
-    <id>https://n-rosenthal.github.io/estudos/introducao-ao-processamento-de-linguagem-natural.html</id>
-    <updated>2026-11-16T00:00:00Z</updated>
   </entry>
 </feed>

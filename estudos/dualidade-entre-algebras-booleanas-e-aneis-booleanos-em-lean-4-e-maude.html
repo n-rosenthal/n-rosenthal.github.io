@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<!-- 2026-11-27 Fri 22:27 -->
+<!-- 2026-11-27 Fri 22:45 -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Dualidade entre Álgebras Booleanas e Anéis Booleanos em Lean 4 e Maude</title>
@@ -60,39 +60,39 @@
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgd77e6df">Visão Geral: A Ponte Lógica-Algébrica (Lang, Capítulos I e II)</a></li>
-<li><a href="#org5ca97da">Especificação Parametrizada em Maude (<code>THEORY</code> e <code>VIEW</code>)</a></li>
-<li><a href="#orga0a5392">Estruturas Algébricas e Equivalência em Lean 4</a>
+<li><a href="#org2a89738">Visão Geral: A Ponte Lógica-Algébrica (Lang, Capítulos I e II)</a></li>
+<li><a href="#org2500cff">Especificação Parametrizada em Maude (<code>THEORY</code> e <code>VIEW</code>)</a></li>
+<li><a href="#org68873ec">Estruturas Algébricas e Equivalência em Lean 4</a>
 <ul>
-<li><a href="#org31390a1">Importação e Hierarquia de Anéis Booleanos</a></li>
-<li><a href="#orgf404acc">Álgebra Booleana Abstrata</a></li>
+<li><a href="#org5987096">Importação e Hierarquia de Anéis Booleanos</a></li>
+<li><a href="#org2162a7f">Álgebra Booleana Abstrata</a></li>
 </ul>
 </li>
-<li><a href="#org74c9d5f">Teoremas Fundamentais da Equivalência de Stone (Provas em LaTeX e Lean 4)</a>
+<li><a href="#org6b1c4ee">Teoremas Fundamentais da Equivalência de Stone (Provas em LaTeX e Lean 4)</a>
 <ul>
-<li><a href="#orgf404931">Metodologia de Prova no Lean 4 para Classes Abstratas</a></li>
-<li><a href="#org9232f54">1. Característica \(2\) em Qualquer Anel Booleano (\(x + x = 0\))</a>
+<li><a href="#org03fcfbb">Metodologia de Prova no Lean 4 para Classes Abstratas</a></li>
+<li><a href="#org98bcaa2">1. Característica \(2\) em Qualquer Anel Booleano (\(x + x = 0\))</a>
 <ul>
-<li><a href="#org9d71cbe">Prova Matemática (LaTeX)</a></li>
-<li><a href="#orgd31e33c">Implementação em Lean 4</a></li>
+<li><a href="#org1da3e81">Prova Matemática (LaTeX)</a></li>
+<li><a href="#org3030242">Implementação em Lean 4</a></li>
 </ul>
 </li>
-<li><a href="#org7070ff3">2. Funtor de Conversão: Todo Anel Booleano é uma Álgebra Booleana</a>
+<li><a href="#org9614833">2. Funtor de Conversão: Todo Anel Booleano é uma Álgebra Booleana</a>
 <ul>
-<li><a href="#org11a886a">Prova Matemática (LaTeX)</a></li>
-<li><a href="#orga667482">Implementação em Lean 4</a></li>
+<li><a href="#orge5f54a0">Prova Matemática (LaTeX)</a></li>
+<li><a href="#orgdd712d5">Implementação em Lean 4</a></li>
 </ul>
 </li>
-<li><a href="#orgf317c1c">3. Instanciação Concreta: <code>TruthValue</code> como <code>BooleanRing</code> e <code>BoolAlg</code></a></li>
+<li><a href="#org64aab32">3. Instanciação Concreta: <code>TruthValue</code> como <code>BooleanRing</code> e <code>BoolAlg</code></a></li>
 </ul>
 </li>
-<li><a href="#orgd6f036f">Próximo Passo: Conexão com o Motor Computacional em Rust</a></li>
+<li><a href="#org49843c6">Próximo Passo: Conexão com o Motor Computacional em Rust</a></li>
 </ul>
 </div>
 </nav>
-<div id="outline-container-orgd77e6df" class="outline-2">
-<h2 id="orgd77e6df">Visão Geral: A Ponte Lógica-Algébrica (Lang, Capítulos I e II)</h2>
-<div class="outline-text-2" id="text-orgd77e6df">
+<div id="outline-container-org2a89738" class="outline-2">
+<h2 id="org2a89738">Visão Geral: A Ponte Lógica-Algébrica (Lang, Capítulos I e II)</h2>
+<div class="outline-text-2" id="text-org2a89738">
 <p>
 Nos dois estudos anteriores, construímos o tipo indutivo <code>TruthValue</code> e provamos suas leis lógicas (\(\land, \lor, \neg, \Rightarrow, \Leftrightarrow\)) e aritméticas (\(\oplus\)). Neste documento, damos o passo estrutural de <b><b>Álgebra Abstrata</b></b>:
 </p>
@@ -104,9 +104,9 @@ Nos dois estudos anteriores, construímos o tipo indutivo <code>TruthValue</code
 </ol>
 </div>
 </div>
-<div id="outline-container-org5ca97da" class="outline-2">
-<h2 id="org5ca97da">Especificação Parametrizada em Maude (<code>THEORY</code> e <code>VIEW</code>)</h2>
-<div class="outline-text-2" id="text-org5ca97da">
+<div id="outline-container-org2500cff" class="outline-2">
+<h2 id="org2500cff">Especificação Parametrizada em Maude (<code>THEORY</code> e <code>VIEW</code>)</h2>
+<div class="outline-text-2" id="text-org2500cff">
 <p>
 Em Maude, estruturas algébricas abstratas são modeladas como <b><b>teorias</b></b> (<code>th</code>) e conectadas a modelos concretos através de <b><b>visões</b></b> (<code>view</code>). Abaixo definimos a teoria de um Anel Booleano e a visão que interpreta <code>Truth-Value</code> como um Anel Booleano:
 </p>
@@ -137,16 +137,16 @@ endv
 </div>
 </div>
 </div>
-<div id="outline-container-orga0a5392" class="outline-2">
-<h2 id="orga0a5392">Estruturas Algébricas e Equivalência em Lean 4</h2>
-<div class="outline-text-2" id="text-orga0a5392">
+<div id="outline-container-org68873ec" class="outline-2">
+<h2 id="org68873ec">Estruturas Algébricas e Equivalência em Lean 4</h2>
+<div class="outline-text-2" id="text-org68873ec">
 <p>
 No Lean 4, o papel das <code>theories</code> e <code>views</code> do Maude é desempenhado por <code>class</code> e <code>instance</code>. Importamos os módulos anteriores e definimos a hierarquia algébrica do Capítulo II do Lang.
 </p>
 </div>
-<div id="outline-container-org31390a1" class="outline-3">
-<h3 id="org31390a1">Importação e Hierarquia de Anéis Booleanos</h3>
-<div class="outline-text-3" id="text-org31390a1">
+<div id="outline-container-org5987096" class="outline-3">
+<h3 id="org5987096">Importação e Hierarquia de Anéis Booleanos</h3>
+<div class="outline-text-3" id="text-org5987096">
 <div class="org-src-container">
 <pre class="src src-lean4">import TruthValues
 import BooleanAlgebra
@@ -176,9 +176,9 @@ class BooleanRing (R : Type u) extends CommRing R where
 </div>
 </div>
 </div>
-<div id="outline-container-orgf404acc" class="outline-3">
-<h3 id="orgf404acc">Álgebra Booleana Abstrata</h3>
-<div class="outline-text-3" id="text-orgf404acc">
+<div id="outline-container-org2162a7f" class="outline-3">
+<h3 id="org2162a7f">Álgebra Booleana Abstrata</h3>
+<div class="outline-text-3" id="text-org2162a7f">
 <p>
 Definimos também a estrutura de Álgebra Booleana pelos axiomas equacionais de Huntington/Reticulado Complementado:
 </p>
@@ -206,13 +206,13 @@ class BoolAlg (B : Type u) where
 </div>
 </div>
 </div>
-<div id="outline-container-org74c9d5f" class="outline-2">
-<h2 id="org74c9d5f">Teoremas Fundamentais da Equivalência de Stone (Provas em LaTeX e Lean 4)</h2>
-<div class="outline-text-2" id="text-org74c9d5f">
+<div id="outline-container-org6b1c4ee" class="outline-2">
+<h2 id="org6b1c4ee">Teoremas Fundamentais da Equivalência de Stone (Provas em LaTeX e Lean 4)</h2>
+<div class="outline-text-2" id="text-org6b1c4ee">
 </div>
-<div id="outline-container-orgf404931" class="outline-3">
-<h3 id="orgf404931">Metodologia de Prova no Lean 4 para Classes Abstratas</h3>
-<div class="outline-text-3" id="text-orgf404931">
+<div id="outline-container-org03fcfbb" class="outline-3">
+<h3 id="org03fcfbb">Metodologia de Prova no Lean 4 para Classes Abstratas</h3>
+<div class="outline-text-3" id="text-org03fcfbb">
 <p>
 Diferente dos documentos anteriores — onde provávamos fatos sobre um tipo concreto (<code>TruthValue</code>) abrindo casos (<code>cases</code>) — aqui provamos teoremas <b><b>universais sobre qualquer tipo abstrato <code>R</code></b></b> equipado com <code>[BooleanRing R]</code>. Como <code>R</code> é desconhecido, a tática <code>cases</code> não se aplica; utilizamos exclusivamente reescrita algébrica (<code>rw</code>), cálculo equacional (<code>calc</code>) e propriedades de anéis.
 </p>
@@ -222,13 +222,13 @@ Diferente dos documentos anteriores — onde provávamos fatos sobre um tipo con
 </p>
 </div>
 </div>
-<div id="outline-container-org9232f54" class="outline-3">
-<h3 id="org9232f54">1. Característica \(2\) em Qualquer Anel Booleano (\(x + x = 0\))</h3>
-<div class="outline-text-3" id="text-org9232f54">
+<div id="outline-container-org98bcaa2" class="outline-3">
+<h3 id="org98bcaa2">1. Característica \(2\) em Qualquer Anel Booleano (\(x + x = 0\))</h3>
+<div class="outline-text-3" id="text-org98bcaa2">
 </div>
-<div id="outline-container-org9d71cbe" class="outline-4">
-<h4 id="org9d71cbe">Prova Matemática (LaTeX)</h4>
-<div class="outline-text-4" id="text-org9d71cbe">
+<div id="outline-container-org1da3e81" class="outline-4">
+<h4 id="org1da3e81">Prova Matemática (LaTeX)</h4>
+<div class="outline-text-4" id="text-org1da3e81">
 <p>
 <b>Teorema 1.1 (Característica \(2\)).</b> Seja \((R, +, \cdot, 0, 1)\) um anel booleano. Então, para todo \(x \in R\), tem-se \(x + x = 0\) e, consequentemente, \(-x = x\).
 </p>
@@ -242,9 +242,9 @@ Por fim, somando \(-x\) a \(x + x = 0\), concluímos \(x = -x\). \(\blacksquare\
 </p>
 </div>
 </div>
-<div id="outline-container-orgd31e33c" class="outline-4">
-<h4 id="orgd31e33c">Implementação em Lean 4</h4>
-<div class="outline-text-4" id="text-orgd31e33c">
+<div id="outline-container-org3030242" class="outline-4">
+<h4 id="org3030242">Implementação em Lean 4</h4>
+<div class="outline-text-4" id="text-org3030242">
 <div class="org-src-container">
 <pre class="src src-lean4">section BooleanRingProperties
 variable {R : Type u} [BooleanRing R]
@@ -287,13 +287,13 @@ end BooleanRingProperties
 </div>
 </div>
 </div>
-<div id="outline-container-org7070ff3" class="outline-3">
-<h3 id="org7070ff3">2. Funtor de Conversão: Todo Anel Booleano é uma Álgebra Booleana</h3>
-<div class="outline-text-3" id="text-org7070ff3">
+<div id="outline-container-org9614833" class="outline-3">
+<h3 id="org9614833">2. Funtor de Conversão: Todo Anel Booleano é uma Álgebra Booleana</h3>
+<div class="outline-text-3" id="text-org9614833">
 </div>
-<div id="outline-container-org11a886a" class="outline-4">
-<h4 id="org11a886a">Prova Matemática (LaTeX)</h4>
-<div class="outline-text-4" id="text-org11a886a">
+<div id="outline-container-orge5f54a0" class="outline-4">
+<h4 id="orge5f54a0">Prova Matemática (LaTeX)</h4>
+<div class="outline-text-4" id="text-orge5f54a0">
 <p>
 <b>Teorema 2.1 (Indução da Estrutura Booleana).</b> Dado um anel booleano \((R, +, \cdot, 0, 1)\), defina sobre \(R\):
 \[a \sqcap b := a \cdot b, \qquad a \sqcup b := a + b + (a \cdot b), \qquad \neg a := 1 + a, \qquad \bot := 0, \qquad \top := 1.\]
@@ -307,9 +307,9 @@ Então \((R, \sqcap, \sqcup, \neg, \bot, \top)\) satisfaz as leis de absorção 
 </ol>
 </div>
 </div>
-<div id="outline-container-orga667482" class="outline-4">
-<h4 id="orga667482">Implementação em Lean 4</h4>
-<div class="outline-text-4" id="text-orga667482">
+<div id="outline-container-orgdd712d5" class="outline-4">
+<h4 id="orgdd712d5">Implementação em Lean 4</h4>
+<div class="outline-text-4" id="text-orgdd712d5">
 <p>
 Provamos formalmente as leis de complementaridade e absorção para qualquer <code>[BooleanRing R]</code>:
 </p>
@@ -355,9 +355,9 @@ end InducedBoolAlg
 </div>
 </div>
 </div>
-<div id="outline-container-orgf317c1c" class="outline-3">
-<h3 id="orgf317c1c">3. Instanciação Concreta: <code>TruthValue</code> como <code>BooleanRing</code> e <code>BoolAlg</code></h3>
-<div class="outline-text-3" id="text-orgf317c1c">
+<div id="outline-container-org64aab32" class="outline-3">
+<h3 id="org64aab32">3. Instanciação Concreta: <code>TruthValue</code> como <code>BooleanRing</code> e <code>BoolAlg</code></h3>
+<div class="outline-text-3" id="text-org64aab32">
 <p>
 Fechamos o ciclo conectando o tipo indutivo <code>TruthValue</code> (definido no primeiro documento) às duas estruturas algébricas abstratas:
 </p>
@@ -409,9 +409,9 @@ end StrangeAlgebras.BooleanDuality
 </div>
 </div>
 </div>
-<div id="outline-container-orgd6f036f" class="outline-2">
-<h2 id="orgd6f036f">Próximo Passo: Conexão com o Motor Computacional em Rust</h2>
-<div class="outline-text-2" id="text-orgd6f036f">
+<div id="outline-container-org49843c6" class="outline-2">
+<h2 id="org49843c6">Próximo Passo: Conexão com o Motor Computacional em Rust</h2>
+<div class="outline-text-2" id="text-org49843c6">
 <p>
 Com <code>TruthValue</code> formalmente instanciado como <code>BooleanRing</code> e <code>BoolAlg</code> em Lean 4, o próximo passo natural no repositório `strange-algebra` é implementar em Rust o anel booleano generalizado \(\mathbb{F}_2^n\) (vetores de bits e funções booleanas / Forma Normal Algébrica — ANF) para computar polinômios de Zhegalkin sobre variáveis booleanas.
 </p>

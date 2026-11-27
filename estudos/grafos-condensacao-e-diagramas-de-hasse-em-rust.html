@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<!-- 2026-11-27 Fri 22:27 -->
+<!-- 2026-11-27 Fri 22:45 -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Grafos, Condensação e Diagramas de Hasse em Rust</title>
@@ -60,15 +60,15 @@
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org53821f6">Implementação</a>
+<li><a href="#org783165c">Implementação</a>
 <ul>
-<li><a href="#org6fc047b">Importações</a></li>
-<li><a href="#org607046e">Alcançabilidade e Condensação de Grafos Direcionados</a></li>
-<li><a href="#orgd1251ff">Extensão Linear (Teorema de Szpilrajn)</a></li>
-<li><a href="#org26ebe00">Relação de Cobertura e Diagrama de Hasse</a></li>
-<li><a href="#orgef5a208">Representações</a>
+<li><a href="#orgfa2b001">Importações</a></li>
+<li><a href="#orge3633a1">Alcançabilidade e Condensação de Grafos Direcionados</a></li>
+<li><a href="#orgb036ef2">Extensão Linear (Teorema de Szpilrajn)</a></li>
+<li><a href="#orgef3bd02">Relação de Cobertura e Diagrama de Hasse</a></li>
+<li><a href="#orge33d217">Representações</a>
 <ul>
-<li><a href="#org419136f"><code>Display</code></a></li>
+<li><a href="#org70893f0"><code>Display</code></a></li>
 </ul>
 </li>
 </ul>
@@ -76,16 +76,16 @@
 </ul>
 </div>
 </nav>
-<div id="outline-container-org53821f6" class="outline-2">
-<h2 id="org53821f6">Implementação</h2>
-<div class="outline-text-2" id="text-org53821f6">
+<div id="outline-container-org783165c" class="outline-2">
+<h2 id="org783165c">Implementação</h2>
+<div class="outline-text-2" id="text-org783165c">
 <p>
 Este módulo estabelece a equivalência estrutural entre grafos direcionados finitos e pré-ordens, implementando alcançabilidade, condensação em DAG, extensão linear (Teorema de Szpilrajn) e redução transitiva (Diagrama de Hasse).
 </p>
 </div>
-<div id="outline-container-org6fc047b" class="outline-3">
-<h3 id="org6fc047b">Importações</h3>
-<div class="outline-text-3" id="text-org6fc047b">
+<div id="outline-container-orgfa2b001" class="outline-3">
+<h3 id="orgfa2b001">Importações</h3>
+<div class="outline-text-3" id="text-orgfa2b001">
 <div class="org-src-container">
 <pre class="src src-rust">use std::collections::{HashMap, HashSet, VecDeque};
 use std::fmt;
@@ -97,9 +97,9 @@ use crate::{PartialOrderSet, PreorderSet, Relation, TotalOrderSet};
 </div>
 </div>
 </div>
-<div id="outline-container-org607046e" class="outline-3">
-<h3 id="org607046e">Alcançabilidade e Condensação de Grafos Direcionados</h3>
-<div class="outline-text-3" id="text-org607046e">
+<div id="outline-container-orge3633a1" class="outline-3">
+<h3 id="orge3633a1">Alcançabilidade e Condensação de Grafos Direcionados</h3>
+<div class="outline-text-3" id="text-orge3633a1">
 <p>
 Dado um grafo direcionado \( G = (V, E) \) com conjunto de vértices \( V \) e arestas direcionadas \( E \subseteq V \times V \), a <b>relação de alcançabilidade</b> \( (\preceq_G) \) é definida por:
 </p>
@@ -167,9 +167,9 @@ impl&lt;T: Ord + Hash + Clone&gt; PreorderSet&lt;T&gt; {
 </div>
 </div>
 </div>
-<div id="outline-container-orgd1251ff" class="outline-3">
-<h3 id="orgd1251ff">Extensão Linear (Teorema de Szpilrajn)</h3>
-<div class="outline-text-3" id="text-orgd1251ff">
+<div id="outline-container-orgb036ef2" class="outline-3">
+<h3 id="orgb036ef2">Extensão Linear (Teorema de Szpilrajn)</h3>
+<div class="outline-text-3" id="text-orgb036ef2">
 <p>
 O <b>Teorema de Szpilrajn</b> garante que toda ordem parcial \( (P, \le) \) pode ser estendida a uma ordem total \( (P, \le_{\text{tot}}) \) compatível (\( x \le y \implies x \le_{\text{tot}} y \)).
 </p>
@@ -246,9 +246,9 @@ Em conjuntos finitos, uma extensão linear corresponde exatamente a uma <b>orden
 </div>
 </div>
 </div>
-<div id="outline-container-org26ebe00" class="outline-3">
-<h3 id="org26ebe00">Relação de Cobertura e Diagrama de Hasse</h3>
-<div class="outline-text-3" id="text-org26ebe00">
+<div id="outline-container-orgef3bd02" class="outline-3">
+<h3 id="orgef3bd02">Relação de Cobertura e Diagrama de Hasse</h3>
+<div class="outline-text-3" id="text-orgef3bd02">
 <p>
 Em uma ordem parcial \( (P, \le) \), dizemos que \( y \) <b>cobre</b> \( x \) (denotado \( x \lessdot y \)) se \( y \) é estritamente maior que \( x \) e não existe nenhum elemento intermediário entre ambos:
 </p>
@@ -348,13 +348,13 @@ impl&lt;T: Eq + Hash + Clone&gt; HasseDiagram&lt;T&gt; {
 </div>
 </div>
 </div>
-<div id="outline-container-orgef5a208" class="outline-3">
-<h3 id="orgef5a208">Representações</h3>
-<div class="outline-text-3" id="text-orgef5a208">
+<div id="outline-container-orge33d217" class="outline-3">
+<h3 id="orge33d217">Representações</h3>
+<div class="outline-text-3" id="text-orge33d217">
 </div>
-<div id="outline-container-org419136f" class="outline-4">
-<h4 id="org419136f"><code>Display</code></h4>
-<div class="outline-text-4" id="text-org419136f">
+<div id="outline-container-org70893f0" class="outline-4">
+<h4 id="org70893f0"><code>Display</code></h4>
+<div class="outline-text-4" id="text-org70893f0">
 <div class="org-src-container">
 <pre class="src src-rust">impl&lt;T: Eq + Hash + fmt::Display&gt; fmt::Display for HasseDiagram&lt;T&gt; {
     fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {

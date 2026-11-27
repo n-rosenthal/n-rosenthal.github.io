@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<!-- 2026-11-27 Fri 22:27 -->
+<!-- 2026-11-27 Fri 22:45 -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Anéis de Polinômios Univariados R[x] e Divisão Euclidiana (Lean 4 + Rust)</title>
@@ -60,27 +60,27 @@
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org58985ae">Visão Geral: Do Anel Booleano aos Polinômios Gerais \(R[x]\) (Lang, Cap. IV)</a></li>
-<li><a href="#orgfd1512d">Camada Formal em Lean 4 (<code>Polynomials.lean</code>)</a>
+<li><a href="#orgc720b2b">Visão Geral: Do Anel Booleano aos Polinômios Gerais \(R[x]\) (Lang, Cap. IV)</a></li>
+<li><a href="#org17df771">Camada Formal em Lean 4 (<code>Polynomials.lean</code>)</a>
 <ul>
-<li><a href="#orgc795ac7">Hierarquia Algébrica: Do Anel Comutativo ao Corpo (\(K\))</a></li>
-<li><a href="#orga139ddc">Representação Densa de Polinômios e Operações Básicas</a></li>
-<li><a href="#org803637b">Teorema da Divisão Euclidiana em \(K[x]\) (Lang, Cap. IV, §1)</a>
+<li><a href="#orged3ddb7">Hierarquia Algébrica: Do Anel Comutativo ao Corpo (\(K\))</a></li>
+<li><a href="#org5826321">Representação Densa de Polinômios e Operações Básicas</a></li>
+<li><a href="#orgcaefae6">Teorema da Divisão Euclidiana em \(K[x]\) (Lang, Cap. IV, §1)</a>
 <ul>
-<li><a href="#org844b39a">Prova Matemática (LaTeX)</a></li>
-<li><a href="#org8dce18e">Implementação da Redução Euclidiana e Prova do Passo em Lean 4</a></li>
+<li><a href="#org786c5f1">Prova Matemática (LaTeX)</a></li>
+<li><a href="#orgdc9ae8a">Implementação da Redução Euclidiana e Prova do Passo em Lean 4</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgb1cbdea">Motor Computacional em Rust: Corpo Primo \(\mathbb{F}_p\) e Anel \(R[x]\)</a></li>
-<li><a href="#orgdffc85e">Próximo Passo: Anéis Quocientes \(K[x]/(f(x))\) e Corpos Finitos \(\mathbb{F}_{p^n}\) (Lang, Cap. V)</a></li>
+<li><a href="#orgcef3de8">Motor Computacional em Rust: Corpo Primo \(\mathbb{F}_p\) e Anel \(R[x]\)</a></li>
+<li><a href="#org5af88d7">Próximo Passo: Anéis Quocientes \(K[x]/(f(x))\) e Corpos Finitos \(\mathbb{F}_{p^n}\) (Lang, Cap. V)</a></li>
 </ul>
 </div>
 </nav>
-<div id="outline-container-org58985ae" class="outline-2">
-<h2 id="org58985ae">Visão Geral: Do Anel Booleano aos Polinômios Gerais \(R[x]\) (Lang, Cap. IV)</h2>
-<div class="outline-text-2" id="text-org58985ae">
+<div id="outline-container-orgc720b2b" class="outline-2">
+<h2 id="orgc720b2b">Visão Geral: Do Anel Booleano aos Polinômios Gerais \(R[x]\) (Lang, Cap. IV)</h2>
+<div class="outline-text-2" id="text-orgc720b2b">
 <p>
 No estudo anterior, construímos o anel booleano livre \(\mathcal{B}_n \cong \mathbb{F}_2[x_0, \dots, x_{n-1}]/(x_i^2 - x_i)\). Agora abandonamos as relações de idempotência (\(x^2 = x\)) e a restrição de característica \(2\) para estudar o <b><b>anel de polinômios em uma indeterminada \(x\)</b></b> sobre um anel comutativo arbitrário \(R\) (Lang, Capítulo IV, §1–§2):
 </p>
@@ -98,13 +98,13 @@ Quando o anel de coeficientes é um <b><b>corpo</b></b> \(K\) (como \(\mathbb{Q}
 </ol>
 </div>
 </div>
-<div id="outline-container-orgfd1512d" class="outline-2">
-<h2 id="orgfd1512d">Camada Formal em Lean 4 (<code>Polynomials.lean</code>)</h2>
-<div class="outline-text-2" id="text-orgfd1512d">
+<div id="outline-container-org17df771" class="outline-2">
+<h2 id="org17df771">Camada Formal em Lean 4 (<code>Polynomials.lean</code>)</h2>
+<div class="outline-text-2" id="text-org17df771">
 </div>
-<div id="outline-container-orgc795ac7" class="outline-3">
-<h3 id="orgc795ac7">Hierarquia Algébrica: Do Anel Comutativo ao Corpo (\(K\))</h3>
-<div class="outline-text-3" id="text-orgc795ac7">
+<div id="outline-container-orged3ddb7" class="outline-3">
+<h3 id="orged3ddb7">Hierarquia Algébrica: Do Anel Comutativo ao Corpo (\(K\))</h3>
+<div class="outline-text-3" id="text-orged3ddb7">
 <p>
 Para realizar a divisão de polinômios \(f(x) = q(x)g(x) + r(x)\), precisamos inverter o coeficiente líder de \(g(x)\) (Lang, Cap. IV, Teorema 1.1). Portanto, estendemos <code>CommRing</code> (definido em <code>BooleanRingDuality.lean</code>) para <code>Field</code>:
 </p>
@@ -130,9 +130,9 @@ def div {K : Type u} [Field K] (a b : K) : K :=
 </div>
 </div>
 </div>
-<div id="outline-container-orga139ddc" class="outline-3">
-<h3 id="orga139ddc">Representação Densa de Polinômios e Operações Básicas</h3>
-<div class="outline-text-3" id="text-orga139ddc">
+<div id="outline-container-org5826321" class="outline-3">
+<h3 id="org5826321">Representação Densa de Polinômios e Operações Básicas</h3>
+<div class="outline-text-3" id="text-org5826321">
 <p>
 Representamos um polinômio \(p(x) = a_0 + a_1 x + \dots + a_d x^d\) como uma lista de coeficientes `[a₀, a₁, &#x2026;, a<sub>d</sub>]` (do termo constante para o termo de maior grau). Para garantir unicidade de representação, definimos a função de normalização <code>normalize</code> que remove zeros à direita (<b>trailing zeros</b>).
 </p>
@@ -182,13 +182,13 @@ end PolyOps
 </div>
 </div>
 </div>
-<div id="outline-container-org803637b" class="outline-3">
-<h3 id="org803637b">Teorema da Divisão Euclidiana em \(K[x]\) (Lang, Cap. IV, §1)</h3>
-<div class="outline-text-3" id="text-org803637b">
+<div id="outline-container-orgcaefae6" class="outline-3">
+<h3 id="orgcaefae6">Teorema da Divisão Euclidiana em \(K[x]\) (Lang, Cap. IV, §1)</h3>
+<div class="outline-text-3" id="text-orgcaefae6">
 </div>
-<div id="outline-container-org844b39a" class="outline-4">
-<h4 id="org844b39a">Prova Matemática (LaTeX)</h4>
-<div class="outline-text-4" id="text-org844b39a">
+<div id="outline-container-org786c5f1" class="outline-4">
+<h4 id="org786c5f1">Prova Matemática (LaTeX)</h4>
+<div class="outline-text-4" id="text-org786c5f1">
 <p>
 <b>Teorema 1.1 (Algoritmo da Divisão em \(K[x]\)).</b> Seja \(K\) um corpo e sejam \(f, g \in K[x]\) com \(g \neq 0\). Existem únicos polinômios \(q, r \in K[x]\) tais que
 \[f = q \cdot g + r \qquad \text{com } r = 0 \text{ ou } \deg(r) < \deg(g).\]
@@ -207,9 +207,9 @@ concluindo a existência com \(q = t + q_1\). \(\blacksquare\)</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org8dce18e" class="outline-4">
-<h4 id="org8dce18e">Implementação da Redução Euclidiana e Prova do Passo em Lean 4</h4>
-<div class="outline-text-4" id="text-org8dce18e">
+<div id="outline-container-orgdc9ae8a" class="outline-4">
+<h4 id="orgdc9ae8a">Implementação da Redução Euclidiana e Prova do Passo em Lean 4</h4>
+<div class="outline-text-4" id="text-orgdc9ae8a">
 <p>
 Abaixo implementamos o passo de redução euclidiana (<code>euclidStep</code>) e provamos formalmente o <b><b>Lema da Anulação do Termo Líder</b></b>, que justifica a terminação e correção do algoritmo:
 </p>
@@ -264,9 +264,9 @@ end StrangeAlgebras.Polynomials
 </div>
 </div>
 </div>
-<div id="outline-container-orgb1cbdea" class="outline-2">
-<h2 id="orgb1cbdea">Motor Computacional em Rust: Corpo Primo \(\mathbb{F}_p\) e Anel \(R[x]\)</h2>
-<div class="outline-text-2" id="text-orgb1cbdea">
+<div id="outline-container-orgcef3de8" class="outline-2">
+<h2 id="orgcef3de8">Motor Computacional em Rust: Corpo Primo \(\mathbb{F}_p\) e Anel \(R[x]\)</h2>
+<div class="outline-text-2" id="text-orgcef3de8">
 <p>
 No Rust, traduzimos a hierarquia `Ring` \(\rightarrow\) `Field` via <b>traits</b> e implementamos:
 </p>
@@ -588,9 +588,9 @@ mod tests {
 </div>
 </div>
 </div>
-<div id="outline-container-orgdffc85e" class="outline-2">
-<h2 id="orgdffc85e">Próximo Passo: Anéis Quocientes \(K[x]/(f(x))\) e Corpos Finitos \(\mathbb{F}_{p^n}\) (Lang, Cap. V)</h2>
-<div class="outline-text-2" id="text-orgdffc85e">
+<div id="outline-container-org5af88d7" class="outline-2">
+<h2 id="org5af88d7">Próximo Passo: Anéis Quocientes \(K[x]/(f(x))\) e Corpos Finitos \(\mathbb{F}_{p^n}\) (Lang, Cap. V)</h2>
+<div class="outline-text-2" id="text-org5af88d7">
 <p>
 Com `div<sub>rem</sub>` e `extended<sub>gcd</sub>` operacionais em \(K[x]\), temos todas as peças para construir <b><b>extensões algébricas simples</b></b> e <b><b>corpos finitos</b></b> \(\mathbb{F}_{p^n} \cong \mathbb{F}_p[x]/(f(x))\) (onde \(f\) é irredutível de grau \(n\)):
 </p>

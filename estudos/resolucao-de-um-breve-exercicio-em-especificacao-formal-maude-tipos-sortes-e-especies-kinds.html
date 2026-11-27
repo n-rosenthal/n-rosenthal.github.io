@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<!-- 2026-11-27 Fri 22:27 -->
+<!-- 2026-11-27 Fri 22:45 -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Resolução de exercício em Especificação Formal (Maude)</title>
@@ -61,39 +61,39 @@
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgc826131">Exercício</a>
+<li><a href="#org7617eb0">Exercício</a>
 <ul>
-<li><a href="#orgb6abd31">Convenções e Regras</a></li>
-<li><a href="#org3d69a94">Fragmentos de Especificações</a></li>
-<li><a href="#org7a37963">Termos a analisar</a></li>
-<li><a href="#org735ff6a">Determinação dos Tipos</a>
+<li><a href="#org070d806">Convenções e Regras</a></li>
+<li><a href="#org5370674">Fragmentos de Especificações</a></li>
+<li><a href="#org7de43c8">Termos a analisar</a></li>
+<li><a href="#org6150d5d">Determinação dos Tipos</a>
 <ul>
-<li><a href="#orgfba5fd8">Em `ESPECIE1`</a></li>
-<li><a href="#org58cbe47">Em `ESPECIE2`</a></li>
+<li><a href="#org803a5b0">Em `ESPECIE1`</a></li>
+<li><a href="#org1a6e278">Em `ESPECIE2`</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgb2cf0a4">Exercício Seguinte</a>
+<li><a href="#orgc50a5e3">Exercício Seguinte</a>
 <ul>
-<li><a href="#orgba2f7c9">Fragmento de Especificação</a></li>
-<li><a href="#org79bb8c3">Tabela de Determinação dos Tipos</a></li>
+<li><a href="#orgb41e588">Fragmento de Especificação</a></li>
+<li><a href="#org3f42590">Tabela de Determinação dos Tipos</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </nav>
-<div id="outline-container-orgc826131" class="outline-2">
-<h2 id="orgc826131">Exercício</h2>
-<div class="outline-text-2" id="text-orgc826131">
+<div id="outline-container-org7617eb0" class="outline-2">
+<h2 id="org7617eb0">Exercício</h2>
+<div class="outline-text-2" id="text-org7617eb0">
 <p>
 Dadas dois fragmentos de especificação em Maude, devemos determinar os tipos de certos termos. Em Maude, um <b>tipo</b> é definido como um supersorte sobre <b>espécies</b> (ou <i>kinds</i>) e <b>sortes</b>.
 </p>
 </div>
-<div id="outline-container-orgb6abd31" class="outline-3">
-<h3 id="orgb6abd31">Convenções e Regras</h3>
-<div class="outline-text-3" id="text-orgb6abd31">
-<div class="margem" id="org01eeb1c">
+<div id="outline-container-org070d806" class="outline-3">
+<h3 id="org070d806">Convenções e Regras</h3>
+<div class="outline-text-3" id="text-org070d806">
+<div class="margem" id="orgc0201e9">
 <p>
 Em Maude, a espécie de um termo mal tipado é denotada por colchetes, como em \([Nat]\) ou \([Int]\).
 </p>
@@ -143,9 +143,9 @@ As duas regras usadas nas resoluções são:
 </p>
 </div>
 </div>
-<div id="outline-container-org3d69a94" class="outline-3">
-<h3 id="org3d69a94">Fragmentos de Especificações</h3>
-<div class="outline-text-3" id="text-org3d69a94">
+<div id="outline-container-org5370674" class="outline-3">
+<h3 id="org5370674">Fragmentos de Especificações</h3>
+<div class="outline-text-3" id="text-org5370674">
 <div class="org-src-container">
 <pre class="src src-maude">fmod ESPECIE1 is
   protecting NAT .
@@ -171,21 +171,21 @@ Na especificação `ESPECIE2`, importamos os números inteiros através de `prot
 </p>
 </div>
 </div>
-<div id="outline-container-org7a37963" class="outline-3">
-<h3 id="org7a37963">Termos a analisar</h3>
-<div class="outline-text-3" id="text-org7a37963">
+<div id="outline-container-org7de43c8" class="outline-3">
+<h3 id="org7de43c8">Termos a analisar</h3>
+<div class="outline-text-3" id="text-org7de43c8">
 <p>
 Devemos determinar os tipos dos termos `op -3`, `op 0` e `op 3`.
 </p>
 </div>
 </div>
-<div id="outline-container-org735ff6a" class="outline-3">
-<h3 id="org735ff6a">Determinação dos Tipos</h3>
-<div class="outline-text-3" id="text-org735ff6a">
+<div id="outline-container-org6150d5d" class="outline-3">
+<h3 id="org6150d5d">Determinação dos Tipos</h3>
+<div class="outline-text-3" id="text-org6150d5d">
 </div>
-<div id="outline-container-orgfba5fd8" class="outline-4">
-<h4 id="orgfba5fd8">Em `ESPECIE1`</h4>
-<div class="outline-text-4" id="text-orgfba5fd8">
+<div id="outline-container-org803a5b0" class="outline-4">
+<h4 id="org803a5b0">Em `ESPECIE1`</h4>
+<div class="outline-text-4" id="text-org803a5b0">
 <ol class="org-ol">
 <li><p>
 <b><b>`op -3`</b></b>: O termo é uma <i>erro sintático</i>. O Maude retorna `didn't expect token -3`. 
@@ -239,9 +239,9 @@ Pelas regras, temos:
 </ol>
 </div>
 </div>
-<div id="outline-container-org58cbe47" class="outline-4">
-<h4 id="org58cbe47">Em `ESPECIE2`</h4>
-<div class="outline-text-4" id="text-org58cbe47">
+<div id="outline-container-org1a6e278" class="outline-4">
+<h4 id="org1a6e278">Em `ESPECIE2`</h4>
+<div class="outline-text-4" id="text-org1a6e278">
 <ol class="org-ol">
 <li><p>
 <b><b>`op -3`</b></b>: Tipo <b>espécie</b> `[Int]`. 
@@ -305,16 +305,16 @@ Pelas regras, temos:
 </div>
 </div>
 </div>
-<div id="outline-container-orgb2cf0a4" class="outline-2">
-<h2 id="orgb2cf0a4">Exercício Seguinte</h2>
-<div class="outline-text-2" id="text-orgb2cf0a4">
+<div id="outline-container-orgc50a5e3" class="outline-2">
+<h2 id="orgc50a5e3">Exercício Seguinte</h2>
+<div class="outline-text-2" id="text-orgc50a5e3">
 <p>
 O exercício seguinte é interessante pois, diferente do anterior, temos aqui as <b>equações</b> que definem a operação.
 </p>
 </div>
-<div id="outline-container-orgba2f7c9" class="outline-3">
-<h3 id="orgba2f7c9">Fragmento de Especificação</h3>
-<div class="outline-text-3" id="text-orgba2f7c9">
+<div id="outline-container-orgb41e588" class="outline-3">
+<h3 id="orgb41e588">Fragmento de Especificação</h3>
+<div class="outline-text-3" id="text-orgb41e588">
 <div class="org-src-container">
 <pre class="src src-maude">protecting INT .
 op _op_ : Nat NzNat -&gt; Int .
@@ -341,9 +341,9 @@ Para quaisquer outros pares de parâmetros distintos de \((2, 3)\) e \((3, 5)\),
 </p>
 </div>
 </div>
-<div id="outline-container-org79bb8c3" class="outline-3">
-<h3 id="org79bb8c3">Tabela de Determinação dos Tipos</h3>
-<div class="outline-text-3" id="text-org79bb8c3">
+<div id="outline-container-org3f42590" class="outline-3">
+<h3 id="org3f42590">Tabela de Determinação dos Tipos</h3>
+<div class="outline-text-3" id="text-org3f42590">
 <table>
 
 

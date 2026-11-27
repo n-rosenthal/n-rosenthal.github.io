@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<!-- 2026-11-27 Fri 22:27 -->
+<!-- 2026-11-27 Fri 22:45 -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Definições para Sistemas de Tipos</title>
@@ -27,41 +27,41 @@
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgdbb4a5f">Definições</a>
+<li><a href="#orgbb340fe">Definições</a>
 <ul>
-<li><a href="#org45be07c">Uma Definição Geral (Peirce, 2002)</a>
+<li><a href="#org62b4faa">Uma Definição Geral (Peirce, 2002)</a>
 <ul>
-<li><a href="#org3034e2a">Breve Histórico da <i>Teoria dos Tipos</i></a></li>
-<li><a href="#org485e522">Classificação quanto à Praticidade</a></li>
-<li><a href="#orge871491">Para que serve um sistema de tipos</a></li>
+<li><a href="#org075bb2a">Breve Histórico da <i>Teoria dos Tipos</i></a></li>
+<li><a href="#org5eb5c63">Classificação quanto à Praticidade</a></li>
+<li><a href="#org1f27131">Para que serve um sistema de tipos</a></li>
 </ul>
 </li>
-<li><a href="#org3249fe3">Sistemas de Tipos Estáticos e Dinâmicos</a></li>
+<li><a href="#org147c913">Sistemas de Tipos Estáticos e Dinâmicos</a></li>
 </ul>
 </li>
-<li><a href="#org4f439b3">Citada em</a></li>
+<li><a href="#org4864d7b">Citada em</a></li>
 </ul>
 </div>
 </nav>
-<div id="outline-container-orgdbb4a5f" class="outline-2">
-<h2 id="orgdbb4a5f">Definições</h2>
-<div class="outline-text-2" id="text-orgdbb4a5f">
+<div id="outline-container-orgbb340fe" class="outline-2">
+<h2 id="orgbb340fe">Definições</h2>
+<div class="outline-text-2" id="text-orgbb340fe">
 <p>
 Sistemas de Tipos são <a href="/estudo/conceitos/frameworks-de-metodos-formais.html">um tipo de <i>framework</i> em Métodos Formais</a>
 </p>
 </div>
-<div id="outline-container-org45be07c" class="outline-3">
-<h3 id="org45be07c">Uma Definição Geral (Peirce, 2002)</h3>
-<div class="outline-text-3" id="text-org45be07c">
+<div id="outline-container-org62b4faa" class="outline-3">
+<h3 id="org62b4faa">Uma Definição Geral (Peirce, 2002)</h3>
+<div class="outline-text-3" id="text-org62b4faa">
 <blockquote>
 <p>
 A type system is a tractable syntactic method for proving the absence of certain program behaviors by classifying phrases according to the kinds of values they compute.
 </p>
 </blockquote>
 </div>
-<div id="outline-container-org3034e2a" class="outline-4">
-<h4 id="org3034e2a">Breve Histórico da <i>Teoria dos Tipos</i></h4>
-<div class="outline-text-4" id="text-org3034e2a">
+<div id="outline-container-org075bb2a" class="outline-4">
+<h4 id="org075bb2a">Breve Histórico da <i>Teoria dos Tipos</i></h4>
+<div class="outline-text-4" id="text-org075bb2a">
 <p>
 São, portantom <i>ferramentas</i> para o estudo de <code>[programas]</code> e para a análise de Linguagens de Programação. São frutos da <code>[Teoria dos Tipos]</code>, um vasto campo interseccional da Lógica, da Matemática e da Filosofia, formalizado no início do século XX por <code>[Bertrand Russel]</code> <code>(1902... )</code> para o tratamento de paradoxos na formalização das fundações da Matemática. Ao longo do século XX, <i>tipos</i> foram utilizados como ferramentas na <code>[Teoria das Provas]</code> e permearam tanto a Filosofia quanto a Ciência, no geral.
 </p>
@@ -73,9 +73,9 @@ Major landmarks in this area include Russell’s original <code>ramified theory 
 </blockquote>
 </div>
 </div>
-<div id="outline-container-org485e522" class="outline-4">
-<h4 id="org485e522">Classificação quanto à Praticidade</h4>
-<div class="outline-text-4" id="text-org485e522">
+<div id="outline-container-org5eb5c63" class="outline-4">
+<h4 id="org5eb5c63">Classificação quanto à Praticidade</h4>
+<div class="outline-text-4" id="text-org5eb5c63">
 <p>
 Em Ciência da Computação, podemos dividir os sistemas de tipos em duas categorias, <b>para fins pragmáticos</b>,
 </p>
@@ -95,14 +95,14 @@ mas ambas comunidades utilizam conceitos, notações e técnicas em comum, apesa
 </p>
 </div>
 </div>
-<div id="outline-container-orge871491" class="outline-4">
-<h4 id="orge871491">Para que serve um sistema de tipos</h4>
-<div class="outline-text-4" id="text-orge871491">
+<div id="outline-container-org1f27131" class="outline-4">
+<h4 id="org1f27131">Para que serve um sistema de tipos</h4>
+<div class="outline-text-4" id="text-org1f27131">
 <p>
 Sistemas de Tipos servem, dentre outras finalidades, à <b>classificação</b> de termos de uma linguagem, de acordo com <b>os valores que os termos produzem</b> (uma vez reduzidos à sua <code>[forma normal]</code>, isto é, quando <i>executados</i>). Um sistema de tipos pode ser visto como uma maneira de <b>computar, <i>aproximada</i> e <i>estaticamente</i>, o comportamento de um termo em um programa.</b>
 </p>
 
-<div class="nota" id="org869e0b8">
+<div class="nota" id="org7844f2f">
 <p>
 Dizemos que sistemas de tipos computam tipos à termos de forma <b>composicional</b>, isto é, (em sistemas <i>estáticos</i>) o <b>tipo de uma expressão</b> depende única e exclusivamente dos <b>tipos de suas sub-expressões</b>.
 </p>
@@ -111,9 +111,9 @@ Dizemos que sistemas de tipos computam tipos à termos de forma <b>composicional
 </div>
 </div>
 </div>
-<div id="outline-container-org3249fe3" class="outline-3">
-<h3 id="org3249fe3">Sistemas de Tipos Estáticos e Dinâmicos</h3>
-<div class="outline-text-3" id="text-org3249fe3">
+<div id="outline-container-org147c913" class="outline-3">
+<h3 id="org147c913">Sistemas de Tipos Estáticos e Dinâmicos</h3>
+<div class="outline-text-3" id="text-org147c913">
 <p>
 Um sistema de tipos é &#x2026;&#x2026;&#x2026;. <b>latente</b> quando <i>type tags</i>, ou <b>rótulos de tipos</b>, são utilizados para diferenciar estruturas no <code>[heap]</code>.
 </p>
@@ -160,9 +160,9 @@ The bad behaviors that can be eliminated by the type system in a given language 
 </div>
 </div>
 </div>
-<div id="outline-container-org4f439b3" class="outline-2">
-<h2 id="org4f439b3">Citada em</h2>
-<div class="outline-text-2" id="text-org4f439b3">
+<div id="outline-container-org4864d7b" class="outline-2">
+<h2 id="org4864d7b">Citada em</h2>
+<div class="outline-text-2" id="text-org4864d7b">
 <ul class="backlinks">
 <li><a href="/sinteses/introducao-aos-metodos-formais.html">Introdução aos Métodos Formais</a></li>
 </ul>

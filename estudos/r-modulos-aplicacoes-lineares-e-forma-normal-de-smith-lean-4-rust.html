@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<!-- 2026-11-27 Fri 22:45 -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>R-Módulos, Aplicações Lineares e Forma Normal de Smith (Lean 4 + Rust)</title>
+<meta name="author" content="n-rosenthal" />
+<meta name="description" content="Formalização de R-módulos e aplicações R-lineares em Lean 4 com provas em LaTeX, acompanhada da implementação computacional de Domínios Euclidianos, matrizes e Forma Normal de Smith em Rust." />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/estudo.css">
+<link rel="alternate" type="application/atom+xml" title="Notas de estudo" href="/feed.xml">
+<script defer src="/js/grafo-local.js"></script>
+<meta property="og:type" content="article">
+<meta property="og:title" content="R-Módulos, Aplicações Lineares e Forma Normal de Smith (Lean 4 + Rust)">
+<meta property="og:description" content="Formalização de R-módulos e aplicações R-lineares em Lean 4 com provas em LaTeX, acompanhada da implementação computacional de Domínios Euclidianos, matrizes e Forma Normal de Smith em Rust.">
+<meta property="og:url" content="https://n-rosenthal.github.io/estudos/r-modulos-aplicacoes-lineares-e-forma-normal-de-smith-lean-4-rust.html">
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav class="nav"><a href="/">Início</a><a href="/grafo.html">Grafo</a><a href="/feed.xml">Feed</a></nav><div class="meta-nota"><span class="selo selo-semente">semente</span><span>5 min de leitura</span><span>criada em 2026-11-27</span><span>atualizada em 2026-11-27</span></div>
+</div>
+<div id="content" class="content">
+<header>
+<h1 class="title">R-Módulos, Aplicações Lineares e Forma Normal de Smith (Lean 4 + Rust)</h1>
+</header><nav id="table-of-contents" role="doc-toc">
+<h2>&Iacute;ndice</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org4467438">Visão Geral: Módulos sobre PIDs e Fatores Invariantes (Lang, Cap. III e Cap. XV)</a></li>
+<li><a href="#orgf35d1da">Camada Formal em Lean 4 (<code>Modules.lean</code>)</a>
+<ul>
+<li><a href="#orga27708e">Estrutura de $R$-Módulo e Submódulo</a></li>
+<li><a href="#org4d4b0b4">Aplicações $R$-Lineares e o Núcleo (\(\ker \phi\))</a>
+<ul>
+<li><a href="#orgdf0b779">Prova Matemática (LaTeX)</a></li>
+<li><a href="#org352adda">Implementação e Provas em Lean 4</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org1047711">Motor Computacional em Rust: Domínios Euclidianos e Forma Normal de Smith</a></li>
+<li><a href="#orgb9c2a4e">Cada elemento não-nulo possui uma medida inteira `euclidean<sub>norm</sub>(&amp;self) -&gt; Option&lt;usize&gt;` (valor absoluto \(|a|\) em \(\mathbb{Z}\), ou \(\deg(f)\) em \(K[x]\)).</a></li>
+<li><a href="#org2827624">Dispõe de divisão com resto `div<sub>rem</sub>` e <b><b>Algoritmo de Euclides Estendido (`extended<sub>gcd</sub>`)</b></b> que retorna \((g, u, v)\) com \(ua + vb = g\).</a></li>
+<li><a href="#org08224be">Próximo Passo: Álgebra Linear Avançada — Autovalores, Decomposição Primária e Formas de Jordan (Lang, Cap. XIV e XV)</a></li>
+</ul>
+</div>
+</nav>
+<div id="outline-container-org4467438" class="outline-2">
+<h2 id="org4467438">Visão Geral: Módulos sobre PIDs e Fatores Invariantes (Lang, Cap. III e Cap. XV)</h2>
+<div class="outline-text-2" id="text-org4467438">
+<p>
+Nos estudos anteriores, construímos a hierarquia <b><b>Grupo \(\rightarrow\) Anel Comutativo \(\rightarrow\) Domínio Euclidiano (\(K[x]\)) \(\rightarrow\) Corpo (\(\mathbb{F}_{p^n}\))</b></b>. Agora damos o salto para a <b><b>Álgebra Linear sobre Anéis</b></b> (Lang, Capítulo III, §1–§7): substituímos o corpo de escalares por um anel comutativo arbitrário \(R\), generalizando espaços vetoriais para <b><b>$R$-módulos</b></b>.
+</p>
+
+<p>
+Quando \(R\) é um <b><b>Domínio de Ideais Principais (PID)</b></b> — em particular, um Domínio Euclidiano como \(\mathbb{Z}\) ou \(K[x]\) — toda matriz \(A \in \text{Mat}_{m \times n}(R)\) admite diagonalização por operações elementares de linha e coluna (equivalência de matrizes \(U A V = D\)), conhecida como <b><b>Forma Normal de Smith (SNF)</b></b>:
+\[D = \text{diag}(d_1, d_2, \dots, d_r, 0, \dots, 0), \qquad d_1 \mid d_2 \mid \dots \mid d_r.\]
+</p>
+
+<p>
+Esse único algoritmo resolve dois teoremas centrais do Lang simultaneamente:
+</p>
+<ol class="org-ol">
+<li><b><b>Caso \(R = \mathbb{Z}\) (Cap. I, §8 / Cap. III, §7):</b></b> Classifica qualquer grupo abeliano finitamente gerado \(G \cong \mathbb{Z}^k \oplus \bigoplus_{i=1}^r \mathbb{Z}/d_i\mathbb{Z}\) a partir de sua matriz de relações.</li>
+<li><b><b>Caso \(R = K[x]\) (Cap. XV, §2):</b></b> Aplicado à matriz característica \(xI - T \in \text{Mat}_{n \times n}(K[x])\) de um operador linear \(T : V \to V\), os fatores invariantes \(d_i(x)\) fornecem diretamente a <b><b>Forma Canônica Racional (Frobenius)</b></b> e o polinômio mínimo de \(T\).</li>
+</ol>
+</div>
+</div>
+<div id="outline-container-orgf35d1da" class="outline-2">
+<h2 id="orgf35d1da">Camada Formal em Lean 4 (<code>Modules.lean</code>)</h2>
+<div class="outline-text-2" id="text-orgf35d1da">
+</div>
+<div id="outline-container-orga27708e" class="outline-3">
+<h3 id="orga27708e">Estrutura de $R$-Módulo e Submódulo</h3>
+<div class="outline-text-3" id="text-orga27708e">
+<p>
+Um <b><b>$R$-módulo à esquerda</b></b> \(M\) consiste em um grupo abeliano aditivo \((M, +, 0, -)\) equipado com uma ação escalar \(\cdot : R \times M \to M\) distributiva e associativa (Lang, Cap. III, §1).
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lean4">import BooleanRingDuality
+
+namespace StrangeAlgebras.Modules
+
+open StrangeAlgebras.BooleanDuality
+
+/-- Capítulo III, §1 (Lang): Grupo Abeliano Aditivo -/
+class AddCommGroup (M : Type v) where
+  zero      : M
+  add       : M → M → M
+  neg       : M → M
+  add_assoc : ∀ x y z : M, add (add x y) z = add x (add y z)
+  add_comm  : ∀ x y : M, add x y = add y x
+  zero_add  : ∀ x : M, add zero x = x
+  neg_add   : ∀ x : M, add (neg x) x = zero
+
+/-- Capítulo III, §1 (Lang): Módulo à esquerda sobre um anel comutativo R -/
+class Module (R : Type u) (M : Type v) [CommRing R] [AddCommGroup M] where
+  smul        : R → M → M
+  one_smul    : ∀ x : M, smul CommRing.one x = x
+  mul_smul    : ∀ (r s : R) (x : M), smul (CommRing.mul r s) x = smul r (smul s x)
+  smul_add    : ∀ (r : R) (x y : M), smul r (AddCommGroup.add x y) =
+                  AddCommGroup.add (smul r x) (smul r y)
+  add_smul    : ∀ (r s : R) (x : M), smul (CommRing.add r s) x =
+                  AddCommGroup.add (smul r x) (smul s x)
+
+infixr:73 " • " =&gt; Module.smul
+
+/-- Capítulo III, §1 (Lang): Submódulo N ⊆ M -/
+structure Submodule (R : Type u) (M : Type v) [CommRing R] [AddCommGroup M] [Module R M] where
+  carrier  : M → Prop
+  zero_mem : carrier AddCommGroup.zero
+  add_mem  : ∀ {x y : M}, carrier x → carrier y → carrier (AddCommGroup.add x y)
+  smul_mem : ∀ (r : R) {x : M}, carrier x → carrier (r • x)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org4d4b0b4" class="outline-3">
+<h3 id="org4d4b0b4">Aplicações $R$-Lineares e o Núcleo (\(\ker \phi\))</h3>
+<div class="outline-text-3" id="text-org4d4b0b4">
+</div>
+<div id="outline-container-orgdf0b779" class="outline-4">
+<h4 id="orgdf0b779">Prova Matemática (LaTeX)</h4>
+<div class="outline-text-4" id="text-orgdf0b779">
+<p>
+<b>Proposição 1.1 (Propriedade do Zero e Submódulo Núcleo).</b> Seja \(\phi : M \to N\) uma aplicação $R$-linear entre $R$-módulos (isto é, \(\phi(x + y) = \phi(x) + \phi(y)\) e \(\phi(r \cdot x) = r \cdot \phi(x)\)). Então:
+</p>
+<ol class="org-ol">
+<li>\(\phi(0_M) = 0_N\) e \(0_R \cdot x = 0_M\) para todo \(x \in M\).</li>
+<li>O núcleo \(\ker(\phi) = \{ x \in M \mid \phi(x) = 0_N \}\) é um submódulo de \(M\).</li>
+</ol>
+
+<p>
+<i>Demonstração.</i>
+</p>
+<ol class="org-ol">
+<li>Pela aditividade, \(\phi(0_M) = \phi(0_M + 0_M) = \phi(0_M) + \phi(0_M)\). Somando \(-\phi(0_M)\) a ambos os lados no grupo abeliano \(N\), obtemos \(0_N = \phi(0_M)\). Analogamente, \(0_R \cdot x = (0_R + 0_R) \cdot x = 0_R \cdot x + 0_R \cdot x \implies 0_R \cdot x = 0_M\).</li>
+<li>Fechamento de \(\ker(\phi)\):
+<ul class="org-ul">
+<li><b>Zero:</b> \(\phi(0_M) = 0_N \implies 0_M \in \ker(\phi)\).</li>
+<li><b>Adição:</b> Se \(x, y \in \ker(\phi)\), então \(\phi(x + y) = \phi(x) + \phi(y) = 0_N + 0_N = 0_N\).</li>
+<li><b>Escalar:</b> Se \(r \in R\) e \(x \in \ker(\phi)\), então \(\phi(r \cdot x) = r \cdot \phi(x) = r \cdot 0_N = 0_N\). \(\blacksquare\)</li>
+</ul></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org352adda" class="outline-4">
+<h4 id="org352adda">Implementação e Provas em Lean 4</h4>
+<div class="outline-text-4" id="text-org352adda">
+<div class="org-src-container">
+<pre class="src src-lean4">section LinearMaps
+variable {R : Type u} {M : Type v} {N : Type w}
+variable [CommRing R] [AddCommGroup M] [AddCommGroup N] [Module R M] [Module R N]
+
+/-- Capítulo III, §2 (Lang): Aplicação R-linear (Homomorfismo de R-módulos) -/
+structure LinearMap (R : Type u) (M : Type v) (N : Type w)
+    [CommRing R] [AddCommGroup M] [AddCommGroup N] [Module R M] [Module R N] where
+  toFun    : M → N
+  map_add  : ∀ x y : M, toFun (AddCommGroup.add x y) = AddCommGroup.add (toFun x) (toFun y)
+  map_smul : ∀ (r : R) (x : M), toFun (r • x) = r • toFun x
+
+/-- Lema auxiliar: cancelamento aditivo à esquerda em AddCommGroup -/
+theorem add_left_cancel_grp {G : Type v} [AddCommGroup G] (a b c : G)
+    (h : AddCommGroup.add a b = AddCommGroup.add a c) : b = c := by
+  calc b = AddCommGroup.add AddCommGroup.zero b := (AddCommGroup.zero_add b).symm
+       _ = AddCommGroup.add (AddCommGroup.add (AddCommGroup.neg a) a) b := by
+           rw [AddCommGroup.neg_add]
+       _ = AddCommGroup.add (AddCommGroup.neg a) (AddCommGroup.add a b) :=
+           AddCommGroup.add_assoc _ _ _
+       _ = AddCommGroup.add (AddCommGroup.neg a) (AddCommGroup.add a c) := by rw [h]
+       _ = AddCommGroup.add (AddCommGroup.add (AddCommGroup.neg a) a) c :=
+           (AddCommGroup.add_assoc _ _ _).symm
+       _ = AddCommGroup.add AddCommGroup.zero c := by rw [AddCommGroup.neg_add]
+       _ = c := AddCommGroup.zero_add c
+
+/-- Proposição 1.1a: Toda aplicação R-linear preserva o zero: φ(0_M) = 0_N -/
+theorem map_zero (φ : LinearMap R M N) :
+    φ.toFun AddCommGroup.zero = AddCommGroup.zero := by
+  have h1 : AddCommGroup.add (φ.toFun AddCommGroup.zero) AddCommGroup.zero =
+            AddCommGroup.add (φ.toFun AddCommGroup.zero) (φ.toFun AddCommGroup.zero) := by
+    calc AddCommGroup.add (φ.toFun AddCommGroup.zero) AddCommGroup.zero
+      _ = AddCommGroup.add AddCommGroup.zero (φ.toFun AddCommGroup.zero) :=
+          AddCommGroup.add_comm _ _
+      _ = φ.toFun AddCommGroup.zero := AddCommGroup.zero_add _
+      _ = φ.toFun (AddCommGroup.add AddCommGroup.zero AddCommGroup.zero) := by
+          rw [AddCommGroup.zero_add]
+      _ = AddCommGroup.add (φ.toFun AddCommGroup.zero) (φ.toFun AddCommGroup.zero) :=
+          φ.map_add _ _
+  exact (add_left_cancel_grp (φ.toFun AddCommGroup.zero) AddCommGroup.zero _ h1).symm
+
+/-- Proposição 1.1b: Multiplicação escalar por 0_R resulta em 0_M: 0_R • x = 0_M -/
+theorem zero_smul (x : M) : (CommRing.zero : R) • x = AddCommGroup.zero := by
+  have h1 : AddCommGroup.add ((CommRing.zero : R) • x) AddCommGroup.zero =
+            AddCommGroup.add ((CommRing.zero : R) • x) ((CommRing.zero : R) • x) := by
+    calc AddCommGroup.add ((CommRing.zero : R) • x) AddCommGroup.zero
+      _ = AddCommGroup.add AddCommGroup.zero ((CommRing.zero : R) • x) :=
+          AddCommGroup.add_comm _ _
+      _ = (CommRing.zero : R) • x := AddCommGroup.zero_add _
+      _ = (CommRing.add (CommRing.zero : R) CommRing.zero) • x := by
+          rw [CommRing.zero_add]
+      _ = AddCommGroup.add ((CommRing.zero : R) • x) ((CommRing.zero : R) • x) :=
+          Module.add_smul _ _ _
+  exact (add_left_cancel_grp ((CommRing.zero : R) • x) AddCommGroup.zero _ h1).symm
+
+/-- Proposição 1.1c: O núcleo ker(φ) = { x ∈ M | φ(x) = 0 } é um Submódulo de M -/
+def ker (φ : LinearMap R M N) : Submodule R M where
+  carrier  := fun x =&gt; φ.toFun x = AddCommGroup.zero
+  zero_mem := map_zero φ
+  add_mem  := fun {x y} hx hy =&gt; by
+    rw [φ.map_add, hx, hy, AddCommGroup.zero_add]
+  smul_mem := fun r {x} hx =&gt; by
+    rw [φ.map_smul, hx, zero_smul]
+
+end LinearMaps
+end StrangeAlgebras.Modules
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org1047711" class="outline-2">
+<h2 id="org1047711">Motor Computacional em Rust: Domínios Euclidianos e Forma Normal de Smith</h2>
+<div class="outline-text-2" id="text-org1047711">
+<p>
+Para que o algoritmo da <b><b>Forma Normal de Smith</b></b> funcione tanto para matrizes de inteiros (\(\mathbb{Z}\), classificando grupos abelianos) quanto para matrizes de polinômios (\(K[x]\), classificando operadores lineares), abstraímos a noção de <b><b>Domínio Euclidiano</b></b> através da <b>trait</b> `EuclideanDomain`:
+</p>
+</div>
+</div>
+<div id="outline-container-orgb9c2a4e" class="outline-2">
+<h2 id="orgb9c2a4e">Cada elemento não-nulo possui uma medida inteira `euclidean<sub>norm</sub>(&amp;self) -&gt; Option&lt;usize&gt;` (valor absoluto \(|a|\) em \(\mathbb{Z}\), ou \(\deg(f)\) em \(K[x]\)).</h2>
+</div>
+<div id="outline-container-org2827624" class="outline-2">
+<h2 id="org2827624">Dispõe de divisão com resto `div<sub>rem</sub>` e <b><b>Algoritmo de Euclides Estendido (`extended<sub>gcd</sub>`)</b></b> que retorna \((g, u, v)\) com \(ua + vb = g\).</h2>
+<div class="outline-text-2" id="text-org2827624">
+<p>
+Com `extended<sub>gcd</sub>`, quando encontramos um pivô \(a_{kk}\) que não divide algum elemento \(a_{kj}\) na mesma linha (ou \(a_{ik}\) na mesma coluna), aplicamos uma <b><b>transformação unimodular \(2 \times 2\)</b></b> (de determinante \(u \cdot (a_{kj}/g) - v \cdot (a_{kk}/g) = 1\)) que substitui \((a_{kk}, a_{kj})\) por \((g, 0)\), reduzindo estritamente a norma euclidiana do pivô até que ele divida toda a linha, toda a coluna e toda a submatriz restante!
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust">use std::fmt;
+use ch02_rings::polynomials::{Field, Poly, Ring};
+
+/// Capítulo II, §4 (Lang): Domínio Euclidiano (Z, K[x], Z[i], etc.)
+pub trait EuclideanDomain: Ring {
+    /// Norma euclidiana δ(a) ∈ N para a ≠ 0 (None para a = 0)
+    fn euclidean_norm(&amp;self) -&gt; Option&lt;usize&gt;;
+
+    /// Divisão euclidiana: retorna (q, r) com self = q * other + r e δ(r) &lt; δ(other)
+    fn div_rem(&amp;self, other: &amp;Self) -&gt; Option&lt;(Self, Self)&gt;;
+
+    /// Retorna true se `self` divide `other` (isto é, resto == 0)
+    fn divides(&amp;self, other: &amp;Self) -&gt; bool {
+        if other.is_zero() {
+            return true;
+        }
+        if self.is_zero() {
+            return false;
+        }
+        other.div_rem(self).map_or(false, |(_, r)| r.is_zero())
+    }
+
+    /// Algoritmo de Euclides Estendido: retorna (g, u, v) com u * self + v * other = g
+    fn extended_gcd(&amp;self, other: &amp;Self) -&gt; (Self, Self, Self) {
+        let (mut r0, mut r1) = (self.clone(), other.clone());
+        let (mut u0, mut u1) = (Self::one(), Self::zero());
+        let (mut v0, mut v1) = (Self::zero(), Self::one());
+
+        while !r1.is_zero() {
+            let (q, r2) = r0.div_rem(&amp;r1).unwrap();
+            let u2 = u0.sub(&amp;q.mul(&amp;u1));
+            let v2 = v0.sub(&amp;q.mul(&amp;v1));
+
+            r0 = r1;
+            r1 = r2;
+            u0 = u1;
+            u1 = u2;
+            v0 = v1;
+            v1 = v2;
+        }
+        (r0, u0, v0)
+    }
+}
+
+/// Instância 1: Anel dos Inteiros Z (usando i64) como Domínio Euclidiano
+impl Ring for i64 {
+    fn zero() -&gt; Self { 0 }
+    fn one() -&gt; Self { 1 }
+    fn add(&amp;self, other: &amp;Self) -&gt; Self { self + other }
+    fn neg(&amp;self) -&gt; Self { -self }
+    fn mul(&amp;self, other: &amp;Self) -&gt; Self { self * other }
+}
+
+impl EuclideanDomain for i64 {
+    fn euclidean_norm(&amp;self) -&gt; Option&lt;usize&gt; {
+        if *self == 0 {
+            None
+        } else {
+            Some(self.unsigned_abs() as usize)
+        }
+    }
+
+    fn div_rem(&amp;self, other: &amp;Self) -&gt; Option&lt;(Self, Self)&gt; {
+        if *other == 0 {
+            None
+        } else {
+            Some((self / other, self % other))
+        }
+    }
+}
+
+/// Instância 2: Anel de Polinômios K[x] sobre qualquer corpo K como Domínio Euclidiano
+impl&lt;K: Field&gt; EuclideanDomain for Poly&lt;K&gt; {
+    fn euclidean_norm(&amp;self) -&gt; Option&lt;usize&gt; {
+        self.degree()
+    }
+
+    fn div_rem(&amp;self, other: &amp;Self) -&gt; Option&lt;(Self, Self)&gt; {
+        Poly::div_rem(self, other)
+    }
+}
+
+/// Matriz densa m × n sobre um Domínio Euclidiano R
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub struct Matrix&lt;R: EuclideanDomain&gt; {
+    pub rows: usize,
+    pub cols: usize,
+    pub data: Vec&lt;Vec&lt;R&gt;&gt;,
+}
+
+impl&lt;R: EuclideanDomain&gt; Matrix&lt;R&gt; {
+    pub fn new(rows: usize, cols: usize, data: Vec&lt;Vec&lt;R&gt;&gt;) -&gt; Self {
+        assert_eq!(data.len(), rows);
+        for row in &amp;data {
+            assert_eq!(row.len(), cols);
+        }
+        Self { rows, cols, data }
+    }
+
+    pub fn identity(n: usize) -&gt; Self {
+        let mut data = vec![vec![R::zero(); n]; n];
+        for i in 0..n {
+            data[i][i] = R::one();
+        }
+        Self { rows: n, cols: n, data }
+    }
+
+    /// Troca linhas i e j
+    fn swap_rows(&amp;mut self, i: usize, j: usize) {
+        if i != j {
+            self.data.swap(i, j);
+        }
+    }
+
+    /// Troca colunas i e j
+    fn swap_cols(&amp;mut self, i: usize, j: usize) {
+        if i != j {
+            for r in 0..self.rows {
+                self.data[r].swap(i, j);
+            }
+        }
+    }
+
+    /// Operação elementar: Linha[target] &lt;- Linha[target] - q * Linha[src]
+    fn row_sub_mul(&amp;mut self, target: usize, src: usize, q: &amp;R) {
+        if q.is_zero() {
+            return;
+        }
+        for c in 0..self.cols {
+            let sub_val = q.mul(&amp;self.data[src][c]);
+            self.data[target][c] = self.data[target][c].sub(&amp;sub_val);
+        }
+    }
+
+    /// Operação elementar: Coluna[target] &lt;- Coluna[target] - q * Coluna[src]
+    fn col_sub_mul(&amp;mut self, target: usize, src: usize, q: &amp;R) {
+        if q.is_zero() {
+            return;
+        }
+        for r in 0..self.rows {
+            let sub_val = q.mul(&amp;self.data[r][src]);
+            self.data[r][target] = self.data[r][target].sub(&amp;sub_val);
+        }
+    }
+
+    /// Transformação unimodular 2×2 nas linhas r1 e r2 usando coeficientes de Bézout:
+    /// g = u*a + v*b, alpha = a/g, beta = b/g
+    /// [ u    v   ] [ a ] = [ g ]
+    /// [ -β   α   ] [ b ]   [ 0 ]
+    fn bezout_row_elim(&amp;mut self, r1: usize, r2: usize, col: usize) {
+        let a = self.data[r1][col].clone();
+        let b = self.data[r2][col].clone();
+        let (g, u, v) = a.extended_gcd(&amp;b);
+        let (alpha, _) = a.div_rem(&amp;g).unwrap();
+        let (beta, _) = b.div_rem(&amp;g).unwrap();
+
+        for c in 0..self.cols {
+            let x = self.data[r1][c].clone();
+            let y = self.data[r2][c].clone();
+            self.data[r1][c] = u.mul(&amp;x).add(&amp;v.mul(&amp;y));
+            self.data[r2][c] = alpha.mul(&amp;y).sub(&amp;beta.mul(&amp;x));
+        }
+    }
+
+    /// Transformação unimodular 2×2 nas colunas c1 e c2 usando coeficientes de Bézout
+    fn bezout_col_elim(&amp;mut self, c1: usize, c2: usize, row: usize) {
+        let a = self.data[row][c1].clone();
+        let b = self.data[row][c2].clone();
+        let (g, u, v) = a.extended_gcd(&amp;b);
+        let (alpha, _) = a.div_rem(&amp;g).unwrap();
+        let (beta, _) = b.div_rem(&amp;g).unwrap();
+
+        for r in 0..self.rows {
+            let x = self.data[r][c1].clone();
+            let y = self.data[r][c2].clone();
+            self.data[r][c1] = u.mul(&amp;x).add(&amp;v.mul(&amp;y));
+            self.data[r][c2] = alpha.mul(&amp;y).sub(&amp;beta.mul(&amp;x));
+        }
+    }
+
+    /// Computa a Forma Normal de Smith (SNF) de `self` e retorna a lista ordenada
+    /// dos fatores invariantes não-nulos [d_1, d_2, ..., d_r] tais que d_1 | d_2 | ... | d_r.
+    pub fn smith_invariant_factors(&amp;self) -&gt; Vec&lt;R&gt; {
+        let mut mat = self.clone();
+        let limit = mat.rows.min(mat.cols);
+        let mut invariants = Vec::new();
+
+        for k in 0..limit {
+            loop {
+                // 1. Encontra o elemento não-nulo de menor norma euclidiana na submatriz [k.., k..]
+                let mut best: Option&lt;(usize, usize, usize)&gt; = None;
+                for r in k..mat.rows {
+                    for c in k..mat.cols {
+                        if let Some(norm) = mat.data[r][c].euclidean_norm() {
+                            if best.map_or(true, |(_, _, b_norm)| norm &lt; b_norm) {
+                                best = Some((r, c, norm));
+                            }
+                        }
+                    }
+                }
+
+                // Se toda a submatriz restante é nula, terminamos!
+                let (piv_r, piv_c, _) = match best {
+                    Some(pos) =&gt; pos,
+                    None =&gt; return invariants,
+                };
+
+                mat.swap_rows(k, piv_r);
+                mat.swap_cols(k, piv_c);
+
+                // 2. Zera todos os elementos abaixo do pivô na coluna k
+                let mut changed = false;
+                for r in (k + 1)..mat.rows {
+                    if mat.data[r][k].is_zero() {
+                        continue;
+                    }
+                    if mat.data[k][k].divides(&amp;mat.data[r][k]) {
+                        let (q, _) = mat.data[r][k].div_rem(&amp;mat.data[k][k]).unwrap();
+                        mat.row_sub_mul(r, k, &amp;q);
+                    } else {
+                        mat.bezout_row_elim(k, r, k);
+                        changed = true;
+                    }
+                }
+                if changed {
+                    continue;
+                }
+
+                // 3. Zera todos os elementos à direita do pivô na linha k
+                for c in (k + 1)..mat.cols {
+                    if mat.data[k][c].is_zero() {
+                        continue;
+                    }
+                    if mat.data[k][k].divides(&amp;mat.data[k][c]) {
+                        let (q, _) = mat.data[k][c].div_rem(&amp;mat.data[k][k]).unwrap();
+                        mat.col_sub_mul(c, k, &amp;q);
+                    } else {
+                        mat.bezout_col_elim(k, c, k);
+                        changed = true;
+                    }
+                }
+                if changed {
+                    continue;
+                }
+
+                // 4. Garante a condição de divisibilidade d_k | a_{i,j} para toda a submatriz
+                let mut bad_entry: Option&lt;(usize, usize)&gt; = None;
+                'outer: for r in (k + 1)..mat.rows {
+                    for c in (k + 1)..mat.cols {
+                        if !mat.data[k][k].divides(&amp;mat.data[r][c]) {
+                            bad_entry = Some((r, c));
+                            break 'outer;
+                        }
+                    }
+                }
+
+                if let Some((r, _)) = bad_entry {
+                    // Soma a linha r à linha k para forçar redução da norma na próxima iteração
+                    for c in k..mat.cols {
+                        let val = mat.data[r][c].clone();
+                        mat.data[k][c] = mat.data[k][c].add(&amp;val);
+                    }
+                    continue;
+                }
+
+                // Pivô d_k estabilizou e divide toda a submatriz!
+                invariants.push(mat.data[k][k].clone());
+                break;
+            }
+        }
+
+        invariants
+    }
+}
+
+impl&lt;R: EuclideanDomain&gt; fmt::Display for Matrix&lt;R&gt; {
+    fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {
+        for r in 0..self.rows {
+            write!(f, "[ ")?;
+            for c in 0..self.cols {
+                write!(f, "{} ", self.data[r][c])?;
+            }
+            writeln!(f, "]")?;
+        }
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use ch02_rings::polynomials::Fp;
+
+    #[test]
+    fn test_snf_finitely_generated_abelian_group() {
+        // Classificação do grupo abeliano G = Z^3 / Im(A) dado pela matriz de relações:
+        // [ 2  4  4 ]
+        // [ -6 6 12 ]
+        // [ 10 -4 -16 ]
+        // Fatores invariantes esperados: d_1 = 2, d_2 = 6, d_3 = 12 (2 | 6 | 12)
+        // Logo G ≅ Z/2Z ⊕ Z/6Z ⊕ Z/12Z (ordem 2 * 6 * 12 = 144).
+        let mat = Matrix::new(
+            3,
+            3,
+            vec![
+                vec![2, 4, 4],
+                vec![-6, 6, 12],
+                vec![10, -4, -16],
+            ],
+        );
+        let inv: Vec&lt;i64&gt; = mat
+            .smith_invariant_factors()
+            .into_iter()
+            .map(|x| x.abs())
+            .collect();
+        assert_eq!(inv, vec![2, 6, 12]);
+    }
+
+    #[test]
+    fn test_snf_characteristic_matrix_rational_canonical_form() {
+        // Operador linear T sobre F_5^2 com matriz A = [[1, 1], [0, 1]] (bloco de Jordan 2×2).
+        // Matriz característica xI - A ∈ Mat_{2×2}(F_5[x]):
+        // [ x - 1    -1   ]
+        // [   0     x - 1 ]
+        // Fatores invariantes esperados: d_1(x) = 1, d_2(x) = (x - 1)^2 = x^2 + 3x + 1 em F_5[x]!
+        type F5 = Fp&lt;5&gt;;
+        let zero = Poly::&lt;F5&gt;::zero();
+        let neg_one = Poly::new(vec![F5::new(-1)]);
+        let x_minus_1 = Poly::new(vec![F5::new(-1), F5::one()]);
+
+        let char_mat = Matrix::new(
+            2,
+            2,
+            vec![
+                vec![x_minus_1.clone(), neg_one],
+                vec![zero, x_minus_1.clone()],
+            ],
+        );
+
+        let inv: Vec&lt;Poly&lt;F5&gt;&gt; = char_mat
+            .smith_invariant_factors()
+            .into_iter()
+            .map(|p| p.make_monic())
+            .collect();
+
+        let expected_min_poly = x_minus_1.mul(&amp;x_minus_1);
+        assert_eq!(inv, vec![Poly::one(), expected_min_poly]);
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org08224be" class="outline-2">
+<h2 id="org08224be">Próximo Passo: Álgebra Linear Avançada — Autovalores, Decomposição Primária e Formas de Jordan (Lang, Cap. XIV e XV)</h2>
+<div class="outline-text-2" id="text-org08224be">
+<p>
+Com a Forma Normal de Smith operacional tanto sobre \(\mathbb{Z}\) quanto sobre \(K[x]\), fechamos a base estrutural dos capítulos principais do Lang:
+</p>
+<ol class="org-ol">
+<li><b><b>Grupos e Quocientes</b></b> (Cap. I)</li>
+<li><b><b>Anéis, Ideais e Dualidade Booleana</b></b> (Cap. II)</li>
+<li><b><b>Módulos sobre PIDs e Fatores Invariantes</b></b> (Cap. III)</li>
+<li><b><b>Polinômios e Domínios Euclidianos</b></b> (Cap. IV)</li>
+<li><b><b>Extensões Algébricas e Corpos Finitos</b></b> (Cap. V)</li>
+<li><b><b>Teoria de Galois Finita e Frobenius</b></b> (Cap. VI)</li>
+<li><b><b>Formas Canônicas via $K[x]$-Módulos</b></b> (Cap. XV)</li>
+</ol>
+
+<p>
+O próximo passo natural é construir o <b><b>Capítulo XVI (Produtos Tensoriais e Álgebra Multilinear)</b></b>: formalizar propriedades universais bilineares em Lean 4 e implementar o produto de Kronecker \(A \otimes B\) e álgebras exteriores \(\bigwedge^k V\) em Rust.
+</p>
+
+<span class="pf-meta" data-pagefind-filter="tipo[data-v]" data-v="estudo"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="computer-science/formal-specification"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="programming/lean"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="programming/rust"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="algebra"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="linear-algebra"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="estudo"></span>
+<span class="pf-meta" data-pagefind-filter="status[data-v]" data-v="semente"></span>
+</div>
+</div>
+</div>
+</body>
+</html>

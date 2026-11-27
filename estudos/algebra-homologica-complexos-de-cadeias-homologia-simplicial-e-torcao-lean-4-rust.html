@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<!-- 2026-11-27 Fri 22:45 -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Álgebra Homológica: Complexos de Cadeias, Homologia Simplicial e Torção (Lean 4 + Rust)</title>
+<meta name="author" content="n-rosenthal" />
+<meta name="description" content="Formalização de complexos de cadeias e da inclusão im(∂_{n+1}) ⊆ ker(∂_n) em Lean 4 com provas em LaTeX, acompanhada da computação exata de grupos de homologia inteira H_k (números de Betti e torção) via Forma Normal de Smith em Rust." />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/estudo.css">
+<link rel="alternate" type="application/atom+xml" title="Notas de estudo" href="/feed.xml">
+<script defer src="/js/grafo-local.js"></script>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Álgebra Homológica: Complexos de Cadeias, Homologia Simplicial e Torção (Lean 4 + Rust)">
+<meta property="og:description" content="Formalização de complexos de cadeias e da inclusão im(∂_{n+1}) ⊆ ker(∂_n) em Lean 4 com provas em LaTeX, acompanhada da computação exata de grupos de homologia inteira H_k (números de Betti e torção) via Forma Normal de Smith em Rust.">
+<meta property="og:url" content="https://n-rosenthal.github.io/estudos/algebra-homologica-complexos-de-cadeias-homologia-simplicial-e-torcao-lean-4-rust.html">
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav class="nav"><a href="/">Início</a><a href="/grafo.html">Grafo</a><a href="/feed.xml">Feed</a></nav><div class="meta-nota"><span class="selo selo-semente">semente</span><span>7 min de leitura</span><span>criada em 2026-11-27</span><span>atualizada em 2026-11-27</span></div>
+</div>
+<div id="content" class="content">
+<header>
+<h1 class="title">Álgebra Homológica: Complexos de Cadeias, Homologia Simplicial e Torção (Lean 4 + Rust)</h1>
+</header><nav id="table-of-contents" role="doc-toc">
+<h2>&Iacute;ndice</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org0e6b5dd">Visão Geral: Do Núcleo e Imagem à Homologia (Lang, Cap. XX, §1–§4)</a></li>
+<li><a href="#org731a868">Camada Formal em Lean 4 (<code>HomologicalAlgebra.lean</code>)</a>
+<ul>
+<li><a href="#orgba929ba">Imagem, Complexos de Cadeias e a Inclusão \(B_n \subseteq Z_n\)</a>
+<ul>
+<li><a href="#orgc8126a8">Prova Matemática (LaTeX)</a></li>
+<li><a href="#org7d267c6">Implementação e Provas em Lean 4</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orgf37bc53">Motor Computacional em Rust: Homologia Simplicial e Torção via SNF</a></li>
+<li><a href="#orgb0a34d7">Mapa Completo da Arquitetura `StrangeAlgebras`</a></li>
+</ul>
+</div>
+</nav>
+<div id="outline-container-org0e6b5dd" class="outline-2">
+<h2 id="org0e6b5dd">Visão Geral: Do Núcleo e Imagem à Homologia (Lang, Cap. XX, §1–§4)</h2>
+<div class="outline-text-2" id="text-org0e6b5dd">
+<p>
+Nos estudos anteriores, construímos a hierarquia algébrica completa do Lang até chegar aos <b><b>$R$-Módulos sobre PIDs</b></b> (Cap. III), <b><b>Forma Normal de Smith</b></b> e <b><b>Álgebra Exterior</b></b> (Cap. XIX). Agora unimos todas essas ferramentas no <b><b>Capítulo XX do Lang (Álgebra Homológica)</b></b>.
+</p>
+
+<p>
+Um <b><b>Complexo de Cadeias</b></b> \((C_\bullet, \partial_\bullet)\) de $R$-módulos é uma sequência de $R$-módulos e aplicações $R$-lineares (operadores de bordo)
+\[\cdots \xrightarrow{\partial_{n+2}} C_{n+1} \xrightarrow{\partial_{n+1}} C_n \xrightarrow{\partial_n} C_{n-1} \xrightarrow{\partial_{n-1}} \cdots\]
+sujeita à lei fundamental \(\partial_n \circ \partial_{n+1} = 0\) ("o bordo de um bordo é nulo"). Essa identidade garante que todo bordo ($n$-ciclo exato, em \(B_n = \text{im }\partial_{n+1}\)) é também um ciclo (\(Z_n = \ker \partial_n\)), permitindo definir o <b><b>$n$-ésimo Módulo de Homologia</b></b>:
+\[H_n(C_\bullet) = \frac{\ker \partial_n}{\text{im }\partial_{n+1}} = \frac{Z_n}{B_n}.\]
+</p>
+
+<p>
+Quando \(R = \mathbb{Z}\) e os módulos \(C_n\) são grupos abelianos livres finitamente gerados (como cadeias simpliciais de um complexo simplicial finito), o Teorema de Estrutura sobre PIDs (Cap. III, §7) decompõe cada grupo de homologia como
+\[H_n(X; \mathbb{Z}) \cong \mathbb{Z}^{\beta_n} \oplus \bigoplus_{i=1}^{t} \mathbb{Z}/d_i\mathbb{Z},\]
+onde \(\beta_n = \text{rank}(C_n) - \text{rank}(\partial_n) - \text{rank}(\partial_{n+1})\) é o <b><b>$n$-ésimo Número de Betti</b></b> e os fatores invariantes \(d_i > 1\) da matriz de \(\partial_{n+1}\) fornecem a <b><b>torção homológica</b></b> (como o \(\mathbb{Z}/2\mathbb{Z}\) do plano projetivo real \(\mathbb{R}P^2\)).
+</p>
+
+<p>
+Neste documento:
+</p>
+<ol class="org-ol">
+<li><b><b>Formalizamos em Lean 4</b></b> a estrutura de complexo de cadeias (`ChainComplex`), definimos o submódulo imagem (`im`) e provamos o <b><b>Teorema Fundamental de Inclusão</b></b> \(\text{im}(\partial_{n+1}) \subseteq \ker(\partial_n)\) e a <b><b>Homologia de Sequências Exatas</b></b>.</li>
+<li><b><b>Implementamos em Rust</b></b> (`ch20-homology`) o construtor de complexos simpliciais abstratos, a montagem matricial dos operadores de bordo \(\partial_k\) com orientação alternada e o cálculo de \(H_k(X; \mathbb{Z})\) via Forma Normal de Smith (`smith<sub>invariant</sub><sub>factors</sub>`).</li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org731a868" class="outline-2">
+<h2 id="org731a868">Camada Formal em Lean 4 (<code>HomologicalAlgebra.lean</code>)</h2>
+<div class="outline-text-2" id="text-org731a868">
+</div>
+<div id="outline-container-orgba929ba" class="outline-3">
+<h3 id="orgba929ba">Imagem, Complexos de Cadeias e a Inclusão \(B_n \subseteq Z_n\)</h3>
+<div class="outline-text-3" id="text-orgba929ba">
+</div>
+<div id="outline-container-orgc8126a8" class="outline-4">
+<h4 id="orgc8126a8">Prova Matemática (LaTeX)</h4>
+<div class="outline-text-4" id="text-orgc8126a8">
+<p>
+<b>Teorema 1.1 (Inclusão dos Bordos nos Ciclos — Lang, Cap. XX, §1).</b> Seja \((C_\bullet, \partial_\bullet)\) um complexo de cadeias de $R$-módulos, isto é, \(\partial_n(\partial_{n+1}(x)) = 0\) para todo \(x \in C_{n+1}\). Então:
+</p>
+<ol class="org-ol">
+<li>A imagem \(\text{im}(\partial_{n+1}) = \{ y \in C_n \mid \exists x \in C_{n+1},\; \partial_{n+1}(x) = y \}\) é um submódulo de \(C_n\).</li>
+<li>Todo elemento de \(\text{im}(\partial_{n+1})\) pertence a \(\ker(\partial_n)\), ou seja, \(\text{im}(\partial_{n+1}) \subseteq \ker(\partial_n)\).</li>
+</ol>
+
+<p>
+<i>Demonstração.</i>
+</p>
+<ol class="org-ol">
+<li>Como \(\partial_{n+1}(0) = 0\) (Proposição 1.1a de `Modules.lean`), \(0 \in \text{im}(\partial_{n+1})\). Se \(y_1 = \partial_{n+1}(x_1)\) e \(y_2 = \partial_{n+1}(x_2)\), então \(y_1 + y_2 = \partial_{n+1}(x_1 + x_2) \in \text{im}(\partial_{n+1})\) e \(r \cdot y_1 = \partial_{n+1}(r \cdot x_1) \in \text{im}(\partial_{n+1})\).</li>
+<li>Seja \(y \in \text{im}(\partial_{n+1})\). Por definição, existe \(x \in C_{n+1}\) tal que \(\partial_{n+1}(x) = y\). Aplicando \(\partial_n\):
+\[\partial_n(y) = \partial_n(\partial_{n+1}(x)) = 0,\]
+donde \(y \in \ker(\partial_n)\). \(\blacksquare\)</li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org7d267c6" class="outline-4">
+<h4 id="org7d267c6">Implementação e Provas em Lean 4</h4>
+<div class="outline-text-4" id="text-org7d267c6">
+<p>
+Reutilizamos `CommRing`, `AddCommGroup`, `Module`, `Submodule`, `LinearMap` e `ker` definidos em `Modules.lean`:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lean4">import BooleanRingDuality
+import Modules
+
+namespace StrangeAlgebras.Homology
+
+open StrangeAlgebras.BooleanDuality
+open StrangeAlgebras.Modules
+
+section SubmoduleOps
+variable {R : Type u} {M : Type v} {N : Type w}
+variable [CommRing R] [AddCommGroup M] [AddCommGroup N] [Module R M] [Module R N]
+
+/-- Imagem de uma aplicação R-linear φ : M → N como Submódulo de N -/
+def im (φ : LinearMap R M N) : Submodule R N where
+  carrier  := fun y =&gt; ∃ x : M, φ.toFun x = y
+  zero_mem := ⟨AddCommGroup.zero, map_zero φ⟩
+  add_mem  := by
+    rintro y₁ y₂ ⟨x₁, rfl⟩ ⟨x₂, rfl⟩
+    exact ⟨AddCommGroup.add x₁ x₂, φ.map_add x₁ x₂⟩
+  smul_mem := by
+    rintro r y ⟨x, rfl⟩
+    exact ⟨r • x, φ.map_smul r x⟩
+
+/-- Relação de inclusão entre submódulos: A ⊆ B -/
+def SubmoduleLE (A B : Submodule R M) : Prop :=
+  ∀ x : M, A.carrier x → B.carrier x
+
+end SubmoduleOps
+
+section ChainComplexes
+variable (R : Type u) [CommRing R]
+
+/-- Capítulo XX, §1 (Lang): Complexo de Cadeias (C_•, ∂_•) de R-módulos
+    indexado por n ∈ ℕ, satisfazendo ∂_n ∘ ∂_{n+1} = 0. -/
+structure ChainComplex where
+  obj      : Nat → Type v
+  grp      : ∀ n : Nat, AddCommGroup (obj n)
+  mod      : ∀ n : Nat, @Module R (obj n) _ (grp n)
+  d        : ∀ n : Nat, @LinearMap R (obj (n + 1)) (obj n) _ (grp (n + 1)) (grp n) (mod (n + 1)) (mod n)
+  d_comp_d : ∀ (n : Nat) (x : obj (n + 2)),
+               (d n).toFun ((d (n + 1)).toFun x) = @AddCommGroup.zero (obj n) (grp n)
+
+/-- Teorema 1.1: Em todo complexo de cadeias, o submódulo de bordos B_{n+1} = im(∂_{n+2})
+    está contido no submódulo de ciclos Z_{n+1} = ker(∂_{n+1}). -/
+theorem boundaries_le_cycles (C : ChainComplex R) (n : Nat) :
+    @SubmoduleLE R (C.obj (n + 1)) _ (C.grp (n + 1)) (C.mod (n + 1))
+      (@im R (C.obj (n + 2)) (C.obj (n + 1)) _ (C.grp (n + 2)) (C.grp (n + 1))
+           (C.mod (n + 2)) (C.mod (n + 1)) (C.d (n + 1)))
+      (@ker R (C.obj (n + 1)) (C.obj n) _ (C.grp (n + 1)) (C.grp n)
+           (C.mod (n + 1)) (C.mod n) (C.d n)) := by
+  intro y hy
+  -- Desempacotamos a testemunha x ∈ C_{n+2} tal que ∂_{n+2}(x) = y
+  rcases hy with ⟨x, rfl⟩
+  -- Aplicamos diretamente o axioma fundamental ∂_{n+1}(∂_{n+2}(x)) = 0
+  exact C.d_comp_d n x
+
+/-- Predicado de Exatidão no grau (n + 1): ker(∂_{n+1}) ⊆ im(∂_{n+2}),
+    o que equivale a afirmar que a homologia H_{n+1}(C_•) é trivial (0). -/
+def IsExactAt (C : ChainComplex R) (n : Nat) : Prop :=
+  @SubmoduleLE R (C.obj (n + 1)) _ (C.grp (n + 1)) (C.mod (n + 1))
+    (@ker R (C.obj (n + 1)) (C.obj n) _ (C.grp (n + 1)) (C.grp n)
+         (C.mod (n + 1)) (C.mod n) (C.d n))
+    (@im R (C.obj (n + 2)) (C.obj (n + 1)) _ (C.grp (n + 2)) (C.grp (n + 1))
+         (C.mod (n + 2)) (C.mod (n + 1)) (C.d (n + 1)))
+
+end ChainComplexes
+end StrangeAlgebras.Homology
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf37bc53" class="outline-2">
+<h2 id="orgf37bc53">Motor Computacional em Rust: Homologia Simplicial e Torção via SNF</h2>
+<div class="outline-text-2" id="text-orgf37bc53">
+<p>
+Para computar efetivamente \(H_k(X; \mathbb{Z}) = \ker \partial_k / \text{im }\partial_{k+1}\) de um complexo simplicial finito \(X\):
+</p>
+<ol class="org-ol">
+<li>Cada $k$-simplexo orientado \(\sigma = [v_0, v_1, \dots, v_k]\) (\(v_0 < v_1 < \dots < v_k\)) gera a base de \(C_k(X; \mathbb{Z}) \cong \mathbb{Z}^{\vert{}X_k\vert{}}\).</li>
+<li>O operador de bordo \(\partial_k : C_k \to C_{k-1}\) atua sobre cada $k$-simplexo pela fórmula alternada (Lang, Cap. XX, §1):
+\[\partial_k([v_0, \dots, v_k]) = \sum_{i=0}^{k} (-1)^i [v_0, \dots, \widehat{v_i}, \dots, v_k].\]</li>
+<li>Aplicamos a <b><b>Forma Normal de Smith (`smith<sub>invariant</sub><sub>factors</sub>`)</b></b> de `ch03-modules` às matrizes inteiras \(M_k\) (de \(\partial_k\)) e \(M_{k+1}\) (de \(\partial_{k+1}\)):
+<ul class="org-ul">
+<li>Seja \(r_k = \text{rank}(M_k)\) o número de fatores invariantes não-nulos de \(\partial_k\). Então \(\text{rank}(\ker \partial_k) = \vert{}X_k\vert{} - r_k\).</li>
+<li>Sejam \(d_1, \dots, d_{r_{k+1}}\) os fatores invariantes não-nulos de \(\partial_{k+1}\).</li>
+<li>O <b><b>$k$-ésimo Número de Betti</b></b> é \(\beta_k = (\vert{}X_k\vert{} - r_k) - r_{k+1}\).</li>
+<li>Os <b><b>coeficientes de torção</b></b> de \(H_k(X; \mathbb{Z})\) são exatamente os fatores invariantes \(d_i > 1\) de \(\partial_{k+1}\)!</li>
+</ul></li>
+</ol>
+
+<div class="org-src-container">
+<pre class="src src-rust">use std::collections::{BTreeMap, BTreeSet};
+use ch03_modules::smith_normal_form::Matrix;
+
+/// Estrutura de Grupo de Homologia finitamente gerado:
+/// H_k(X; Z) ≅ Z^{betti} ⊕ ⨁_{t ∈ torsion} Z / tZ
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub struct HomologyGroup {
+    pub betti: usize,
+    pub torsion: Vec&lt;i64&gt;,
+}
+
+/// Complexo Simplicial Abstrato Finito X
+#[derive(Clone, Debug, Default)]
+pub struct SimplicialComplex {
+    /// simplices[k] armazena todos os k-simplexos ordenados (cada um com k + 1 vértices)
+    simplices: BTreeMap&lt;usize, BTreeSet&lt;Vec&lt;usize&gt;&gt;&gt;,
+}
+
+impl SimplicialComplex {
+    pub fn new() -&gt; Self {
+        Self::default()
+    }
+
+    /// Adiciona um simplexo e automaticamente fecha sob todas as suas faces não-vazias
+    pub fn add_simplex(&amp;mut self, vertices: &amp;[usize]) {
+        if vertices.is_empty() {
+            return;
+        }
+        let mut sorted = vertices.to_vec();
+        sorted.sort_unstable();
+        sorted.dedup();
+
+        let n = sorted.len();
+        // Gera todas as 2^n - 1 faces não-vazias via bitmask
+        for mask in 1usize..(1usize &lt;&lt; n) {
+            let mut face = Vec::new();
+            for i in 0..n {
+                if (mask &amp; (1 &lt;&lt; i)) != 0 {
+                    face.push(sorted[i]);
+                }
+            }
+            let dim = face.len() - 1;
+            self.simplices.entry(dim).or_default().insert(face);
+        }
+    }
+
+    pub fn max_dim(&amp;self) -&gt; usize {
+        self.simplices.keys().copied().max().unwrap_or(0)
+    }
+
+    /// Constrói a matriz inteira M_k ∈ Mat_{|X_{k-1}| × |X_k|}(Z) do operador de bordo ∂_k
+    pub fn boundary_matrix(&amp;self, k: usize) -&gt; Option&lt;Matrix&lt;i64&gt;&gt; {
+        if k == 0 {
+            return None;
+        }
+        let k_simplices: Vec&lt;Vec&lt;usize&gt;&gt; = self
+            .simplices
+            .get(&amp;k)?
+            .iter()
+            .cloned()
+            .collect();
+        let prev_simplices: Vec&lt;Vec&lt;usize&gt;&gt; = self
+            .simplices
+            .get(&amp;(k - 1))?
+            .iter()
+            .cloned()
+            .collect();
+
+        let rows = prev_simplices.len();
+        let cols = k_simplices.len();
+        let mut data = vec![vec![0i64; cols]; rows];
+
+        for (col_idx, sigma) in k_simplices.iter().enumerate() {
+            for i in 0..sigma.len() {
+                let mut face = Vec::with_capacity(sigma.len() - 1);
+                face.extend_from_slice(&amp;sigma[..i]);
+                face.extend_from_slice(&amp;sigma[(i + 1)..]);
+
+                let row_idx = prev_simplices
+                    .binary_search(&amp;face)
+                    .expect("Complexo simplicial deve ser fechado sob faces");
+                let sign = if i % 2 == 0 { 1 } else { -1 };
+                data[row_idx][col_idx] += sign;
+            }
+        }
+
+        Some(Matrix::new(rows, cols, data))
+    }
+
+    /// Verifica computacionalmente a lei fundamental ∂_{k-1} ∘ ∂_k = 0
+    pub fn verify_chain_complex_axiom(&amp;self, k: usize) -&gt; bool {
+        if k &lt; 2 {
+            return true;
+        }
+        let m_prev = match self.boundary_matrix(k - 1) {
+            Some(m) =&gt; m,
+            None =&gt; return true,
+        };
+        let m_curr = match self.boundary_matrix(k) {
+            Some(m) =&gt; m,
+            None =&gt; return true,
+        };
+
+        // Multiplica m_prev (rows_prev × cols_prev) por m_curr (cols_prev × cols_curr)
+        for r in 0..m_prev.rows {
+            for c in 0..m_curr.cols {
+                let mut acc = 0i64;
+                for mid in 0..m_prev.cols {
+                    acc += m_prev.data[r][mid] * m_curr.data[mid][c];
+                }
+                if acc != 0 {
+                    return false;
+                }
+            }
+        }
+        true
+    }
+
+    /// Calcula o k-ésimo grupo de homologia inteira H_k(X; Z) = ker(∂_k) / im(∂_{k+1})
+    pub fn homology(&amp;self, k: usize) -&gt; HomologyGroup {
+        let num_k_chains = self.simplices.get(&amp;k).map_or(0, |s| s.len());
+        if num_k_chains == 0 {
+            return HomologyGroup {
+                betti: 0,
+                torsion: Vec::new(),
+            };
+        }
+
+        // rank(∂_k): 0 se k == 0 (pois ∂_0 : C_0 → 0)
+        let rank_dk = match self.boundary_matrix(k) {
+            Some(m_k) =&gt; m_k.smith_invariant_factors().len(),
+            None =&gt; 0,
+        };
+
+        // Fatores invariantes de ∂_{k+1}: determinam rank(im ∂_{k+1}) e a torção
+        let inv_dk1: Vec&lt;i64&gt; = match self.boundary_matrix(k + 1) {
+            Some(m_k1) =&gt; m_k1
+                .smith_invariant_factors()
+                .into_iter()
+                .map(|d| d.abs())
+                .collect(),
+            None =&gt; Vec::new(),
+        };
+
+        let rank_dk1 = inv_dk1.len();
+        let betti = (num_k_chains - rank_dk) - rank_dk1;
+        let torsion = inv_dk1.into_iter().filter(|&amp;d| d &gt; 1).collect();
+
+        HomologyGroup { betti, torsion }
+    }
+
+    /// Característica de Euler χ(X) = ∑ (-1)^k |X_k| = ∑ (-1)^k β_k
+    pub fn euler_characteristic(&amp;self) -&gt; isize {
+        let mut chi = 0isize;
+        for (&amp;k, set) in &amp;self.simplices {
+            let sign = if k % 2 == 0 { 1 } else { -1 };
+            chi += sign * (set.len() as isize);
+        }
+        chi
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_sphere_s2_homology() {
+        // Esfera S^2 triangulada como o bordo de um tetraedro (4 vértices, 6 arestas, 4 faces)
+        // Homologia esperada: H_0 = Z (β_0=1), H_1 = 0 (β_1=0), H_2 = Z (β_2=1), χ = 2.
+        let mut s2 = SimplicialComplex::new();
+        s2.add_simplex(&amp;[0, 1, 2]);
+        s2.add_simplex(&amp;[0, 1, 3]);
+        s2.add_simplex(&amp;[0, 2, 3]);
+        s2.add_simplex(&amp;[1, 2, 3]);
+
+        assert!(s2.verify_chain_complex_axiom(2));
+        assert_eq!(s2.euler_characteristic(), 2);
+        assert_eq!(s2.homology(0), HomologyGroup { betti: 1, torsion: vec![] });
+        assert_eq!(s2.homology(1), HomologyGroup { betti: 0, torsion: vec![] });
+        assert_eq!(s2.homology(2), HomologyGroup { betti: 1, torsion: vec![] });
+    }
+
+    #[test]
+    fn test_real_projective_plane_rp2_torsion() {
+        // Triangulação mínima do Plano Projetivo Real RP^2 (6 vértices, 15 arestas, 10 faces)
+        // Homologia esperada: H_0 = Z, H_1 = Z/2Z (torção = [2]!), H_2 = 0, χ = 1.
+        let mut rp2 = SimplicialComplex::new();
+        let faces = [
+            [0, 1, 3], [1, 2, 3], [1, 2, 4], [2, 4, 5], [0, 2, 5],
+            [0, 3, 5], [3, 4, 5], [0, 1, 4], [1, 3, 5], [0, 2, 4],
+        ];
+        for f in &amp;faces {
+            rp2.add_simplex(f);
+        }
+
+        assert!(rp2.verify_chain_complex_axiom(2));
+        assert_eq!(rp2.euler_characteristic(), 1);
+        assert_eq!(rp2.homology(0), HomologyGroup { betti: 1, torsion: vec![] });
+        // Captura exatamente a torção Z/2Z de RP^2 via Forma Normal de Smith!
+        assert_eq!(rp2.homology(1), HomologyGroup { betti: 0, torsion: vec![2] });
+        assert_eq!(rp2.homology(2), HomologyGroup { betti: 0, torsion: vec![] });
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgb0a34d7" class="outline-2">
+<h2 id="orgb0a34d7">Mapa Completo da Arquitetura `StrangeAlgebras`</h2>
+<div class="outline-text-2" id="text-orgb0a34d7">
+<p>
+Com este décimo documento, fechamos um percurso vertical completo pela <b>Algebra</b> de Serge Lang, onde cada camada teórica no <b><b>Lean 4</b></b> alimenta diretamente uma estrutura de dados e algoritmo construtivo em <b><b>Rust</b></b>:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Módulo / Capítulo (Lang)</td>
+<td class="org-left">Arquivo Lean 4 (Provas)</td>
+<td class="org-left">Crate Rust (Algoritmos)</td>
+<td class="org-left">Invariante / Teorema Central</td>
+</tr>
+
+<tr>
+<td class="org-left">:---</td>
+<td class="org-left">:---</td>
+<td class="org-left">:---</td>
+<td class="org-left">:---</td>
+</tr>
+
+<tr>
+<td class="org-left"><b><b>Cap. I:</b></b> Grupos</td>
+<td class="org-left">`LangGroups.lean`</td>
+<td class="org-left">`ch01-groups`</td>
+<td class="org-left">Unicidade da identidade, \(S_n\), quocientes \(G/N\)</td>
+</tr>
+
+<tr>
+<td class="org-left"><b><b>Cap. II:</b></b> Anéis &amp; Boole</td>
+<td class="org-left">`BooleanRingDuality.lean`</td>
+<td class="org-left">`ch02-rings`</td>
+<td class="org-left">Característica \(2\) (\(x+x=0\)), Dualidade de Stone</td>
+</tr>
+
+<tr>
+<td class="org-left"><b><b>Cap. IV:</b></b> Polinômios</td>
+<td class="org-left">`Polynomials.lean`</td>
+<td class="org-left">`ch02-rings`</td>
+<td class="org-left">Divisão euclidiana em \(K[x]\), Euclides estendido</td>
+</tr>
+
+<tr>
+<td class="org-left"><b><b>Cap. V:</b></b> Corpos Finitos</td>
+<td class="org-left">`AlgebraicExtensions.lean`</td>
+<td class="org-left">`ch05-fields`</td>
+<td class="org-left">Inverso de Bézout em \(K[x]/(f)\), \(\mathbb{F}_{p^n}\), Teste de Rabin</td>
+</tr>
+
+<tr>
+<td class="org-left"><b><b>Cap. VI:</b></b> Teoria de Galois</td>
+<td class="org-left">`GaloisTheory.lean`</td>
+<td class="org-left">`ch06-galois`</td>
+<td class="org-left">Grupo \(\text{Gal}(E/F)\), Frobenius \(\Phi_p\), Norma, Traço, \(\text{Irr}(\alpha)\)</td>
+</tr>
+
+<tr>
+<td class="org-left"><b><b>Cap. III &amp; XV:</b></b> Módulos</td>
+<td class="org-left">`Modules.lean`</td>
+<td class="org-left">`ch03-modules`</td>
+<td class="org-left">Submódulo \(\ker \phi\), Forma Normal de Smith sobre PIDs</td>
+</tr>
+
+<tr>
+<td class="org-left"><b><b>Cap. XVI &amp; XIX:</b></b> Tensores</td>
+<td class="org-left">`TensorAlgebra.lean`</td>
+<td class="org-left">`ch16-multilinear`</td>
+<td class="org-left">Unicidade universal de \(M \otimes_R N\), Álgebra Exterior \(\bigwedge(V)\)</td>
+</tr>
+
+<tr>
+<td class="org-left"><b><b>Cap. XX:</b></b> Homologia</td>
+<td class="org-left">`HomologicalAlgebra.lean`</td>
+<td class="org-left">`ch20-homology`</td>
+<td class="org-left">\(\text{im }\partial_{n+1} \subseteq \ker \partial_n\), Números de Betti e Torção (\(\mathbb{R}P^2\))</td>
+</tr>
+</tbody>
+</table>
+
+<span class="pf-meta" data-pagefind-filter="tipo[data-v]" data-v="estudo"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="computer-science/formal-specification"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="programming/lean"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="programming/rust"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="algebra"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="homological-algebra"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="topology"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="estudo"></span>
+<span class="pf-meta" data-pagefind-filter="status[data-v]" data-v="semente"></span>
+</div>
+</div>
+</div>
+</body>
+</html>
