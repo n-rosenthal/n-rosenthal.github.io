@@ -10,6 +10,14 @@
     <link href="https://n-rosenthal.github.io/estudos/grafos-em-rust.html"/>
     <id>https://n-rosenthal.github.io/estudos/grafos-em-rust.html</id>
     <updated>2026-11-26T00:00:00Z</updated>
+    <summary>Implementação de grafos direcionados em Rust</summary>
+  </entry>
+  <entry>
+    <title>Relações de Ordem em Rust</title>
+    <link href="https://n-rosenthal.github.io/estudos/relacoes-de-ordem-em-rust.html"/>
+    <id>https://n-rosenthal.github.io/estudos/relacoes-de-ordem-em-rust.html</id>
+    <updated>2026-11-26T00:00:00Z</updated>
+    <summary>Implementação de relações de ordem e pré-ordem para estruturas de dados</summary>
   </entry>
   <entry>
     <title>Contextos para Implementação de Linguagens de Programação</title>

@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<!-- 2026-11-27 Fri 00:19 -->
+<!-- 2026-11-27 Fri 00:37 -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Grafos em Rust</title>
 <meta name="author" content="n-rosenthal" />
+<meta name="description" content="Implementação de grafos direcionados em Rust" />
 <meta name="generator" content="Org Mode" />
 <link rel="stylesheet" href="/css/site.css">
 <link rel="stylesheet" href="/css/estudo.css">
@@ -13,7 +14,7 @@
 <script defer src="/js/grafo-local.js"></script>
 <meta property="og:type" content="article">
 <meta property="og:title" content="Grafos em Rust">
-<meta property="og:description" content="">
+<meta property="og:description" content="Implementação de grafos direcionados em Rust">
 <meta property="og:url" content="https://n-rosenthal.github.io/estudos/grafos-em-rust.html">
 <script>
   window.MathJax = {
@@ -50,7 +51,7 @@
 </head>
 <body>
 <div id="preamble" class="status">
-<nav class="nav"><a href="/">Início</a><a href="/grafo.html">Grafo</a><a href="/feed.xml">Feed</a></nav><div class="meta-nota"><span class="selo selo-semente">semente</span><span>1 min de leitura</span><span>criada em 2026-11-26</span><span>atualizada em 2026-11-26</span></div>
+<nav class="nav"><a href="/">Início</a><a href="/grafo.html">Grafo</a><a href="/feed.xml">Feed</a></nav><div class="meta-nota"><span class="selo selo-semente">semente</span><span>2 min de leitura</span><span>criada em 2026-11-26</span><span>atualizada em 2026-11-26</span></div>
 </div>
 <div id="content" class="content">
 <header>
@@ -59,17 +60,20 @@
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org6d3efc0">Implementação</a>
+<li><a href="#org92bdc20">Implementação</a>
 <ul>
-<li><a href="#org018f77a"><i>Crates</i></a></li>
-<li><a href="#org9c9e963">Erros</a>
+<li><a href="#orgb656d82">Importações</a></li>
+<li><a href="#orgc4008ed">Erros</a>
 <ul>
-<li><a href="#org44e4471">Representação para Erros</a></li>
+<li><a href="#orgffb082a">Representação para Erros</a></li>
 </ul>
 </li>
-<li><a href="#orgb1673bc">Definições</a>
+<li><a href="#orga4e282c">Definições</a>
 <ul>
-<li><a href="#org2812edb">Representações para Nós e Arcos</a></li>
+<li><a href="#orgdb7e88b">Nós e Arcos</a></li>
+<li><a href="#org3ffca11">Arestas (<i>Edges</i>)</a></li>
+<li><a href="#orgfb0761b">Grafos</a></li>
+<li><a href="#org0afdefd"><code>Display</code></a></li>
 </ul>
 </li>
 </ul>
@@ -77,16 +81,13 @@
 </ul>
 </div>
 </nav>
-<p>
-:ID:       8f1b3354-e0c9-4f63-be3b-c8ae585f4ebf
-</p>
-<div id="outline-container-org6d3efc0" class="outline-2">
-<h2 id="org6d3efc0">Implementação</h2>
-<div class="outline-text-2" id="text-org6d3efc0">
+<div id="outline-container-org92bdc20" class="outline-2">
+<h2 id="org92bdc20">Implementação</h2>
+<div class="outline-text-2" id="text-org92bdc20">
 </div>
-<div id="outline-container-org018f77a" class="outline-3">
-<h3 id="org018f77a"><i>Crates</i></h3>
-<div class="outline-text-3" id="text-org018f77a">
+<div id="outline-container-orgb656d82" class="outline-3">
+<h3 id="orgb656d82">Importações</h3>
+<div class="outline-text-3" id="text-orgb656d82">
 <div class="org-src-container">
 <pre class="src src-rust">use std::cmp::Reverse;
 use std::collections::{BinaryHeap, VecDeque};
@@ -94,26 +95,26 @@ use std::error::Error;
 use std::fmt;
 use std::ops::Add;
 use std::rc::Rc;
-
 </pre>
 </div>
 </div>
 </div>
-<div id="outline-container-org9c9e963" class="outline-3">
-<h3 id="org9c9e963">Erros</h3>
-<div class="outline-text-3" id="text-org9c9e963">
+<div id="outline-container-orgc4008ed" class="outline-3">
+<h3 id="orgc4008ed">Erros</h3>
+<div class="outline-text-3" id="text-orgc4008ed">
 <p>
-Atualmente, as condições de erro implicam a tentativa de construção de um grafo impossível, ou mal-formado. Seja \( G = (N, A) \) um grafo, então
+Atualmente, as condições de erro representam a tentativa de construir um grafo impossível ou malformado. Seja \( G = (N, A) \) um grafo direcionado, em que \( N \) é o conjunto de nós e \( A \subseteq N \times N \) é o conjunto de arcos. Dado um arco candidato \( (u, v) \):
 </p>
+
 <ol class="org-ol">
-<li><code>Erro</code> <code>RightNodeNotInGraph</code> se \( a \in A \land a' \notin A \implies \false \), isto é, se a primeira componente de um arco for um nó que <i>está no grafo</i>, enquanto a segunda componente <b>não pertencer ao grafo</b>, então <b>é impossível adicionar a nova <i>aresta</i> ao grafo</b>.</li>
-<li><code>Erro</code> <code>LeftNodeNotInGraph</code></li>
-<li><code>Erro</code> <code>BothNodesNotInGraph</code></li>
-<li><code>Erro</code> <code>DirectedCycleDetected</code></li>
+<li><code>Erro</code> <code>RightNodeNotInGraph</code>: ocorre se \( u \in N \land v \notin N \), isto é, o nó de origem pertence ao grafo, mas o nó de destino não pertence; logo, é impossível adicionar o arco ao grafo.</li>
+<li><code>Erro</code> <code>LeftNodeNotInGraph</code>: ocorre se \( u \notin N \land v \in N \), isto é, o nó de destino pertence ao grafo, mas o nó de origem não pertence.</li>
+<li><code>Erro</code> <code>BothNodesNotInGraph</code>: ocorre se \( u \notin N \land v \notin N \), isto é, nem o nó de origem nem o nó de destino pertencem ao grafo.</li>
+<li><code>Erro</code> <code>DirectedCycleDetected</code>: ocorre quando a operação introduz ou encontra um ciclo direcionado \( v_0 \to v_1 \to \dots \to v_k \to v_0 \) em um grafo que exige aciclicidade (como na ordenação topológica).</li>
 </ol>
 
 <div class="org-src-container">
-<pre class="src src-nil">#[derive(Debug, Clone, PartialEq, Eq)]
+<pre class="src src-rust">#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum GraphError {
     LeftNodeNotInGraph,
     RightNodeNotInGraph,
@@ -123,21 +124,21 @@ pub enum GraphError {
 </pre>
 </div>
 </div>
-<div id="outline-container-org44e4471" class="outline-4">
-<h4 id="org44e4471">Representação para Erros</h4>
-<div class="outline-text-4" id="text-org44e4471">
+<div id="outline-container-orgffb082a" class="outline-4">
+<h4 id="orgffb082a">Representação para Erros</h4>
+<div class="outline-text-4" id="text-orgffb082a">
 <div class="org-src-container">
-<pre class="src src-nil">impl fmt::Display for GraphError {
+<pre class="src src-rust">impl fmt::Display for GraphError {
     fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {
         match self {
             GraphError::LeftNodeNotInGraph =&gt; {
-                write!(f, "cannot add edge: left node does not belong to the graph")
+                write!(f, "cannot add arc: left node does not belong to the graph")
             }
             GraphError::RightNodeNotInGraph =&gt; {
-                write!(f, "cannot add edge: right node does not belong to the graph")
+                write!(f, "cannot add arc: right node does not belong to the graph")
             }
             GraphError::BothNodesNotInGraph =&gt; {
-                write!(f, "cannot add edge: neither left nor right node belongs to the graph")
+                write!(f, "cannot add arc: neither left nor right node belongs to the graph")
             }
             GraphError::DirectedCycleDetected =&gt; {
                 write!(f, "cannot compute topological order: directed cycle detected")
@@ -152,11 +153,15 @@ impl Error for GraphError {}
 </div>
 </div>
 </div>
-<div id="outline-container-orgb1673bc" class="outline-3">
-<h3 id="orgb1673bc">Definições</h3>
-<div class="outline-text-3" id="text-orgb1673bc">
+<div id="outline-container-orga4e282c" class="outline-3">
+<h3 id="orga4e282c">Definições</h3>
+<div class="outline-text-3" id="text-orga4e282c">
+</div>
+<div id="outline-container-orgdb7e88b" class="outline-4">
+<h4 id="orgdb7e88b">Nós e Arcos</h4>
+<div class="outline-text-4" id="text-orgdb7e88b">
 <p>
-Um nó <code>Node</code> genérico sobre <code>T</code>. Acessamos seu conteúdo através de seu campo <code>value</code>. Nós são conectados por arcos <code>Arc</code>, genérico sobre <code>T</code>. Espera-se um <code>T</code> coincidente em <code>Node&lt;T&gt;</code> e <code>Arc&lt;T&gt;</code>.
+Um nó <code>Node</code> é genérico sobre <code>T</code>, com seu conteúdo acessível pelo campo <code>value</code>. Os nós são conectados por arcos direcionados <code>Arc</code>, também genéricos sobre <code>T</code>, exigindo o mesmo tipo <code>T</code> em <code>Node&lt;T&gt;</code> e <code>Arc&lt;T&gt;</code>.
 </p>
 
 <div class="org-src-container">
@@ -165,10 +170,15 @@ pub struct Node&lt;T&gt; {
     pub value: T,
 }
 
+impl&lt;T&gt; Node&lt;T&gt; {
+    pub fn new(value: T) -&gt; Self {
+        Self { value }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Arc&lt;T&gt; {
-    pub left:  Rc&lt;Node&lt;T&gt;&gt;,
+    pub left: Rc&lt;Node&lt;T&gt;&gt;,
     pub right: Rc&lt;Node&lt;T&gt;&gt;,
 }
 
@@ -180,38 +190,149 @@ impl&lt;T&gt; Arc&lt;T&gt; {
 </pre>
 </div>
 </div>
-<div id="outline-container-org2812edb" class="outline-4">
-<h4 id="org2812edb">Representações para Nós e Arcos</h4>
-<div class="outline-text-4" id="text-org2812edb">
-</div>
 <ul class="org-ul">
-<li><a id="orgfecb35e"></a><code>Display</code><br>
-<div class="outline-text-5" id="text-orgfecb35e">
+<li><a id="org8fec01f"></a>Representações para Nós e Arcos<br></li>
+</ul>
+</div>
+<div id="outline-container-org3ffca11" class="outline-4">
+<h4 id="org3ffca11">Arestas (<i>Edges</i>)</h4>
+<div class="outline-text-4" id="text-org3ffca11">
+<p>
+Aqui, uma aresta é entendida como um arco \( a \in A \) associado a uma propriedade \( P(a) \) (por exemplo, um peso, custo ou rótulo).
+</p>
+</div>
+</div>
+<div id="outline-container-orgfb0761b" class="outline-4">
+<h4 id="orgfb0761b">Grafos</h4>
+<div class="outline-text-4" id="text-orgfb0761b">
+<p>
+Um grafo direcionado ponderado (ou rotulado) \( G = (N, E) \) é definido por uma coleção de nós \( N \) e uma coleção de arestas \( E \), em que cada aresta associa um arco \( a = (u, v) \in N \times N \) a uma propriedade \( P(a) \).
+</p>
+
+<p>
+A inserção de uma nova aresta preserva a invariante estrutural do grafo: ambos os extremos \( u \) e \( v \) devem pertencer previamente a \( N \); caso contrário, a operação falha com a variante correspondente de <code>GraphError</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust">#[derive(Debug, Clone)]
+pub struct Graph&lt;T, P&gt; {
+    pub nodes: Vec&lt;Rc&lt;Node&lt;T&gt;&gt;&gt;,
+    pub edges: Vec&lt;Edge&lt;T, P&gt;&gt;,
+}
+
+impl&lt;T, P&gt; Default for Graph&lt;T, P&gt; {
+    fn default() -&gt; Self {
+        Self::new()
+    }
+}
+
+impl&lt;T, P&gt; Graph&lt;T, P&gt; {
+    pub fn new() -&gt; Self {
+        Self {
+            nodes: Vec::new(),
+            edges: Vec::new(),
+        }
+    }
+
+    pub fn contains_node(&amp;self, node: &amp;Rc&lt;Node&lt;T&gt;&gt;) -&gt; bool {
+        self.nodes.iter().any(|n| Rc::ptr_eq(n, node))
+    }
+
+    pub fn add_node(&amp;mut self, value: T) -&gt; Rc&lt;Node&lt;T&gt;&gt; {
+        let node = Rc::new(Node::new(value));
+        self.nodes.push(Rc::clone(&amp;node));
+        node
+    }
+
+    pub fn add_edge(
+        &amp;mut self,
+        left: &amp;Rc&lt;Node&lt;T&gt;&gt;,
+        right: &amp;Rc&lt;Node&lt;T&gt;&gt;,
+        property: P,
+    ) -&gt; Result&lt;(), GraphError&gt; {
+        match (self.contains_node(left), self.contains_node(right)) {
+            (false, false) =&gt; Err(GraphError::BothNodesNotInGraph),
+            (false, true) =&gt; Err(GraphError::LeftNodeNotInGraph),
+            (true, false) =&gt; Err(GraphError::RightNodeNotInGraph),
+            (true, true) =&gt; {
+                let arc = Arc::new(Rc::clone(left), Rc::clone(right));
+                self.edges.push(Edge::new(arc, property));
+                Ok(())
+            }
+        }
+    }
+
+    pub fn neighbors(&amp;self, node: &amp;Rc&lt;Node&lt;T&gt;&gt;) -&gt; Vec&lt;(&amp;Rc&lt;Node&lt;T&gt;&gt;, &amp;P)&gt; {
+        self.edges
+            .iter()
+            .filter(|edge| Rc::ptr_eq(&amp;edge.arc.left, node))
+            .map(|edge| (&amp;edge.arc.right, &amp;edge.property))
+            .collect()
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org0afdefd" class="outline-4">
+<h4 id="org0afdefd"><code>Display</code></h4>
+<div class="outline-text-4" id="text-org0afdefd">
 <div class="org-src-container">
 <pre class="src src-rust">impl&lt;T: fmt::Display&gt; fmt::Display for Node&lt;T&gt; {
     fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {
         write!(f, "{}", self.value)
     }
 }
+
 impl&lt;T: fmt::Display&gt; fmt::Display for Arc&lt;T&gt; {
     fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {
-        write!(f, "{} ~ {}", self.left, self.right)
+        write!(f, "{} -&gt; {}", self.left, self.right)
+    }
+}
+
+#+begin_src rust
+impl&lt;T: fmt::Display, P: fmt::Display&gt; fmt::Display for Edge&lt;T, P&gt; {
+    fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {
+        write!(f, "{} [{}]", self.arc, self.property)
     }
 }
 </pre>
 </div>
+<div class="org-src-container">
+<pre class="src src-rust">#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Edge&lt;T, P&gt; {
+    pub arc: Arc&lt;T&gt;,
+    pub property: P,
+}
+
+impl&lt;T, P&gt; Edge&lt;T, P&gt; {
+    pub fn new(arc: Arc&lt;T&gt;, property: P) -&gt; Self {
+        Self { arc, property }
+    }
+}
+
+impl&lt;T: fmt::Display, P: fmt::Display&gt; fmt::Display for Graph&lt;T, P&gt; {
+    fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {
+        writeln!(f, "Nodes ({}):", self.nodes.len())?;
+        for node in &amp;self.nodes {
+            writeln!(f, "  {}", node)?;
+        }
+        writeln!(f, "Edges ({}):", self.edges.len())?;
+        for edge in &amp;self.edges {
+            writeln!(f, "  {}", edge)?;
+        }
+        Ok(())
+    }
+}
+</pre>
 </div>
-</li>
-<li><a id="org63357ec"></a><br>
-<div class="outline-text-5" id="text-org63357ec">
+
 <span class="pf-meta" data-pagefind-filter="tipo[data-v]" data-v="estudo"></span>
-<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="programming-language/rust"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="rust"></span>
 <span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="implementation"></span>
 <span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="estudo"></span>
 <span class="pf-meta" data-pagefind-filter="status[data-v]" data-v="semente"></span>
 </div>
-</li>
-</ul>
 </div>
 </div>
 </div>

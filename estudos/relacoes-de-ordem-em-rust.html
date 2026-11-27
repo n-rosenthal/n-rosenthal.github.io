@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<!-- 2026-11-27 Fri 00:37 -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Relações de Ordem em Rust</title>
+<meta name="author" content="n-rosenthal" />
+<meta name="description" content="Implementação de relações de ordem e pré-ordem para estruturas de dados" />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/estudo.css">
+<link rel="alternate" type="application/atom+xml" title="Notas de estudo" href="/feed.xml">
+<script defer src="/js/grafo-local.js"></script>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Relações de Ordem em Rust">
+<meta property="og:description" content="Implementação de relações de ordem e pré-ordem para estruturas de dados">
+<meta property="og:url" content="https://n-rosenthal.github.io/estudos/relacoes-de-ordem-em-rust.html">
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav class="nav"><a href="/">Início</a><a href="/grafo.html">Grafo</a><a href="/feed.xml">Feed</a></nav><div class="meta-nota"><span class="selo selo-semente">semente</span><span>3 min de leitura</span><span>criada em 2026-11-26</span><span>atualizada em 2026-11-26</span></div>
+</div>
+<div id="content" class="content">
+<header>
+<h1 class="title">Relações de Ordem em Rust</h1>
+</header><nav id="table-of-contents" role="doc-toc">
+<h2>&Iacute;ndice</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org210428c">Implementação</a>
+<ul>
+<li><a href="#org508cc80">Importações</a></li>
+<li><a href="#orgaf189ec">Fundamentos e Erros</a>
+<ul>
+<li><a href="#org2e01d04">Representação para Erros</a></li>
+</ul>
+</li>
+<li><a href="#org80799b7">Definições</a>
+<ul>
+<li><a href="#org581ca8f">Traço <code>Preorder</code></a></li>
+<li><a href="#orgdd42158">Relações Binárias Finitas</a></li>
+<li><a href="#orgefe6f91">Fechos e Estruturas Validadas</a></li>
+<li><a href="#org8c997f8">Representações</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</nav>
+<div id="outline-container-org210428c" class="outline-2">
+<h2 id="org210428c">Implementação</h2>
+<div class="outline-text-2" id="text-org210428c">
+</div>
+<div id="outline-container-org508cc80" class="outline-3">
+<h3 id="org508cc80">Importações</h3>
+<div class="outline-text-3" id="text-org508cc80">
+<div class="org-src-container">
+<pre class="src src-rust">use std::collections::HashSet;
+use std::error::Error;
+use std::fmt;
+use std::hash::Hash;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgaf189ec" class="outline-3">
+<h3 id="orgaf189ec">Fundamentos e Erros</h3>
+<div class="outline-text-3" id="text-orgaf189ec">
+<p>
+Seja \( S \) um conjunto (domínio) e \( R \subseteq S \times S \) uma relação binária sobre \( S \), onde \( (x, y) \in R \) denota \( x \preceq y \). Os axiomas fundamentais de ordem são:
+</p>
+
+<ul class="org-ul">
+<li><b>Reflexividade:</b> \( \forall x \in S,\ (x, x) \in R \).</li>
+<li><b>Transitividade:</b> \( \forall x, y, z \in S,\ (x, y) \in R \land (y, z) \in R \implies (x, z) \in R \).</li>
+<li><b>Antissimetria:</b> \( \forall x, y \in S,\ (x, y) \in R \land (y, x) \in R \implies x = y \).</li>
+<li><b>Totalidade (conectividade):</b> \( \forall x, y \in S,\ (x, y) \in R \lor (y, x) \in R \).</li>
+</ul>
+
+<p>
+A partir desses axiomas, definem-se as seguintes hierarquias:
+</p>
+
+<ol class="org-ol">
+<li><b>Pré-ordem (<i>Preorder</i>):</b> relação reflexiva e transitiva. Elementos distintos podem ser mutuamente comparáveis (\( x \preceq y \land y \preceq x \) com \( x \neq y \)), induzindo uma relação de equivalência \( x \sim y \).</li>
+<li><b>Ordem parcial (<i>Partial Order</i>):</b> pré-ordem que também satisfaz a antissimetria.</li>
+<li><b>Ordem total (<i>Total Order</i>):</b> ordem parcial que também satisfaz a totalidade.</li>
+</ol>
+
+<p>
+As condições de erro representam tentativas de operar fora do domínio ou de promover uma relação finita \( R \) a uma estrutura de ordem cujos axiomas não são satisfeitos:
+</p>
+
+<ol class="org-ol">
+<li><code>Erro</code> <code>ElementNotInDomain</code>: ocorre ao tentar relacionar \( (x, y) \) quando \( x \notin S \lor y \notin S \).</li>
+<li><code>Erro</code> <code>ReflexivityViolated</code>: ocorre se \( \exists x \in S,\ (x, x) \notin R \).</li>
+<li><code>Erro</code> <code>TransitivityViolated</code>: ocorre se \( \exists x, y, z \in S,\ (x, y) \in R \land (y, z) \in R \land (x, z) \notin R \).</li>
+<li><code>Erro</code> <code>AntisymmetryViolated</code>: ocorre se \( \exists x, y \in S,\ (x, y) \in R \land (y, x) \in R \land x \neq y \).</li>
+<li><code>Erro</code> <code>TotalityViolated</code>: ocorre se \( \exists x, y \in S,\ (x, y) \notin R \land (y, x) \notin R \).</li>
+</ol>
+
+<div class="org-src-container">
+<pre class="src src-rust">#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum OrderError {
+    ElementNotInDomain,
+    ReflexivityViolated,
+    TransitivityViolated,
+    AntisymmetryViolated,
+    TotalityViolated,
+}
+</pre>
+</div>
+</div>
+<div id="outline-container-org2e01d04" class="outline-4">
+<h4 id="org2e01d04">Representação para Erros</h4>
+<div class="outline-text-4" id="text-org2e01d04">
+<div class="org-src-container">
+<pre class="src src-rust">impl fmt::Display for OrderError {
+    fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {
+        match self {
+            OrderError::ElementNotInDomain =&gt; {
+                write!(f, "cannot relate elements: one or both elements do not belong to the domain")
+            }
+            OrderError::ReflexivityViolated =&gt; {
+                write!(f, "invalid order relation: reflexivity axiom violated")
+            }
+            OrderError::TransitivityViolated =&gt; {
+                write!(f, "invalid order relation: transitivity axiom violated")
+            }
+            OrderError::AntisymmetryViolated =&gt; {
+                write!(f, "invalid partial order: antisymmetry axiom violated")
+            }
+            OrderError::TotalityViolated =&gt; {
+                write!(f, "invalid total order: totality axiom violated")
+            }
+        }
+    }
+}
+
+impl Error for OrderError {}
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org80799b7" class="outline-3">
+<h3 id="org80799b7">Definições</h3>
+<div class="outline-text-3" id="text-org80799b7">
+</div>
+<div id="outline-container-org581ca8f" class="outline-4">
+<h4 id="org581ca8f">Traço <code>Preorder</code></h4>
+<div class="outline-text-4" id="text-org581ca8f">
+<p>
+A biblioteca padrão do Rust modela ordens parciais (<code>PartialOrd</code>) e ordens totais (<code>Ord</code>), mas não fornece um traço dedicado a pré-ordens. O traço <code>Preorder</code> exige apenas o operador não estrito <code>le</code> (\( x \preceq y \)), derivando a equivalência induzida <code>equiv</code> (\( x \sim y \iff x \preceq y \land y \preceq x \)) e a pré-ordem estrita <code>lt</code> (\( x \prec y \iff x \preceq y \land y \npreceq x \)).
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust">pub trait Preorder {
+    fn le(&amp;self, other: &amp;Self) -&gt; bool;
+
+    fn equiv(&amp;self, other: &amp;Self) -&gt; bool {
+        self.le(other) &amp;&amp; other.le(self)
+    }
+
+    fn lt(&amp;self, other: &amp;Self) -&gt; bool {
+        self.le(other) &amp;&amp; !other.le(self)
+    }
+
+    fn ge(&amp;self, other: &amp;Self) -&gt; bool {
+        other.le(self)
+    }
+
+    fn gt(&amp;self, other: &amp;Self) -&gt; bool {
+        other.lt(self)
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgdd42158" class="outline-4">
+<h4 id="orgdd42158">Relações Binárias Finitas</h4>
+<div class="outline-text-4" id="text-orgdd42158">
+<p>
+Para inspecionar e validar relações finitas em tempo de execução, definimos <code>Relation&lt;T&gt;</code> como um par \( (S, R) \) sobre um domínio finito \( S \). A partir de <code>Relation&lt;T&gt;</code>, os tipos <code>PreorderSet&lt;T&gt;</code>, <code>PartialOrderSet&lt;T&gt;</code> e <code>TotalOrderSet&lt;T&gt;</code> garantem por construção (via <code>TryFrom</code>) os respectivos invariantes axiomáticos.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust">#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Relation&lt;T: Eq + Hash&gt; {
+    pub domain: HashSet&lt;T&gt;,
+    pub pairs: HashSet&lt;(T, T)&gt;,
+}
+
+impl&lt;T: Eq + Hash&gt; Default for Relation&lt;T&gt; {
+    fn default() -&gt; Self {
+        Self::new()
+    }
+}
+
+impl&lt;T: Eq + Hash&gt; Relation&lt;T&gt; {
+    pub fn new() -&gt; Self {
+        Self {
+            domain: HashSet::new(),
+            pairs: HashSet::new(),
+        }
+    }
+
+    pub fn insert_element(&amp;mut self, elem: T) -&gt; bool {
+        self.domain.insert(elem)
+    }
+
+    pub fn contains_element(&amp;self, elem: &amp;T) -&gt; bool {
+        self.domain.contains(elem)
+    }
+
+    pub fn relate(&amp;mut self, left: T, right: T) -&gt; Result&lt;bool, OrderError&gt; {
+        if !self.domain.contains(&amp;left) || !self.domain.contains(&amp;right) {
+            return Err(OrderError::ElementNotInDomain);
+        }
+        Ok(self.pairs.insert((left, right)))
+    }
+
+    pub fn holds(&amp;self, left: &amp;T, right: &amp;T) -&gt; bool
+    where
+        T: Clone,
+    {
+        self.pairs.contains(&amp;(left.clone(), right.clone()))
+    }
+
+    pub fn is_reflexive(&amp;self) -&gt; bool
+    where
+        T: Clone,
+    {
+        self.domain
+            .iter()
+            .all(|x| self.pairs.contains(&amp;(x.clone(), x.clone())))
+    }
+
+    pub fn is_transitive(&amp;self) -&gt; bool
+    where
+        T: Clone,
+    {
+        for (x, y1) in &amp;self.pairs {
+            for (y2, z) in &amp;self.pairs {
+                if y1 == y2 &amp;&amp; !self.pairs.contains(&amp;(x.clone(), z.clone())) {
+                    return false;
+                }
+            }
+        }
+        true
+    }
+
+    pub fn is_antisymmetric(&amp;self) -&gt; bool
+    where
+        T: Clone,
+    {
+        self.pairs
+            .iter()
+            .all(|(x, y)| x == y || !self.pairs.contains(&amp;(y.clone(), x.clone())))
+    }
+
+    pub fn is_total(&amp;self) -&gt; bool
+    where
+        T: Clone,
+    {
+        for x in &amp;self.domain {
+            for y in &amp;self.domain {
+                let forward = self.pairs.contains(&amp;(x.clone(), y.clone()));
+                let backward = self.pairs.contains(&amp;(y.clone(), x.clone()));
+                if !forward &amp;&amp; !backward {
+                    return false;
+                }
+            }
+        }
+        true
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgefe6f91" class="outline-4">
+<h4 id="orgefe6f91">Fechos e Estruturas Validadas</h4>
+<div class="outline-text-4" id="text-orgefe6f91">
+<p>
+O fecho reflexivo-transitivo \( R^* \) transforma qualquer relação binária finita \( R \) sobre \( S \) na menor pré-ordem que a contém.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust">impl&lt;T: Eq + Hash + Clone&gt; Relation&lt;T&gt; {
+    pub fn reflexive_closure(&amp;self) -&gt; Self {
+        let mut closed = self.clone();
+        for x in &amp;self.domain {
+            closed.pairs.insert((x.clone(), x.clone()));
+        }
+        closed
+    }
+
+    pub fn transitive_closure(&amp;self) -&gt; Self {
+        let mut closed = self.clone();
+        let elems: Vec&lt;T&gt; = self.domain.iter().cloned().collect();
+
+        for k in &amp;elems {
+            for i in &amp;elems {
+                if !closed.pairs.contains(&amp;(i.clone(), k.clone())) {
+                    continue;
+                }
+                for j in &amp;elems {
+                    if closed.pairs.contains(&amp;(k.clone(), j.clone())) {
+                        closed.pairs.insert((i.clone(), j.clone()));
+                    }
+                }
+            }
+        }
+        closed
+    }
+
+    pub fn preorder_closure(&amp;self) -&gt; PreorderSet&lt;T&gt; {
+        let closed = self.reflexive_closure().transitive_closure();
+        PreorderSet { relation: closed }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PreorderSet&lt;T: Eq + Hash&gt; {
+    relation: Relation&lt;T&gt;,
+}
+
+impl&lt;T: Eq + Hash + Clone&gt; TryFrom&lt;Relation&lt;T&gt;&gt; for PreorderSet&lt;T&gt; {
+    type Error = OrderError;
+
+    fn try_from(relation: Relation&lt;T&gt;) -&gt; Result&lt;Self, Self::Error&gt; {
+        if !relation.is_reflexive() {
+            return Err(OrderError::ReflexivityViolated);
+        }
+        if !relation.is_transitive() {
+            return Err(OrderError::TransitivityViolated);
+        }
+        Ok(Self { relation })
+    }
+}
+
+impl&lt;T: Eq + Hash + Clone&gt; PreorderSet&lt;T&gt; {
+    pub fn relation(&amp;self) -&gt; &amp;Relation&lt;T&gt; {
+        &amp;self.relation
+    }
+
+    pub fn le(&amp;self, left: &amp;T, right: &amp;T) -&gt; bool {
+        self.relation.holds(left, right)
+    }
+
+    pub fn equiv(&amp;self, left: &amp;T, right: &amp;T) -&gt; bool {
+        self.le(left, right) &amp;&amp; self.le(right, left)
+    }
+
+    pub fn equivalence_class(&amp;self, elem: &amp;T) -&gt; HashSet&lt;T&gt; {
+        self.relation
+            .domain
+            .iter()
+            .filter(|other| self.equiv(elem, other))
+            .cloned()
+            .collect()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PartialOrderSet&lt;T: Eq + Hash&gt; {
+    preorder: PreorderSet&lt;T&gt;,
+}
+
+impl&lt;T: Eq + Hash + Clone&gt; TryFrom&lt;Relation&lt;T&gt;&gt; for PartialOrderSet&lt;T&gt; {
+    type Error = OrderError;
+
+    fn try_from(relation: Relation&lt;T&gt;) -&gt; Result&lt;Self, Self::Error&gt; {
+        let preorder = PreorderSet::try_from(relation)?;
+        if !preorder.relation.is_antisymmetric() {
+            return Err(OrderError::AntisymmetryViolated);
+        }
+        Ok(Self { preorder })
+    }
+}
+
+impl&lt;T: Eq + Hash + Clone&gt; PartialOrderSet&lt;T&gt; {
+    pub fn relation(&amp;self) -&gt; &amp;Relation&lt;T&gt; {
+        self.preorder.relation()
+    }
+
+    pub fn minimal_elements(&amp;self) -&gt; HashSet&lt;T&gt; {
+        let rel = self.relation();
+        rel.domain
+            .iter()
+            .filter(|m| {
+                !rel.domain
+                    .iter()
+                    .any(|x| x != *m &amp;&amp; rel.holds(x, m))
+            })
+            .cloned()
+            .collect()
+    }
+
+    pub fn maximal_elements(&amp;self) -&gt; HashSet&lt;T&gt; {
+        let rel = self.relation();
+        rel.domain
+            .iter()
+            .filter(|m| {
+                !rel.domain
+                    .iter()
+                    .any(|x| x != *m &amp;&amp; rel.holds(m, x))
+            })
+            .cloned()
+            .collect()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TotalOrderSet&lt;T: Eq + Hash&gt; {
+    poset: PartialOrderSet&lt;T&gt;,
+}
+
+impl&lt;T: Eq + Hash + Clone&gt; TryFrom&lt;Relation&lt;T&gt;&gt; for TotalOrderSet&lt;T&gt; {
+    type Error = OrderError;
+
+    fn try_from(relation: Relation&lt;T&gt;) -&gt; Result&lt;Self, Self::Error&gt; {
+        let poset = PartialOrderSet::try_from(relation)?;
+        if !poset.relation().is_total() {
+            return Err(OrderError::TotalityViolated);
+        }
+        Ok(Self { poset })
+    }
+}
+
+impl&lt;T: Eq + Hash + Clone&gt; TotalOrderSet&lt;T&gt; {
+    pub fn relation(&amp;self) -&gt; &amp;Relation&lt;T&gt; {
+        self.poset.relation()
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org8c997f8" class="outline-4">
+<h4 id="org8c997f8">Representações</h4>
+<div class="outline-text-4" id="text-org8c997f8">
+</div>
+<ul class="org-ul">
+<li><a id="orgd6cb774"></a><code>Display</code><br>
+<div class="outline-text-5" id="text-orgd6cb774">
+<div class="org-src-container">
+<pre class="src src-rust">impl&lt;T: Eq + Hash + fmt::Display&gt; fmt::Display for Relation&lt;T&gt; {
+    fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {
+        writeln!(f, "Domain ({}):", self.domain.len())?;
+        for elem in &amp;self.domain {
+            writeln!(f, "  {}", elem)?;
+        }
+        writeln!(f, "Pairs ({}):", self.pairs.len())?;
+        for (left, right) in &amp;self.pairs {
+            writeln!(f, "  {} &lt;= {}", left, right)?;
+        }
+        Ok(())
+    }
+}
+
+impl&lt;T: Eq + Hash + fmt::Display&gt; fmt::Display for PreorderSet&lt;T&gt; {
+    fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {
+        write!(f, "{}", self.relation)
+    }
+}
+
+impl&lt;T: Eq + Hash + fmt::Display&gt; fmt::Display for PartialOrderSet&lt;T&gt; {
+    fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {
+        write!(f, "{}", self.preorder)
+    }
+}
+
+impl&lt;T: Eq + Hash + fmt::Display&gt; fmt::Display for TotalOrderSet&lt;T&gt; {
+    fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {
+        write!(f, "{}", self.poset)
+    }
+}
+</pre>
+</div>
+
+<span class="pf-meta" data-pagefind-filter="tipo[data-v]" data-v="estudo"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="rust"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="implementation"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="estudo"></span>
+<span class="pf-meta" data-pagefind-filter="status[data-v]" data-v="semente"></span>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
