@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<!-- 2026-11-27 Fri 00:59 -->
+<!-- 2026-11-27 Fri 22:14 -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>pequenas transformações sobre textos</title>
@@ -27,19 +27,19 @@
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org564682a">Definição</a>
+<li><a href="#org6e7de57">Definição</a>
 <ul>
-<li><a href="#orgbad7511">example of <code>async-tokenize</code></a></li>
-<li><a href="#org05d9324"><i>struct wrapper</i></a></li>
+<li><a href="#orgeb555a9">example of <code>async-tokenize</code></a></li>
+<li><a href="#org92d2413"><i>struct wrapper</i></a></li>
 </ul>
 </li>
-<li><a href="#org71515df">Tokenizador</a></li>
+<li><a href="#orgb0d90ba">Tokenizador</a></li>
 </ul>
 </div>
 </nav>
-<div id="outline-container-org564682a" class="outline-2">
-<h2 id="org564682a">Definição</h2>
-<div class="outline-text-2" id="text-org564682a">
+<div id="outline-container-org6e7de57" class="outline-2">
+<h2 id="org6e7de57">Definição</h2>
+<div class="outline-text-2" id="text-org6e7de57">
 <div class="org-src-container">
 <pre class="src src-emacs-lisp"><span class="org-comment-delimiter">;;; </span><span class="org-comment">text-transform.el --- Org text transformations -*- lexical-binding: t; -*-
 </span>
@@ -125,9 +125,9 @@ propagates an error if the subprocess fails or emits invalid JSON."</span>
 </pre>
 </div>
 </div>
-<div id="outline-container-orgbad7511" class="outline-3">
-<h3 id="orgbad7511">example of <code>async-tokenize</code></h3>
-<div class="outline-text-3" id="text-orgbad7511">
+<div id="outline-container-orgeb555a9" class="outline-3">
+<h3 id="orgeb555a9">example of <code>async-tokenize</code></h3>
+<div class="outline-text-3" id="text-orgeb555a9">
 <div class="org-src-container">
 <pre class="src src-emacs-lisp">(aio-defun demo ()
   <span class="org-string">"Tokenize a test string and return the tokens."</span>
@@ -167,9 +167,9 @@ propagates an error if the subprocess fails or emits invalid JSON."</span>
 </div>
 </div>
 </div>
-<div id="outline-container-org05d9324" class="outline-3">
-<h3 id="org05d9324"><i>struct wrapper</i></h3>
-<div class="outline-text-3" id="text-org05d9324">
+<div id="outline-container-org92d2413" class="outline-3">
+<h3 id="org92d2413"><i>struct wrapper</i></h3>
+<div class="outline-text-3" id="text-org92d2413">
 <div class="org-src-container">
 <pre class="src src-emacs-lisp">(aio-defun transform-current-buffer ()
   <span class="org-string">"Tokenize all sections of the current buffer and report the counts."</span>
@@ -187,9 +187,9 @@ propagates an error if the subprocess fails or emits invalid JSON."</span>
 </div>
 </div>
 </div>
-<div id="outline-container-org71515df" class="outline-2">
-<h2 id="org71515df">Tokenizador</h2>
-<div class="outline-text-2" id="text-org71515df">
+<div id="outline-container-orgb0d90ba" class="outline-2">
+<h2 id="orgb0d90ba">Tokenizador</h2>
+<div class="outline-text-2" id="text-orgb0d90ba">
 <div class="org-src-container">
 <pre class="src src-python"><span class="org-doc">"""tokenizer.py &#8212; reads text from stdin, emits a JSON array of tokens on stdout.
 

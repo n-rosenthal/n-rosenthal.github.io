@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<!-- 2026-11-27 Fri 00:59 -->
+<!-- 2026-11-27 Fri 22:14 -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Reticulados, Reticulados Completos e Pontos Fixos em Rust</title>
@@ -60,34 +60,34 @@
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgfeb2f64">Implementação</a>
+<li><a href="#org4ce13d8">Implementação</a>
 <ul>
-<li><a href="#org47ec81d">Importações</a></li>
-<li><a href="#org49f2184">Fundamentos e Erros</a></li>
-<li><a href="#org696ad2c">Traço <code>Lattice</code> e Reticulados Finitos (<code>LatticeSet</code>)</a></li>
-<li><a href="#org7ae7543">Reticulados Completos e Teorema de Representação de Birkhoff</a></li>
-<li><a href="#orgf092aee">Teorema do Ponto Fixo de Knaster-Tarski</a></li>
-<li><a href="#orgafeeec7">Representações</a>
+<li><a href="#orgb86d0d9">Importações</a></li>
+<li><a href="#org4b68316">Fundamentos e Erros</a></li>
+<li><a href="#org1a320d6">Traço <code>Lattice</code> e Reticulados Finitos (<code>LatticeSet</code>)</a></li>
+<li><a href="#org9b206b6">Reticulados Completos e Teorema de Representação de Birkhoff</a></li>
+<li><a href="#orge5e1cf7">Teorema do Ponto Fixo de Knaster-Tarski</a></li>
+<li><a href="#orgdbdfddd">Representações</a>
 <ul>
-<li><a href="#org7424d91"><code>Display</code></a></li>
+<li><a href="#orgfa89bee"><code>Display</code></a></li>
 </ul>
 </li>
-<li><a href="#org6d98486">Suíte de Verificação (<code>cargo test</code>)</a></li>
+<li><a href="#org68abb0d">Suíte de Verificação (<code>cargo test</code>)</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </nav>
-<div id="outline-container-orgfeb2f64" class="outline-2">
-<h2 id="orgfeb2f64">Implementação</h2>
-<div class="outline-text-2" id="text-orgfeb2f64">
+<div id="outline-container-org4ce13d8" class="outline-2">
+<h2 id="org4ce13d8">Implementação</h2>
+<div class="outline-text-2" id="text-org4ce13d8">
 <p>
 Este módulo aprofunda o estudo das ordens parciais introduzindo <b>reticulados</b> (<i>lattices</i>), <b>reticulados completos</b>, a representação de Birkhoff via conjuntos inferiores e o <b>Teorema do Ponto Fixo de Knaster-Tarski</b>, fundamental para semântica denotacional, análise de fluxo de dados e lógica modal.
 </p>
 </div>
-<div id="outline-container-org47ec81d" class="outline-3">
-<h3 id="org47ec81d">Importações</h3>
-<div class="outline-text-3" id="text-org47ec81d">
+<div id="outline-container-orgb86d0d9" class="outline-3">
+<h3 id="orgb86d0d9">Importações</h3>
+<div class="outline-text-3" id="text-orgb86d0d9">
 <div class="org-src-container">
 <pre class="src src-rust">use std::collections::{BTreeSet, HashSet};
 use std::error::Error;
@@ -100,9 +100,9 @@ use crate::{OrderError, PartialOrderSet, PreorderSet, Relation};
 </div>
 </div>
 </div>
-<div id="outline-container-org49f2184" class="outline-3">
-<h3 id="org49f2184">Fundamentos e Erros</h3>
-<div class="outline-text-3" id="text-org49f2184">
+<div id="outline-container-org4b68316" class="outline-3">
+<h3 id="org4b68316">Fundamentos e Erros</h3>
+<div class="outline-text-3" id="text-org4b68316">
 <p>
 Seja \( (L, \le) \) uma ordem parcial:
 </p>
@@ -181,9 +181,9 @@ impl Error for LatticeError {}
 </div>
 </div>
 </div>
-<div id="outline-container-org696ad2c" class="outline-3">
-<h3 id="org696ad2c">Traço <code>Lattice</code> e Reticulados Finitos (<code>LatticeSet</code>)</h3>
-<div class="outline-text-3" id="text-org696ad2c">
+<div id="outline-container-org1a320d6" class="outline-3">
+<h3 id="org1a320d6">Traço <code>Lattice</code> e Reticulados Finitos (<code>LatticeSet</code>)</h3>
+<div class="outline-text-3" id="text-org1a320d6">
 <p>
 Do ponto de vista algébrico, um reticulado pode ser caracterizado tanto pela ordem \( (L, \le) \) quanto por duas operações binárias comutativas, associativas e idempotentes \( (\wedge, \vee) \) ligadas pelas <b>leis de absorção</b>:
 </p>
@@ -377,9 +377,9 @@ impl&lt;T: Eq + Hash + Clone&gt; LatticeSet&lt;T&gt; {
 </div>
 </div>
 </div>
-<div id="outline-container-org7ae7543" class="outline-3">
-<h3 id="org7ae7543">Reticulados Completos e Teorema de Representação de Birkhoff</h3>
-<div class="outline-text-3" id="text-org7ae7543">
+<div id="outline-container-org9b206b6" class="outline-3">
+<h3 id="org9b206b6">Reticulados Completos e Teorema de Representação de Birkhoff</h3>
+<div class="outline-text-3" id="text-org9b206b6">
 <p>
 Um reticulado completo <code>CompleteLatticeSet&lt;T&gt;</code> garante a existência de \( \bot \), \( \top \), \( \bigwedge X \) e \( \bigvee X \) para todo \( X \subseteq L \), além de permitir testar se um elemento \( x \in L \) possui <b>complemento</b> \( y \in L \) (\( x \wedge y = \bot \) e \( x \vee y = \top \)).
 </p>
@@ -557,9 +557,9 @@ impl&lt;T: Ord + Hash + Clone&gt; PartialOrderSet&lt;T&gt; {
 </div>
 </div>
 </div>
-<div id="outline-container-orgf092aee" class="outline-3">
-<h3 id="orgf092aee">Teorema do Ponto Fixo de Knaster-Tarski</h3>
-<div class="outline-text-3" id="text-orgf092aee">
+<div id="outline-container-orge5e1cf7" class="outline-3">
+<h3 id="orge5e1cf7">Teorema do Ponto Fixo de Knaster-Tarski</h3>
+<div class="outline-text-3" id="text-orge5e1cf7">
 <p>
 Seja \( (L, \le) \) um reticulado completo e \( f: L \to L \) um endomorfismo monótono (\( x \le y \implies f(x) \le f(y) \)). O <b>Teorema de Knaster-Tarski</b> afirma que o conjunto dos pontos fixos:
 </p>
@@ -675,13 +675,13 @@ Em particular, os pontos fixos extremos admitem caracterizações fechadas a par
 </div>
 </div>
 </div>
-<div id="outline-container-orgafeeec7" class="outline-3">
-<h3 id="orgafeeec7">Representações</h3>
-<div class="outline-text-3" id="text-orgafeeec7">
+<div id="outline-container-orgdbdfddd" class="outline-3">
+<h3 id="orgdbdfddd">Representações</h3>
+<div class="outline-text-3" id="text-orgdbdfddd">
 </div>
-<div id="outline-container-org7424d91" class="outline-4">
-<h4 id="org7424d91"><code>Display</code></h4>
-<div class="outline-text-4" id="text-org7424d91">
+<div id="outline-container-orgfa89bee" class="outline-4">
+<h4 id="orgfa89bee"><code>Display</code></h4>
+<div class="outline-text-4" id="text-orgfa89bee">
 <div class="org-src-container">
 <pre class="src src-rust">impl&lt;T: Eq + Hash + fmt::Display&gt; fmt::Display for LatticeSet&lt;T&gt; {
     fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {
@@ -700,9 +700,9 @@ impl&lt;T: Eq + Hash + fmt::Display&gt; fmt::Display for CompleteLatticeSet&lt;T
 </div>
 </div>
 </div>
-<div id="outline-container-org6d98486" class="outline-3">
-<h3 id="org6d98486">Suíte de Verificação (<code>cargo test</code>)</h3>
-<div class="outline-text-3" id="text-org6d98486">
+<div id="outline-container-org68abb0d" class="outline-3">
+<h3 id="org68abb0d">Suíte de Verificação (<code>cargo test</code>)</h3>
+<div class="outline-text-3" id="text-org68abb0d">
 <div class="org-src-container">
 <pre class="src src-rust">#[cfg(test)]
 mod tests {

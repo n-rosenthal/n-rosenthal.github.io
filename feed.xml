@@ -4,7 +4,21 @@
   <link href="https://n-rosenthal.github.io/feed.xml" rel="self"/>
   <link href="https://n-rosenthal.github.io/"/>
   <id>https://n-rosenthal.github.io/</id>
-  <updated>2026-11-26T00:00:00Z</updated>
+  <updated>2026-11-27T00:00:00Z</updated>
+  <entry>
+    <title>Implementando a Especificação Truth-Values em Lean</title>
+    <link href="https://n-rosenthal.github.io/estudos/implementando-a-especificacao-truth-values-em-lean.html"/>
+    <id>https://n-rosenthal.github.io/estudos/implementando-a-especificacao-truth-values-em-lean.html</id>
+    <updated>2026-11-27T00:00:00Z</updated>
+    <summary>Especificação algébrica do módulo TRUTH-VALUES (Maude) traduzida para Lean 4 com provas formais em LaTeX e demonstração da construção de termos de prova.</summary>
+  </entry>
+  <entry>
+    <title>Análise Formal de Conceitos (FCA) e Reticulados de Conceitos em Rust</title>
+    <link href="https://n-rosenthal.github.io/estudos/analise-formal-de-conceitos-fca-e-reticulados-de-conceitos-em-rust.html"/>
+    <id>https://n-rosenthal.github.io/estudos/analise-formal-de-conceitos-fca-e-reticulados-de-conceitos-em-rust.html</id>
+    <updated>2026-11-26T00:00:00Z</updated>
+    <summary>Contextos formais, conexões de Galois antítonas, Teorema Fundamental dos Reticulados de Conceitos e implicações de atributos</summary>
+  </entry>
   <entry>
     <title>Aplicações de Pré-ordens, Morfismos e Diagramas de Hasse em Rust</title>
     <link href="https://n-rosenthal.github.io/estudos/aplicacoes-de-pre-ordens-morfismos-e-diagramas-de-hasse-em-rust.html"/>
