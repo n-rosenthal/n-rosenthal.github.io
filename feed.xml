@@ -6,6 +6,20 @@
   <id>https://n-rosenthal.github.io/</id>
   <updated>2026-11-26T00:00:00Z</updated>
   <entry>
+    <title>Aplicações de Pré-ordens, Morfismos e Diagramas de Hasse em Rust</title>
+    <link href="https://n-rosenthal.github.io/estudos/aplicacoes-de-pre-ordens-morfismos-e-diagramas-de-hasse-em-rust.html"/>
+    <id>https://n-rosenthal.github.io/estudos/aplicacoes-de-pre-ordens-morfismos-e-diagramas-de-hasse-em-rust.html</id>
+    <updated>2026-11-26T00:00:00Z</updated>
+    <summary>Estudo aplicado integrando grafos de dependências, reticulados de divisibilidade, interpretação abstrata via conexões de Galois e triagem multicritério</summary>
+  </entry>
+  <entry>
+    <title>Grafos, Condensação e Diagramas de Hasse em Rust</title>
+    <link href="https://n-rosenthal.github.io/estudos/grafos-condensacao-e-diagramas-de-hasse-em-rust.html"/>
+    <id>https://n-rosenthal.github.io/estudos/grafos-condensacao-e-diagramas-de-hasse-em-rust.html</id>
+    <updated>2026-11-26T00:00:00Z</updated>
+    <summary>Ponte entre grafos direcionados e pré-ordens: alcançabilidade, condensação de SCCs, extensão linear e diagrama de Hasse</summary>
+  </entry>
+  <entry>
     <title>Grafos em Rust</title>
     <link href="https://n-rosenthal.github.io/estudos/grafos-em-rust.html"/>
     <id>https://n-rosenthal.github.io/estudos/grafos-em-rust.html</id>
@@ -13,11 +27,32 @@
     <summary>Implementação de grafos direcionados em Rust</summary>
   </entry>
   <entry>
+    <title>Operações Fundamentais sobre Pré-ordens em Rust</title>
+    <link href="https://n-rosenthal.github.io/estudos/operacoes-fundamentais-sobre-pre-ordens.html"/>
+    <id>https://n-rosenthal.github.io/estudos/operacoes-fundamentais-sobre-pre-ordens.html</id>
+    <updated>2026-11-26T00:00:00Z</updated>
+    <summary>Dualidade, conjuntos inferiores/superiores, quociente poset e limites em pré-ordens</summary>
+  </entry>
+  <entry>
+    <title>Produtos, Morfismos e Conexões de Galois em Rust</title>
+    <link href="https://n-rosenthal.github.io/estudos/produtos-morfismos-e-conexoes-de-galois-em-rust.html"/>
+    <id>https://n-rosenthal.github.io/estudos/produtos-morfismos-e-conexoes-de-galois-em-rust.html</id>
+    <updated>2026-11-26T00:00:00Z</updated>
+    <summary>Produto cartesiano, ordem lexicográfica, mapas monótonos e conexões de Galois entre pré-ordens</summary>
+  </entry>
+  <entry>
     <title>Relações de Ordem em Rust</title>
     <link href="https://n-rosenthal.github.io/estudos/relacoes-de-ordem-em-rust.html"/>
     <id>https://n-rosenthal.github.io/estudos/relacoes-de-ordem-em-rust.html</id>
     <updated>2026-11-26T00:00:00Z</updated>
     <summary>Implementação de relações de ordem e pré-ordem para estruturas de dados</summary>
+  </entry>
+  <entry>
+    <title>Reticulados, Reticulados Completos e Pontos Fixos em Rust</title>
+    <link href="https://n-rosenthal.github.io/estudos/reticulados-reticulados-completos-e-pontos-fixos-em-rust.html"/>
+    <id>https://n-rosenthal.github.io/estudos/reticulados-reticulados-completos-e-pontos-fixos-em-rust.html</id>
+    <updated>2026-11-26T00:00:00Z</updated>
+    <summary>Implementação de reticulados, reticulados distributivos, Teorema de Representação de Birkhoff e Teorema do Ponto Fixo de Knaster-Tarski</summary>
   </entry>
   <entry>
     <title>Contextos para Implementação de Linguagens de Programação</title>

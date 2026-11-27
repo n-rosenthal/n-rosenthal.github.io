@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<!-- 2026-11-27 Fri 00:59 -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Operações Fundamentais sobre Pré-ordens em Rust</title>
+<meta name="author" content="n-rosenthal" />
+<meta name="description" content="Dualidade, conjuntos inferiores/superiores, quociente poset e limites em pré-ordens" />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/estudo.css">
+<link rel="alternate" type="application/atom+xml" title="Notas de estudo" href="/feed.xml">
+<script defer src="/js/grafo-local.js"></script>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Operações Fundamentais sobre Pré-ordens em Rust">
+<meta property="og:description" content="Dualidade, conjuntos inferiores/superiores, quociente poset e limites em pré-ordens">
+<meta property="og:url" content="https://n-rosenthal.github.io/estudos/operacoes-fundamentais-sobre-pre-ordens.html">
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav class="nav"><a href="/">Início</a><a href="/grafo.html">Grafo</a><a href="/feed.xml">Feed</a></nav><div class="meta-nota"><span class="selo selo-semente">semente</span><span>4 min de leitura</span><span>criada em 2026-11-26</span><span>atualizada em 2026-11-26</span></div>
+</div>
+<div id="content" class="content">
+<header>
+<h1 class="title">Operações Fundamentais sobre Pré-ordens em Rust</h1>
+</header><nav id="table-of-contents" role="doc-toc">
+<h2>&Iacute;ndice</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org88d40b2">Implementação</a>
+<ul>
+<li><a href="#org5f1d1a9">Importações</a></li>
+<li><a href="#org70df89a">Dualidade (\( P^{\text{op}} \))</a></li>
+<li><a href="#orgdcf0280">Conjuntos Inferiores (<i>Downsets</i>) e Superiores (<i>Upsets</i>)</a></li>
+<li><a href="#org93641b8">Quociente Poset (\( P / {\sim} \))</a></li>
+<li><a href="#org133e23a">Cotas, Ínfimo (<i>Meet</i>) e Supremo (<i>Join</i>)</a></li>
+<li><a href="#org1e13d1e">Instâncias Concretas do Traço <code>Preorder</code></a></li>
+<li><a href="#org70d0a50">Representações</a>
+<ul>
+<li><a href="#orgb41e648"><code>Display</code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</nav>
+<div id="outline-container-org88d40b2" class="outline-2">
+<h2 id="org88d40b2">Implementação</h2>
+<div class="outline-text-2" id="text-org88d40b2">
+<p>
+Este módulo estende as definições base (<code>Preorder</code>, <code>Relation</code>, <code>PreorderSet</code> e <code>PartialOrderSet</code>) com as construções estruturais fundamentais da teoria da ordem.
+</p>
+</div>
+<div id="outline-container-org5f1d1a9" class="outline-3">
+<h3 id="org5f1d1a9">Importações</h3>
+<div class="outline-text-3" id="text-org5f1d1a9">
+<div class="org-src-container">
+<pre class="src src-rust">use std::collections::{BTreeSet, HashSet};
+use std::fmt;
+use std::hash::Hash;
+
+use crate::{PartialOrderSet, Preorder, PreorderSet, Relation};
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org70df89a" class="outline-3">
+<h3 id="org70df89a">Dualidade (\( P^{\text{op}} \))</h3>
+<div class="outline-text-3" id="text-org70df89a">
+<p>
+Toda pré-ordem \( P = (S, \preceq) \) possui uma <b>pré-ordem dual</b> (ou oposta) \( P^{\text{op}} = (S, \preceq^{\text{op}}) \) sobre o mesmo domínio, definida pela inversão da relação:
+</p>
+
+<p>
+\[x \preceq^{\text{op}} y \iff y \preceq x\]
+</p>
+
+<p>
+O princípio da dualidade garante que qualquer propriedade ou construção válida para toda pré-ordem possui uma contraparte dual obtida pela inversão das desigualdades (por exemplo, elementos minimais tornam-se maximais e <b>downsets</b> tornam-se <b>upsets</b>).
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust">#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct Dual&lt;T&gt;(pub T);
+
+impl&lt;T: Preorder&gt; Preorder for Dual&lt;T&gt; {
+    fn le(&amp;self, other: &amp;Self) -&gt; bool {
+        other.0.le(&amp;self.0)
+    }
+}
+
+impl&lt;T: Eq + Hash + Clone&gt; PreorderSet&lt;T&gt; {
+    pub fn dual(&amp;self) -&gt; PreorderSet&lt;T&gt; {
+        let pairs = self
+            .relation()
+            .pairs
+            .iter()
+            .map(|(x, y)| (y.clone(), x.clone()))
+            .collect();
+
+        let relation = Relation {
+            domain: self.relation().domain.clone(),
+            pairs,
+        };
+
+        PreorderSet::try_from(relation)
+            .expect("o dual de uma pré-ordem é sempre uma pré-ordem")
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgdcf0280" class="outline-3">
+<h3 id="orgdcf0280">Conjuntos Inferiores (<i>Downsets</i>) e Superiores (<i>Upsets</i>)</h3>
+<div class="outline-text-3" id="text-orgdcf0280">
+<p>
+Seja \( (S, \preceq) \) uma pré-ordem e \( X \subseteq S \) um subconjunto qualquer:
+</p>
+
+<ul class="org-ul">
+<li><b>Conjunto inferior gerado (<i>downset</i>):</b> \( \downarrow X = \{ y \in S \mid \exists x \in X,\ y \preceq x \} \).</li>
+<li><b>Conjunto superior gerado (<i>upset</i>):</b> \( \uparrow X = \{ y \in S \mid \exists x \in X,\ x \preceq y \} \).</li>
+</ul>
+
+<p>
+Quando \( X = \{x\} \) é unitário, \( \downarrow x \) e \( \uparrow x \) são chamados de <b>downset principal</b> e <b>upset principal</b>, respectivamente. Um subconjunto \( D \subseteq S \) é fechado para baixo (<b>downset</b>) se, e somente se, \( \downarrow D = D \).
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust">impl&lt;T: Eq + Hash + Clone&gt; PreorderSet&lt;T&gt; {
+    pub fn principal_downset(&amp;self, x: &amp;T) -&gt; HashSet&lt;T&gt; {
+        self.relation()
+            .domain
+            .iter()
+            .filter(|y| self.le(y, x))
+            .cloned()
+            .collect()
+    }
+
+    pub fn principal_upset(&amp;self, x: &amp;T) -&gt; HashSet&lt;T&gt; {
+        self.relation()
+            .domain
+            .iter()
+            .filter(|y| self.le(x, y))
+            .cloned()
+            .collect()
+    }
+
+    pub fn downset(&amp;self, subset: &amp;HashSet&lt;T&gt;) -&gt; HashSet&lt;T&gt; {
+        self.relation()
+            .domain
+            .iter()
+            .filter(|y| subset.iter().any(|x| self.le(y, x)))
+            .cloned()
+            .collect()
+    }
+
+    pub fn upset(&amp;self, subset: &amp;HashSet&lt;T&gt;) -&gt; HashSet&lt;T&gt; {
+        self.relation()
+            .domain
+            .iter()
+            .filter(|y| subset.iter().any(|x| self.le(x, y)))
+            .cloned()
+            .collect()
+    }
+
+    pub fn is_downset(&amp;self, subset: &amp;HashSet&lt;T&gt;) -&gt; bool {
+        subset.is_subset(&amp;self.relation().domain) &amp;&amp; self.downset(subset) == *subset
+    }
+
+    pub fn is_upset(&amp;self, subset: &amp;HashSet&lt;T&gt;) -&gt; bool {
+        subset.is_subset(&amp;self.relation().domain) &amp;&amp; self.upset(subset) == *subset
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org93641b8" class="outline-3">
+<h3 id="org93641b8">Quociente Poset (\( P / {\sim} \))</h3>
+<div class="outline-text-3" id="text-org93641b8">
+<p>
+A construção fundamental que conecta pré-ordens a ordens parciais é o <b>quociente pela equivalência induzida</b> (\( x \sim y \iff x \preceq y \land y \preceq x \)).
+</p>
+
+<p>
+Ao particionar \( S \) em suas classes de equivalência \( [x] = \{ y \in S \mid x \sim y \} \), a relação induzida no conjunto quociente \( S / {\sim} \):
+</p>
+
+<p>
+\[[x] \le [y] \iff x \preceq y\]
+</p>
+
+<p>
+é bem definida (independe da escolha dos representantes \( x, y \)) e satisfaz a antissimetria: se \( [x] \le [y] \) e \( [y] \le [x] \), então \( x \sim y \), logo \( [x] = [y] \). Categoricamente, essa construção é o <b>funtor de reflexão</b> \( \mathbf{Preord} \to \mathbf{Poset} \), extraindo o esqueleto da pré-ordem.
+</p>
+
+<p>
+Em Rust, utilizamos <code>BTreeSet&lt;T&gt;</code> para representar cada classe de equivalência de forma canônica e determinística (garantindo a implementação de <code>Hash</code> e <code>Eq</code> exigida por <code>PartialOrderSet</code>).
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust">#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct EquivalenceClass&lt;T: Ord&gt;(pub BTreeSet&lt;T&gt;);
+
+impl&lt;T: Ord + Hash + Clone&gt; PreorderSet&lt;T&gt; {
+    pub fn quotient(&amp;self) -&gt; PartialOrderSet&lt;EquivalenceClass&lt;T&gt;&gt; {
+        let mut q_domain = HashSet::new();
+
+        for x in &amp;self.relation().domain {
+            let members: BTreeSet&lt;T&gt; = self.equivalence_class(x).into_iter().collect();
+            q_domain.insert(EquivalenceClass(members));
+        }
+
+        let mut q_pairs = HashSet::new();
+        for c1 in &amp;q_domain {
+            let r1 = c1.0.first().expect("classe de equivalência não vazia");
+            for c2 in &amp;q_domain {
+                let r2 = c2.0.first().expect("classe de equivalência não vazia");
+                if self.le(r1, r2) {
+                    q_pairs.insert((c1.clone(), c2.clone()));
+                }
+            }
+        }
+
+        PartialOrderSet::try_from(Relation {
+            domain: q_domain,
+            pairs: q_pairs,
+        })
+        .expect("o quociente de uma pré-ordem por ~ é sempre uma ordem parcial")
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org133e23a" class="outline-3">
+<h3 id="org133e23a">Cotas, Ínfimo (<i>Meet</i>) e Supremo (<i>Join</i>)</h3>
+<div class="outline-text-3" id="text-org133e23a">
+<p>
+Dado um subconjunto \( X \subseteq S \) em uma pré-ordem \( (S, \preceq) \):
+</p>
+
+<ul class="org-ul">
+<li><b>Cotas inferiores:</b> \( \text{LB}(X) = \{ b \in S \mid \forall x \in X,\ b \preceq x \} \).</li>
+<li><b>Cotas superiores:</b> \( \text{UB}(X) = \{ b \in S \mid \forall x \in X,\ x \preceq b \} \).</li>
+<li><b>Ínfimos (/meets</b>, \( \bigwedge X \)):* elementos \( m \in \text{LB}(X) \) tais que \( \forall b \in \text{LB}(X),\ b \preceq m \).</li>
+<li><b>Supremos (/joins</b>, \( \bigvee X \)):* elementos \( j \in \text{UB}(X) \) tais que \( \forall b \in \text{UB}(X),\ j \preceq b \).</li>
+</ul>
+
+<p>
+Diferentemente de uma ordem parcial — onde o ínfimo e o supremo, quando existem, são únicos —, em uma pré-ordem geral eles são únicos <b>a menos de equivalência (\( \sim \))</b>: se \( m_1 \) e \( m_2 \) são ínfimos de \( X \), então \( m_1 \preceq m_2 \) e \( m_2 \preceq m_1 \), formando uma única classe de equivalência.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust">impl&lt;T: Eq + Hash + Clone&gt; PreorderSet&lt;T&gt; {
+    pub fn lower_bounds(&amp;self, subset: &amp;HashSet&lt;T&gt;) -&gt; HashSet&lt;T&gt; {
+        self.relation()
+            .domain
+            .iter()
+            .filter(|b| subset.iter().all(|x| self.le(b, x)))
+            .cloned()
+            .collect()
+    }
+
+    pub fn upper_bounds(&amp;self, subset: &amp;HashSet&lt;T&gt;) -&gt; HashSet&lt;T&gt; {
+        self.relation()
+            .domain
+            .iter()
+            .filter(|b| subset.iter().all(|x| self.le(x, b)))
+            .cloned()
+            .collect()
+    }
+
+    pub fn meets(&amp;self, subset: &amp;HashSet&lt;T&gt;) -&gt; HashSet&lt;T&gt; {
+        let lb = self.lower_bounds(subset);
+        lb.iter()
+            .filter(|m| lb.iter().all(|b| self.le(b, m)))
+            .cloned()
+            .collect()
+    }
+
+    pub fn joins(&amp;self, subset: &amp;HashSet&lt;T&gt;) -&gt; HashSet&lt;T&gt; {
+        let ub = self.upper_bounds(subset);
+        ub.iter()
+            .filter(|j| ub.iter().all(|b| self.le(j, b)))
+            .cloned()
+            .collect()
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org1e13d1e" class="outline-3">
+<h3 id="org1e13d1e">Instâncias Concretas do Traço <code>Preorder</code></h3>
+<div class="outline-text-3" id="text-org1e13d1e">
+<p>
+Dois modelos canônicos ilustram pré-ordens genuínas (nas quais a antissimetria falha, gerando classes de equivalência não triviais):
+</p>
+
+<ol class="org-ol">
+<li><b>Divisibilidade nos inteiros (\( a \preceq b \iff a \mid b \)):</b> como \( 3 \mid -3 \) e \( -3 \mid 3 \), tem-se \( 3 \sim -3 \) com \( 3 \neq -3 \). Além disso, \( 0 \) é o elemento máximo (\( \forall a \in \mathbb{Z},\ a \mid 0 \)) e \( \pm 1 \) são os elementos mínimos (\( \pm 1 \mid a \)).</li>
+<li><b>Pré-ordem induzida por projeção (/pullback</b>):* dada uma função \( f: A \to B \) para um tipo ordenado, \( a_1 \preceq a_2 \iff f(a_1) \le f(a_2) \). Elementos distintos com a mesma chave são equivalentes (\( a_1 \sim a_2 \)).</li>
+</ol>
+
+<div class="org-src-container">
+<pre class="src src-rust">#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct Divisibility(pub i64);
+
+impl Preorder for Divisibility {
+    fn le(&amp;self, other: &amp;Self) -&gt; bool {
+        match (self.0, other.0) {
+            (_, 0) =&gt; true,
+            (0, _) =&gt; false,
+            (a, b) =&gt; b % a == 0,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ByKey&lt;T, K, F&gt; {
+    pub value: T,
+    pub key_fn: F,
+    _marker: std::marker::PhantomData&lt;K&gt;,
+}
+
+impl&lt;T, K, F&gt; ByKey&lt;T, K, F&gt;
+where
+    F: Fn(&amp;T) -&gt; K,
+{
+    pub fn new(value: T, key_fn: F) -&gt; Self {
+        Self {
+            value,
+            key_fn,
+            _marker: std::marker::PhantomData,
+        }
+    }
+}
+
+impl&lt;T, K, F&gt; Preorder for ByKey&lt;T, K, F&gt;
+where
+    K: Ord,
+    F: Fn(&amp;T) -&gt; K,
+{
+    fn le(&amp;self, other: &amp;Self) -&gt; bool {
+        (self.key_fn)(&amp;self.value) &lt;= (self.key_fn)(&amp;other.value)
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org70d0a50" class="outline-3">
+<h3 id="org70d0a50">Representações</h3>
+<div class="outline-text-3" id="text-org70d0a50">
+</div>
+<div id="outline-container-orgb41e648" class="outline-4">
+<h4 id="orgb41e648"><code>Display</code></h4>
+<div class="outline-text-4" id="text-orgb41e648">
+<div class="org-src-container">
+<pre class="src src-rust">impl&lt;T: fmt::Display&gt; fmt::Display for Dual&lt;T&gt; {
+    fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {
+        write!(f, "Dual({})", self.0)
+    }
+}
+
+impl&lt;T: Ord + fmt::Display&gt; fmt::Display for EquivalenceClass&lt;T&gt; {
+    fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {
+        write!(f, "[")?;
+        for (i, item) in self.0.iter().enumerate() {
+            if i &gt; 0 {
+                write!(f, ", ")?;
+            }
+            write!(f, "{}", item)?;
+        }
+        write!(f, "]")
+    }
+}
+
+impl fmt::Display for Divisibility {
+    fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+</pre>
+</div>
+
+<span class="pf-meta" data-pagefind-filter="tipo[data-v]" data-v="estudo"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="rust"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="implementation"></span>
+<span class="pf-meta" data-pagefind-filter="tag[data-v]" data-v="estudo"></span>
+<span class="pf-meta" data-pagefind-filter="status[data-v]" data-v="semente"></span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

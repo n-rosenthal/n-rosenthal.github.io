@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<!-- 2026-11-27 Fri 00:37 -->
+<!-- 2026-11-27 Fri 00:59 -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Relações de Ordem em Rust</title>
@@ -60,20 +60,20 @@
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org210428c">Implementação</a>
+<li><a href="#org8e70994">Implementação</a>
 <ul>
-<li><a href="#org508cc80">Importações</a></li>
-<li><a href="#orgaf189ec">Fundamentos e Erros</a>
+<li><a href="#orgda80150">Importações</a></li>
+<li><a href="#org00c883f">Fundamentos e Erros</a>
 <ul>
-<li><a href="#org2e01d04">Representação para Erros</a></li>
+<li><a href="#orgb7a2431">Representação para Erros</a></li>
 </ul>
 </li>
-<li><a href="#org80799b7">Definições</a>
+<li><a href="#org297c66a">Definições</a>
 <ul>
-<li><a href="#org581ca8f">Traço <code>Preorder</code></a></li>
-<li><a href="#orgdd42158">Relações Binárias Finitas</a></li>
-<li><a href="#orgefe6f91">Fechos e Estruturas Validadas</a></li>
-<li><a href="#org8c997f8">Representações</a></li>
+<li><a href="#orgf5f95e4">Traço <code>Preorder</code></a></li>
+<li><a href="#org42d906b">Relações Binárias Finitas</a></li>
+<li><a href="#orgf0822ba">Fechos e Estruturas Validadas</a></li>
+<li><a href="#org14d353c">Representações</a></li>
 </ul>
 </li>
 </ul>
@@ -81,13 +81,13 @@
 </ul>
 </div>
 </nav>
-<div id="outline-container-org210428c" class="outline-2">
-<h2 id="org210428c">Implementação</h2>
-<div class="outline-text-2" id="text-org210428c">
+<div id="outline-container-org8e70994" class="outline-2">
+<h2 id="org8e70994">Implementação</h2>
+<div class="outline-text-2" id="text-org8e70994">
 </div>
-<div id="outline-container-org508cc80" class="outline-3">
-<h3 id="org508cc80">Importações</h3>
-<div class="outline-text-3" id="text-org508cc80">
+<div id="outline-container-orgda80150" class="outline-3">
+<h3 id="orgda80150">Importações</h3>
+<div class="outline-text-3" id="text-orgda80150">
 <div class="org-src-container">
 <pre class="src src-rust">use std::collections::HashSet;
 use std::error::Error;
@@ -97,9 +97,9 @@ use std::hash::Hash;
 </div>
 </div>
 </div>
-<div id="outline-container-orgaf189ec" class="outline-3">
-<h3 id="orgaf189ec">Fundamentos e Erros</h3>
-<div class="outline-text-3" id="text-orgaf189ec">
+<div id="outline-container-org00c883f" class="outline-3">
+<h3 id="org00c883f">Fundamentos e Erros</h3>
+<div class="outline-text-3" id="text-org00c883f">
 <p>
 Seja \( S \) um conjunto (domínio) e \( R \subseteq S \times S \) uma relação binária sobre \( S \), onde \( (x, y) \in R \) denota \( x \preceq y \). Os axiomas fundamentais de ordem são:
 </p>
@@ -145,9 +145,9 @@ pub enum OrderError {
 </pre>
 </div>
 </div>
-<div id="outline-container-org2e01d04" class="outline-4">
-<h4 id="org2e01d04">Representação para Erros</h4>
-<div class="outline-text-4" id="text-org2e01d04">
+<div id="outline-container-orgb7a2431" class="outline-4">
+<h4 id="orgb7a2431">Representação para Erros</h4>
+<div class="outline-text-4" id="text-orgb7a2431">
 <div class="org-src-container">
 <pre class="src src-rust">impl fmt::Display for OrderError {
     fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {
@@ -177,13 +177,13 @@ impl Error for OrderError {}
 </div>
 </div>
 </div>
-<div id="outline-container-org80799b7" class="outline-3">
-<h3 id="org80799b7">Definições</h3>
-<div class="outline-text-3" id="text-org80799b7">
+<div id="outline-container-org297c66a" class="outline-3">
+<h3 id="org297c66a">Definições</h3>
+<div class="outline-text-3" id="text-org297c66a">
 </div>
-<div id="outline-container-org581ca8f" class="outline-4">
-<h4 id="org581ca8f">Traço <code>Preorder</code></h4>
-<div class="outline-text-4" id="text-org581ca8f">
+<div id="outline-container-orgf5f95e4" class="outline-4">
+<h4 id="orgf5f95e4">Traço <code>Preorder</code></h4>
+<div class="outline-text-4" id="text-orgf5f95e4">
 <p>
 A biblioteca padrão do Rust modela ordens parciais (<code>PartialOrd</code>) e ordens totais (<code>Ord</code>), mas não fornece um traço dedicado a pré-ordens. O traço <code>Preorder</code> exige apenas o operador não estrito <code>le</code> (\( x \preceq y \)), derivando a equivalência induzida <code>equiv</code> (\( x \sim y \iff x \preceq y \land y \preceq x \)) e a pré-ordem estrita <code>lt</code> (\( x \prec y \iff x \preceq y \land y \npreceq x \)).
 </p>
@@ -212,9 +212,9 @@ A biblioteca padrão do Rust modela ordens parciais (<code>PartialOrd</code>) e 
 </div>
 </div>
 </div>
-<div id="outline-container-orgdd42158" class="outline-4">
-<h4 id="orgdd42158">Relações Binárias Finitas</h4>
-<div class="outline-text-4" id="text-orgdd42158">
+<div id="outline-container-org42d906b" class="outline-4">
+<h4 id="org42d906b">Relações Binárias Finitas</h4>
+<div class="outline-text-4" id="text-org42d906b">
 <p>
 Para inspecionar e validar relações finitas em tempo de execução, definimos <code>Relation&lt;T&gt;</code> como um par \( (S, R) \) sobre um domínio finito \( S \). A partir de <code>Relation&lt;T&gt;</code>, os tipos <code>PreorderSet&lt;T&gt;</code>, <code>PartialOrderSet&lt;T&gt;</code> e <code>TotalOrderSet&lt;T&gt;</code> garantem por construção (via <code>TryFrom</code>) os respectivos invariantes axiomáticos.
 </p>
@@ -314,9 +314,9 @@ impl&lt;T: Eq + Hash&gt; Relation&lt;T&gt; {
 </div>
 </div>
 </div>
-<div id="outline-container-orgefe6f91" class="outline-4">
-<h4 id="orgefe6f91">Fechos e Estruturas Validadas</h4>
-<div class="outline-text-4" id="text-orgefe6f91">
+<div id="outline-container-orgf0822ba" class="outline-4">
+<h4 id="orgf0822ba">Fechos e Estruturas Validadas</h4>
+<div class="outline-text-4" id="text-orgf0822ba">
 <p>
 O fecho reflexivo-transitivo \( R^* \) transforma qualquer relação binária finita \( R \) sobre \( S \) na menor pré-ordem que a contém.
 </p>
@@ -473,13 +473,13 @@ impl&lt;T: Eq + Hash + Clone&gt; TotalOrderSet&lt;T&gt; {
 </div>
 </div>
 </div>
-<div id="outline-container-org8c997f8" class="outline-4">
-<h4 id="org8c997f8">Representações</h4>
-<div class="outline-text-4" id="text-org8c997f8">
+<div id="outline-container-org14d353c" class="outline-4">
+<h4 id="org14d353c">Representações</h4>
+<div class="outline-text-4" id="text-org14d353c">
 </div>
 <ul class="org-ul">
-<li><a id="orgd6cb774"></a><code>Display</code><br>
-<div class="outline-text-5" id="text-orgd6cb774">
+<li><a id="org6013aca"></a><code>Display</code><br>
+<div class="outline-text-5" id="text-org6013aca">
 <div class="org-src-container">
 <pre class="src src-rust">impl&lt;T: Eq + Hash + fmt::Display&gt; fmt::Display for Relation&lt;T&gt; {
     fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {

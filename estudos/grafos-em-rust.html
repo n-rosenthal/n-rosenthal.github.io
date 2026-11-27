@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<!-- 2026-11-27 Fri 00:37 -->
+<!-- 2026-11-27 Fri 00:59 -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Grafos em Rust</title>
@@ -60,20 +60,20 @@
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org92bdc20">Implementação</a>
+<li><a href="#org7e03c1f">Implementação</a>
 <ul>
-<li><a href="#orgb656d82">Importações</a></li>
-<li><a href="#orgc4008ed">Erros</a>
+<li><a href="#org8254ffe">Importações</a></li>
+<li><a href="#orgc6b76f8">Erros</a>
 <ul>
-<li><a href="#orgffb082a">Representação para Erros</a></li>
+<li><a href="#org0a1edfe">Representação para Erros</a></li>
 </ul>
 </li>
-<li><a href="#orga4e282c">Definições</a>
+<li><a href="#org6a6ffad">Definições</a>
 <ul>
-<li><a href="#orgdb7e88b">Nós e Arcos</a></li>
-<li><a href="#org3ffca11">Arestas (<i>Edges</i>)</a></li>
-<li><a href="#orgfb0761b">Grafos</a></li>
-<li><a href="#org0afdefd"><code>Display</code></a></li>
+<li><a href="#org31cbf76">Nós e Arcos</a></li>
+<li><a href="#orgba2fc4c">Arestas (<i>Edges</i>)</a></li>
+<li><a href="#orgdd6075d">Grafos</a></li>
+<li><a href="#org8299e67"><code>Display</code></a></li>
 </ul>
 </li>
 </ul>
@@ -81,13 +81,13 @@
 </ul>
 </div>
 </nav>
-<div id="outline-container-org92bdc20" class="outline-2">
-<h2 id="org92bdc20">Implementação</h2>
-<div class="outline-text-2" id="text-org92bdc20">
+<div id="outline-container-org7e03c1f" class="outline-2">
+<h2 id="org7e03c1f">Implementação</h2>
+<div class="outline-text-2" id="text-org7e03c1f">
 </div>
-<div id="outline-container-orgb656d82" class="outline-3">
-<h3 id="orgb656d82">Importações</h3>
-<div class="outline-text-3" id="text-orgb656d82">
+<div id="outline-container-org8254ffe" class="outline-3">
+<h3 id="org8254ffe">Importações</h3>
+<div class="outline-text-3" id="text-org8254ffe">
 <div class="org-src-container">
 <pre class="src src-rust">use std::cmp::Reverse;
 use std::collections::{BinaryHeap, VecDeque};
@@ -99,9 +99,9 @@ use std::rc::Rc;
 </div>
 </div>
 </div>
-<div id="outline-container-orgc4008ed" class="outline-3">
-<h3 id="orgc4008ed">Erros</h3>
-<div class="outline-text-3" id="text-orgc4008ed">
+<div id="outline-container-orgc6b76f8" class="outline-3">
+<h3 id="orgc6b76f8">Erros</h3>
+<div class="outline-text-3" id="text-orgc6b76f8">
 <p>
 Atualmente, as condições de erro representam a tentativa de construir um grafo impossível ou malformado. Seja \( G = (N, A) \) um grafo direcionado, em que \( N \) é o conjunto de nós e \( A \subseteq N \times N \) é o conjunto de arcos. Dado um arco candidato \( (u, v) \):
 </p>
@@ -124,9 +124,9 @@ pub enum GraphError {
 </pre>
 </div>
 </div>
-<div id="outline-container-orgffb082a" class="outline-4">
-<h4 id="orgffb082a">Representação para Erros</h4>
-<div class="outline-text-4" id="text-orgffb082a">
+<div id="outline-container-org0a1edfe" class="outline-4">
+<h4 id="org0a1edfe">Representação para Erros</h4>
+<div class="outline-text-4" id="text-org0a1edfe">
 <div class="org-src-container">
 <pre class="src src-rust">impl fmt::Display for GraphError {
     fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {
@@ -153,13 +153,13 @@ impl Error for GraphError {}
 </div>
 </div>
 </div>
-<div id="outline-container-orga4e282c" class="outline-3">
-<h3 id="orga4e282c">Definições</h3>
-<div class="outline-text-3" id="text-orga4e282c">
+<div id="outline-container-org6a6ffad" class="outline-3">
+<h3 id="org6a6ffad">Definições</h3>
+<div class="outline-text-3" id="text-org6a6ffad">
 </div>
-<div id="outline-container-orgdb7e88b" class="outline-4">
-<h4 id="orgdb7e88b">Nós e Arcos</h4>
-<div class="outline-text-4" id="text-orgdb7e88b">
+<div id="outline-container-org31cbf76" class="outline-4">
+<h4 id="org31cbf76">Nós e Arcos</h4>
+<div class="outline-text-4" id="text-org31cbf76">
 <p>
 Um nó <code>Node</code> é genérico sobre <code>T</code>, com seu conteúdo acessível pelo campo <code>value</code>. Os nós são conectados por arcos direcionados <code>Arc</code>, também genéricos sobre <code>T</code>, exigindo o mesmo tipo <code>T</code> em <code>Node&lt;T&gt;</code> e <code>Arc&lt;T&gt;</code>.
 </p>
@@ -191,20 +191,20 @@ impl&lt;T&gt; Arc&lt;T&gt; {
 </div>
 </div>
 <ul class="org-ul">
-<li><a id="org8fec01f"></a>Representações para Nós e Arcos<br></li>
+<li><a id="orgf9b4059"></a>Representações para Nós e Arcos<br></li>
 </ul>
 </div>
-<div id="outline-container-org3ffca11" class="outline-4">
-<h4 id="org3ffca11">Arestas (<i>Edges</i>)</h4>
-<div class="outline-text-4" id="text-org3ffca11">
+<div id="outline-container-orgba2fc4c" class="outline-4">
+<h4 id="orgba2fc4c">Arestas (<i>Edges</i>)</h4>
+<div class="outline-text-4" id="text-orgba2fc4c">
 <p>
 Aqui, uma aresta é entendida como um arco \( a \in A \) associado a uma propriedade \( P(a) \) (por exemplo, um peso, custo ou rótulo).
 </p>
 </div>
 </div>
-<div id="outline-container-orgfb0761b" class="outline-4">
-<h4 id="orgfb0761b">Grafos</h4>
-<div class="outline-text-4" id="text-orgfb0761b">
+<div id="outline-container-orgdd6075d" class="outline-4">
+<h4 id="orgdd6075d">Grafos</h4>
+<div class="outline-text-4" id="text-orgdd6075d">
 <p>
 Um grafo direcionado ponderado (ou rotulado) \( G = (N, E) \) é definido por uma coleção de nós \( N \) e uma coleção de arestas \( E \), em que cada aresta associa um arco \( a = (u, v) \in N \times N \) a uma propriedade \( P(a) \).
 </p>
@@ -274,9 +274,9 @@ impl&lt;T, P&gt; Graph&lt;T, P&gt; {
 </div>
 </div>
 </div>
-<div id="outline-container-org0afdefd" class="outline-4">
-<h4 id="org0afdefd"><code>Display</code></h4>
-<div class="outline-text-4" id="text-org0afdefd">
+<div id="outline-container-org8299e67" class="outline-4">
+<h4 id="org8299e67"><code>Display</code></h4>
+<div class="outline-text-4" id="text-org8299e67">
 <div class="org-src-container">
 <pre class="src src-rust">impl&lt;T: fmt::Display&gt; fmt::Display for Node&lt;T&gt; {
     fn fmt(&amp;self, f: &amp;mut fmt::Formatter&lt;'_&gt;) -&gt; fmt::Result {
